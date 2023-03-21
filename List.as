@@ -30,11 +30,15 @@ class VerticalList : List
     Vec2f getBounds()
     {
         Vec2f bounds = Vec2f_zero;
-        for (uint i = 0; i < components.size(); i++)
+        uint n = components.size();
+        if (n == 0) return bounds;
+
+        for (uint i = 0; i < n; i++)
         {
-            bounds += components[i].getBounds() + Vec2f(0.0f, spacing);
+            bounds += components[i].getBounds();
         }
-        return bounds;
+
+        return bounds + Vec2f(0.0f, spacing) * (n - 1);
     }
 
     void Render()
@@ -75,11 +79,15 @@ class HorizontalList : List
     Vec2f getBounds()
     {
         Vec2f bounds = Vec2f_zero;
-        for (uint i = 0; i < components.size(); i++)
+        uint n = components.size();
+        if (n == 0) return bounds;
+
+        for (uint i = 0; i < n; i++)
         {
-            bounds += components[i].getBounds() + Vec2f(0.0f, spacing);
+            bounds += components[i].getBounds();
         }
-        return bounds;
+
+        return bounds + Vec2f(spacing, 0.0f) * (n - 1);
     }
 
     void Render()
