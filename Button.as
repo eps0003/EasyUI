@@ -104,14 +104,22 @@ class StandardTextButton : TextButton
 
     void Render()
     {
-        if (isHovered() && pressed)
+        if (isHovered())
         {
-            GUI::DrawSunkenPane(position, position + size);
+            if (pressed)
+            {
+                GUI::DrawButtonPressed(position, position + size);
+            }
+            else
+            {
+                GUI::DrawButtonHover(position, position + size);
+            }
         }
         else
         {
-            GUI::DrawPane(position, position + size);
+            GUI::DrawButton(position, position + size);
         }
+
         GUI::DrawTextCentered(text, position + size * 0.5f, color);
     }
 }
