@@ -1,8 +1,9 @@
 #include "Component.as"
 #include "Label.as"
 
-interface Button : VisibleComponent, InteractableComponent, BoundedComponent
+interface Button : VisibleComponent, InteractableComponent
 {
+    void SetSize(float width, float height);
     void Click();
     void OnClick(ButtonClickHandler@ listener);
 }
@@ -63,6 +64,11 @@ class StandardTextButton : TextButton
     void SetPosition(float x, float y)
     {
         position = Vec2f(x, y);
+    }
+
+    Vec2f getBounds()
+    {
+        return size;
     }
 
     private bool isHovered()

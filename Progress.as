@@ -1,8 +1,9 @@
 #include "Component.as"
 #include "Label.as"
 
-interface Progress : VisibleComponent, BoundedComponent
+interface Progress : VisibleComponent
 {
+    void SetSize(float width, float height);
     void SetText(string text);
     void SetProgress(float progress);
 }
@@ -37,6 +38,11 @@ class StandardProgress : Progress
     void SetPosition(float x, float y)
     {
         position = Vec2f(x, y);
+    }
+
+    Vec2f getBounds()
+    {
+        return size;
     }
 
     void Render()

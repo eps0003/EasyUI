@@ -59,6 +59,20 @@ class StandardLabel : Label
         position = Vec2f(x, y);
     }
 
+    // FIXME: bounds height when label width is set
+    Vec2f getBounds()
+    {
+        Vec2f dim;
+        GUI::GetTextDimensions(text, dim);
+
+        if (width > 0)
+        {
+            dim.x = width;
+        }
+
+        return dim;
+    }
+
     void Render()
     {
         if (text == "") return;

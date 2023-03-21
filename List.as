@@ -2,17 +2,17 @@
 
 interface List : VisibleComponent
 {
-    void AddComponent(BoundedComponent@ component);
+    void AddComponent(VisibleComponent@ component);
     void SetSpacing(float spacing);
 }
 
 class VerticalList : List
 {
-    private BoundedComponent@[] components;
+    private VisibleComponent@[] components;
     private float spacing = 0.0f;
     private Vec2f position = Vec2f_zero;
 
-    void AddComponent(BoundedComponent@ component)
+    void AddComponent(VisibleComponent@ component)
     {
         components.push_back(component);
     }
@@ -27,27 +27,37 @@ class VerticalList : List
         position = Vec2f(x, y);
     }
 
+    Vec2f getBounds()
+    {
+        Vec2f bounds = Vec2f_zero;
+        for (uint i = 0; i < components.size(); i++)
+        {
+            bounds += components[i].getBounds() + Vec2f(0.0f, spacing);
+        }
+        return bounds;
+    }
+
     void Render()
     {
         float offset = 0.0f;
 
         for (uint i = 0; i < components.size(); i++)
         {
-            BoundedComponent@ component = components[i];
+            VisibleComponent@ component = components[i];
             component.SetPosition(position.x, position.y + offset);
 
-            offset += component.getSize().y + spacing;
+            offset += component.getBounds().y + spacing;
         }
     }
 }
 
 class HorizontalList : List
 {
-    private BoundedComponent@[] components;
+    private VisibleComponent@[] components;
     private float spacing = 0.0f;
     private Vec2f position = Vec2f_zero;
 
-    void AddComponent(BoundedComponent@ component)
+    void AddComponent(VisibleComponent@ component)
     {
         components.push_back(component);
     }
@@ -62,16 +72,26 @@ class HorizontalList : List
         position = Vec2f(x, y);
     }
 
+    Vec2f getBounds()
+    {
+        Vec2f bounds = Vec2f_zero;
+        for (uint i = 0; i < components.size(); i++)
+        {
+            bounds += components[i].getBounds() + Vec2f(0.0f, spacing);
+        }
+        return bounds;
+    }
+
     void Render()
     {
         float offset = 0.0f;
 
         for (uint i = 0; i < components.size(); i++)
         {
-            BoundedComponent@ component = components[i];
+            VisibleComponent@ component = components[i];
             component.SetPosition(position.x + offset, position.y);
 
-            offset += component.getSize().x + spacing;
+            offset += component.getBounds().x + spacing;
         }
     }
 }
