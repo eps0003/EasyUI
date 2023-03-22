@@ -62,12 +62,12 @@ class StandardTextButton : TextButton
 
     private bool isHovered()
     {
-        Vec2f mouse = getControls().getInterpMouseScreenPos();
+        Vec2f mousePos = getControls().getInterpMouseScreenPos();
         return (
-            mouse.x >= position.x &&
-            mouse.y >= position.y &&
-            mouse.x <= position.x + size.x &&
-            mouse.y <= position.y + size.y
+            mousePos.x >= position.x &&
+            mousePos.y >= position.y &&
+            mousePos.x <= position.x + size.x &&
+            mousePos.y <= position.y + size.y
         );
     }
 
@@ -106,7 +106,14 @@ class StandardTextButton : TextButton
         }
         else
         {
-            GUI::DrawButton(position, position + size);
+            if (pressed)
+            {
+                GUI::DrawButtonHover(position, position + size);
+            }
+            else
+            {
+                GUI::DrawButton(position, position + size);
+            }
         }
 
         GUI::DrawTextCentered(text, position + size * 0.5f, color);
