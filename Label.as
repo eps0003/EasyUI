@@ -60,12 +60,10 @@ class StandardLabel : Label
 
         GUI::SetFont(font);
 
-        Vec2f dim;
-        GUI::GetTextDimensions(text, dim);
-
+        Vec2f bounds = getBounds();
         Vec2f center(
-            centerX ? dim.x * 0.5f : 0,
-            centerY ? dim.y * 0.5f : 0
+            centerX ? bounds.x * 0.5f : 0,
+            centerY ? bounds.y * 0.5f : 0
         );
 
         GUI::DrawText(text, position - center, color);

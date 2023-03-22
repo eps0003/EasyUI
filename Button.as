@@ -49,11 +49,6 @@ class StandardTextButton : TextButton
         size.y = height;
     }
 
-    Vec2f getSize()
-    {
-        return size;
-    }
-
     void SetPosition(float x, float y)
     {
         position.x = x;

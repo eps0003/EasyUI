@@ -35,38 +35,32 @@ class VerticalList : List
 
     Vec2f getBounds()
     {
-        Vec2f bounds = Vec2f_zero;
         uint n = components.size();
-        if (n == 0) return bounds;
+        if (n == 0) return Vec2f_zero;
 
+        Vec2f bounds(0.0f, spacing * (n - 1));
         for (uint i = 0; i < n; i++)
         {
-            bounds += components[i].getBounds();
+            Vec2f childBounds = components[i].getBounds();
+            if (childBounds.x > bounds.x)
+            {
+                bounds.x = childBounds.x;
+            }
+            bounds.y += childBounds.y;
         }
-
-        return bounds + Vec2f(0.0f, spacing) * (n - 1);
+        return bounds;
     }
 
     void Render()
     {
         float offset = 0.0f;
-        float maxWidth = 0.0f;
-
-        for (uint i = 0; i < components.size(); i++)
-        {
-            VisibleComponent@ component = components[i];
-            float width = component.getBounds().x;
-            if (width > maxWidth)
-            {
-                maxWidth = width;
-            }
-        }
+        float width = getBounds().x;
 
         for (uint i = 0; i < components.size(); i++)
         {
             VisibleComponent@ component = components[i];
             Vec2f bounds = component.getBounds();
-            float widthDiff = maxWidth - bounds.x;
+            float widthDiff = width - bounds.x;
 
             component.SetPosition(position.x + widthDiff * alignment, position.y + offset);
 
@@ -105,38 +99,32 @@ class HorizontalList : List
 
     Vec2f getBounds()
     {
-        Vec2f bounds = Vec2f_zero;
         uint n = components.size();
-        if (n == 0) return bounds;
+        if (n == 0) return Vec2f_zero;
 
+        Vec2f bounds(0.0f, spacing * (n - 1));
         for (uint i = 0; i < n; i++)
         {
-            bounds += components[i].getBounds();
+            Vec2f childBounds = components[i].getBounds();
+            if (childBounds.y > bounds.y)
+            {
+                bounds.y = childBounds.y;
+            }
+            bounds.x += childBounds.x;
         }
-
-        return bounds + Vec2f(spacing, 0.0f) * (n - 1);
+        return bounds;
     }
 
     void Render()
     {
         float offset = 0.0f;
-        float maxHeight = 0.0f;
-
-        for (uint i = 0; i < components.size(); i++)
-        {
-            VisibleComponent@ component = components[i];
-            float height = component.getBounds().y;
-            if (height > maxHeight)
-            {
-                maxHeight = height;
-            }
-        }
+        float height = getBounds().y;
 
         for (uint i = 0; i < components.size(); i++)
         {
             VisibleComponent@ component = components[i];
             Vec2f bounds = component.getBounds();
-            float heightDiff = maxHeight - bounds.y;
+            float heightDiff = height - bounds.y;
 
             component.SetPosition(position.x + offset, position.y + heightDiff * alignment);
 
