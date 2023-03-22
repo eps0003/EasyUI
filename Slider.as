@@ -2,6 +2,7 @@ interface Slider : VisibleComponent, InteractableComponent
 {
     void SetPercentage(float percentage);
     void SetSize(float width, float height);
+    void SetHandleSize(float size);
 }
 
 class VerticalSlider : Slider
@@ -9,7 +10,7 @@ class VerticalSlider : Slider
     private float percentage = 0.0f;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private float handleSize = 40.0f;
+    private float handleSize = 0.0f;
     private bool pressed = false;
     private float clickOffsetY;
 
@@ -22,6 +23,16 @@ class VerticalSlider : Slider
     {
         size.x = width;
         size.y = height;
+
+        if (handleSize == 0.0f)
+        {
+            handleSize = size.y * 0.2f;
+        }
+    }
+
+    void SetHandleSize(float size)
+    {
+        handleSize = size;
     }
 
     void SetPosition(float x, float y)
