@@ -1,5 +1,3 @@
-#include "Component.as"
-
 interface List : VisibleComponent
 {
     void AddComponent(VisibleComponent@ component);

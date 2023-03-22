@@ -1,5 +1,3 @@
-#include "Component.as"
-
 interface Label : VisibleComponent
 {
     void SetText(string text);

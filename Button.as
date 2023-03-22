@@ -1,11 +1,8 @@
-#include "Component.as"
-#include "Label.as"
-
 interface Button : VisibleComponent, InteractableComponent
 {
     void SetSize(float width, float height);
     void Click();
-    void OnClick(ButtonClickHandler@ listener);
+    void OnClick(EventHandler@ handler);
 }
 
 interface TextButton : Button
@@ -14,14 +11,9 @@ interface TextButton : Button
     void SetColor(SColor color);
 }
 
-interface ButtonClickHandler
-{
-    void Handle();
-}
-
 class StandardTextButton : TextButton
 {
-    private ButtonClickHandler@[] listeners;
+    private EventHandler@[] clickHandlers;
     private string text;
     private SColor color;
     private Vec2f size = Vec2f_zero;
@@ -30,15 +22,15 @@ class StandardTextButton : TextButton
 
     void Click()
     {
-        for (uint i = 0; i < listeners.size(); i++)
+        for (uint i = 0; i < clickHandlers.size(); i++)
         {
-            listeners[i].Handle();
+            clickHandlers[i].Handle();
         }
     }
 
-    void OnClick(ButtonClickHandler@ listener)
+    void OnClick(EventHandler@ handler)
     {
-        listeners.push_back(listener);
+        clickHandlers.push_back(handler);
     }
 
     void SetText(string text)

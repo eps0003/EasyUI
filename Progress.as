@@ -1,6 +1,3 @@
-#include "Component.as"
-#include "Label.as"
-
 interface Progress : VisibleComponent
 {
     void SetSize(float width, float height);

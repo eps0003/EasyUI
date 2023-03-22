@@ -1,0 +1,4 @@
+interface EventHandler
+{
+    void Handle();
+}
