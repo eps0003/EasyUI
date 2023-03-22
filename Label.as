@@ -14,15 +14,11 @@ interface AreaLabel : Label
 class StandardLabel : Label
 {
     private string text;
+    private string font = "menu";
     private SColor color = color_black;
     private bool centerX = false;
     private bool centerY = false;
     private Vec2f position = Vec2f_zero;
-
-    StandardLabel()
-    {
-        GUI::SetFont("menu");
-    }
 
     void SetText(string text)
     {
@@ -31,12 +27,7 @@ class StandardLabel : Label
 
     void SetFont(string font)
     {
-        if (!GUI::isFontLoaded(font))
-        {
-            font = "menu";
-        }
-
-        GUI::SetFont(font);
+        this.font = GUI::isFontLoaded(font) ? font : "menu";
     }
 
     void SetColor(SColor color)
@@ -67,6 +58,8 @@ class StandardLabel : Label
     {
         if (text == "") return;
 
+        GUI::SetFont(font);
+
         Vec2f dim;
         GUI::GetTextDimensions(text, dim);
 
@@ -82,16 +75,12 @@ class StandardLabel : Label
 class StandardAreaLabel : AreaLabel
 {
     private string text;
+    private string font = "menu";
     private SColor color = color_black;
     private bool centerX = false;
     private bool centerY = false;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-
-    StandardAreaLabel()
-    {
-        GUI::SetFont("menu");
-    }
 
     void SetText(string text)
     {
@@ -100,12 +89,7 @@ class StandardAreaLabel : AreaLabel
 
     void SetFont(string font)
     {
-        if (!GUI::isFontLoaded(font))
-        {
-            font = "menu";
-        }
-
-        GUI::SetFont(font);
+        this.font = GUI::isFontLoaded(font) ? font : "menu";
     }
 
     void SetColor(SColor color)
@@ -139,6 +123,8 @@ class StandardAreaLabel : AreaLabel
     void Render()
     {
         if (text == "") return;
+
+        GUI::SetFont(font);
 
         Vec2f center(
             centerX ? size.x * 0.5f : 0.0f,
