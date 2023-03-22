@@ -29,7 +29,8 @@ class VerticalList : List
 
     void SetPosition(float x, float y)
     {
-        position = Vec2f(x, y);
+        position.x = x;
+        position.y = y;
     }
 
     Vec2f getBounds()
@@ -98,7 +99,8 @@ class HorizontalList : List
 
     void SetPosition(float x, float y)
     {
-        position = Vec2f(x, y);
+        position.x = x;
+        position.y = y;
     }
 
     Vec2f getBounds()

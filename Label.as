@@ -52,7 +52,8 @@ class StandardLabel : Label
 
     void SetPosition(float x, float y)
     {
-        position = Vec2f(x, y);
+        position.x = x;
+        position.y = y;
     }
 
     Vec2f getBounds()
@@ -120,12 +121,14 @@ class StandardAreaLabel : AreaLabel
 
     void SetSize(float width, float height)
     {
-        size = Vec2f(width, height);
+        size.x = width;
+        size.y = height;
     }
 
     void SetPosition(float x, float y)
     {
-        position = Vec2f(x, y);
+        position.x = x;
+        position.y = y;
     }
 
     Vec2f getBounds()

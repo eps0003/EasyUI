@@ -24,7 +24,8 @@ class StandardProgress : Progress
 
     void SetSize(float width, float height)
     {
-        size = Vec2f(width, height);
+        size.x = width;
+        size.y = height;
     }
 
     Vec2f getSize()
@@ -34,7 +35,8 @@ class StandardProgress : Progress
 
     void SetPosition(float x, float y)
     {
-        position = Vec2f(x, y);
+        position.x = x;
+        position.y = y;
     }
 
     Vec2f getBounds()
