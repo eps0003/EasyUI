@@ -2,6 +2,8 @@ interface List : MultiContainer
 {
     void SetSpacing(float spacing);
     void SetAlignment(float x);
+    void SetRows(uint rows);
+    void SetColumns(uint columns);
 }
 
 class VerticalList : List
@@ -11,7 +13,15 @@ class VerticalList : List
     private Vec2f padding = Vec2f_zero;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
+    private uint rows = 0;
+    private uint columns = 1;
     private Vec2f position = Vec2f_zero;
+    private Slider@ scrollbar;
+
+    VerticalList()
+    {
+        @scrollbar = VerticalSlider();
+    }
 
     void AddComponent(Component@ component)
     {
@@ -40,6 +50,16 @@ class VerticalList : List
         alignment = Maths::Clamp01(x);
     }
 
+    void SetRows(uint rows)
+    {
+        this.rows = rows;
+    }
+
+    void SetColumns(uint columns)
+    {
+        this.columns = columns;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -48,13 +68,15 @@ class VerticalList : List
 
     private Vec2f getInnerBounds()
     {
-        uint n = components.size();
+        uint n = getVisibleCount();
         if (n == 0) return Vec2f_zero;
+
+        uint index = getScrollIndex();
 
         Vec2f bounds(0.0f, spacing * (n - 1));
         for (uint i = 0; i < n; i++)
         {
-            Vec2f childBounds = components[i].getBounds();
+            Vec2f childBounds = components[index + i].getBounds();
             if (childBounds.x > bounds.x)
             {
                 bounds.x = childBounds.x;
@@ -74,23 +96,42 @@ class VerticalList : List
         return margin + getTrueBounds() + margin;
     }
 
+    private uint getScrollIndex()
+    {
+        uint totalCount = components.size();
+        uint visibleCount = getVisibleCount();
+        uint hiddenCount = totalCount - visibleCount;
+        return Maths::Min((hiddenCount + 1) * scrollbar.getPercentage(), hiddenCount);
+    }
+
+    private uint getVisibleCount()
+    {
+        return Maths::Min(rows, components.size());
+    }
+
     void Update()
     {
         for (int i = components.size() - 1; i >= 0; i--)
         {
             components[i].Update();
         }
+
+        scrollbar.Update();
     }
 
     void Render()
     {
+        uint totalCount = components.size();
+        uint visibleCount = getVisibleCount();
+        uint index = getScrollIndex();
+
         float offset = 0.0f;
         Vec2f innerBounds = getInnerBounds();
         Vec2f innerPos = position + margin + padding;
 
-        for (uint i = 0; i < components.size(); i++)
+        for (uint i = 0; i < visibleCount; i++)
         {
-            Component@ component = components[i];
+            Component@ component = components[index + i];
             Vec2f bounds = component.getBounds();
             float widthDiff = innerBounds.x - bounds.x;
 
@@ -98,6 +139,16 @@ class VerticalList : List
             component.Render();
 
             offset += bounds.y + spacing;
+        }
+
+        if (totalCount != visibleCount)
+        {
+            float scrollHeight = getTrueBounds().y;
+            float scrollPosX = innerPos.x + innerBounds.x + (padding.x + margin.x) * 2.0f;
+            scrollbar.SetPosition(scrollPosX, position.y);
+            scrollbar.SetSize(30, scrollHeight);
+            scrollbar.SetHandleSize(scrollHeight * visibleCount / Maths::Max(totalCount, 1.0f));
+            scrollbar.Render();
         }
     }
 }
@@ -109,6 +160,8 @@ class HorizontalList : List
     private Vec2f padding = Vec2f_zero;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
+    private uint rows = 1;
+    private uint columns = 0;
     private Vec2f position = Vec2f_zero;
 
     void AddComponent(Component@ component)
@@ -136,6 +189,16 @@ class HorizontalList : List
     void SetAlignment(float x)
     {
         alignment = Maths::Clamp01(x);
+    }
+
+    void SetRows(uint rows)
+    {
+        this.rows = rows;
+    }
+
+    void SetColumns(uint columns)
+    {
+        this.columns = columns;
     }
 
     void SetPosition(float x, float y)
@@ -185,7 +248,9 @@ class HorizontalList : List
         float offset = 0.0f;
         float height = getBounds().y;
 
-        for (uint i = 0; i < components.size(); i++)
+        uint n = Maths::Min(rows, components.size());
+
+        for (uint i = 0; i < n; i++)
         {
             Component@ component = components[i];
             Vec2f bounds = component.getBounds();

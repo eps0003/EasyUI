@@ -1,6 +1,7 @@
 interface Slider : Component
 {
     void SetPercentage(float percentage);
+    float getPercentage();
     void SetSize(float width, float height);
     void SetHandleSize(float size);
 }
@@ -17,6 +18,11 @@ class VerticalSlider : Slider
     void SetPercentage(float percentage)
     {
         this.percentage = Maths::Clamp01(percentage);
+    }
+
+    float getPercentage()
+    {
+        return percentage;
     }
 
     void SetSize(float width, float height)
@@ -75,6 +81,15 @@ class VerticalSlider : Slider
         return position + Vec2f(0.0f, handleY);
     }
 
+    private void MoveHandleIfDragging()
+    {
+        if (!pressed) return;
+
+        float mouseY = getControls().getInterpMouseScreenPos().y;
+        float handleY = mouseY - handleSize * clickOffsetY;
+        SetPercentage((handleY - position.y) / Maths::Max(size.y - handleSize, 1.0f));
+    }
+
     void Update()
     {
         CControls@ controls = getControls();
@@ -85,13 +100,13 @@ class VerticalSlider : Slider
             {
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
-                clickOffsetY = getControls().getInterpMouseScreenPos().y - getHandlePosition().y;
+                clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
             }
             // else if (isHovered())
             // {
             //     // Jump handle to cursor if clicking on track
             //     pressed = true;
-            //     clickOffsetY = handleSize * 0.5f;
+            //     clickOffsetY = 0.5f;
             // }
         }
 
@@ -102,15 +117,6 @@ class VerticalSlider : Slider
         {
             pressed = false;
         }
-    }
-
-    void MoveHandleIfDragging()
-    {
-        if (!pressed) return;
-
-        float mouseY = getControls().getInterpMouseScreenPos().y;
-        float handleY = mouseY - clickOffsetY;
-        SetPercentage((handleY - position.y) / (size.y - handleSize));
     }
 
     void Render()
