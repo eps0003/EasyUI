@@ -4,4 +4,5 @@
 #include "Label.as"
 #include "List.as"
 #include "Slider.as"
+#include "Stack.as"
 #include "EventHandler.as"

@@ -9,3 +9,8 @@ interface InteractableComponent
 {
     void Update();
 }
+
+interface ContainerComponent
+{
+    void AddComponent(VisibleComponent@ component);
+}

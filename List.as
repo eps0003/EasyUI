@@ -1,6 +1,5 @@
-interface List : VisibleComponent
+interface List : VisibleComponent, ContainerComponent
 {
-    void AddComponent(VisibleComponent@ component);
     void SetSpacing(float spacing);
     void SetAlignment(float x);
 }
