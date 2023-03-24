@@ -1,15 +1,15 @@
-interface Stack : VisibleComponent, ContainerComponent
+interface Stack : Container
 {
     void SetAlignment(float x);
 }
 
 class StandardStack : Stack
 {
-    private VisibleComponent@[] components;
+    private Component@[] components;
     private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
 
-    void AddComponent(VisibleComponent@ component)
+    void AddComponent(Component@ component)
     {
         components.push_back(component);
     }
@@ -46,13 +46,18 @@ class StandardStack : Stack
         return bounds;
     }
 
+    void Update()
+    {
+
+    }
+
     void Render()
     {
         Vec2f size = getBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {
-            VisibleComponent@ component = components[i];
+            Component@ component = components[i];
             Vec2f bounds = component.getBounds();
             Vec2f sizeDiff = size - bounds;
             Vec2f pos = position + sizeDiff * alignment;

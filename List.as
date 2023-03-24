@@ -1,4 +1,4 @@
-interface List : VisibleComponent, ContainerComponent
+interface List : Container
 {
     void SetSpacing(float spacing);
     void SetAlignment(float x);
@@ -6,12 +6,12 @@ interface List : VisibleComponent, ContainerComponent
 
 class VerticalList : List
 {
-    private VisibleComponent@[] components;
+    private Component@[] components;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
 
-    void AddComponent(VisibleComponent@ component)
+    void AddComponent(Component@ component)
     {
         components.push_back(component);
     }
@@ -50,6 +50,11 @@ class VerticalList : List
         return bounds;
     }
 
+    void Update()
+    {
+
+    }
+
     void Render()
     {
         float offset = 0.0f;
@@ -57,7 +62,7 @@ class VerticalList : List
 
         for (uint i = 0; i < components.size(); i++)
         {
-            VisibleComponent@ component = components[i];
+            Component@ component = components[i];
             Vec2f bounds = component.getBounds();
             float widthDiff = width - bounds.x;
 
@@ -70,12 +75,12 @@ class VerticalList : List
 
 class HorizontalList : List
 {
-    private VisibleComponent@[] components;
+    private Component@[] components;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
 
-    void AddComponent(VisibleComponent@ component)
+    void AddComponent(Component@ component)
     {
         components.push_back(component);
     }
@@ -114,6 +119,11 @@ class HorizontalList : List
         return bounds;
     }
 
+    void Update()
+    {
+
+    }
+
     void Render()
     {
         float offset = 0.0f;
@@ -121,7 +131,7 @@ class HorizontalList : List
 
         for (uint i = 0; i < components.size(); i++)
         {
-            VisibleComponent@ component = components[i];
+            Component@ component = components[i];
             Vec2f bounds = component.getBounds();
             float heightDiff = height - bounds.y;
 

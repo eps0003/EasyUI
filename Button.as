@@ -1,4 +1,4 @@
-interface Button : VisibleComponent, InteractableComponent
+interface Button : Component
 {
     void SetSize(float width, float height);
     void Click();

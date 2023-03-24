@@ -1,4 +1,4 @@
-interface Label : VisibleComponent
+interface Label : Component
 {
     void SetText(string text);
     void SetFont(string font);
@@ -52,6 +52,11 @@ class StandardLabel : Label
         Vec2f dim;
         GUI::GetTextDimensions(text, dim);
         return dim;
+    }
+
+    void Update()
+    {
+
     }
 
     void Render()
@@ -116,6 +121,11 @@ class StandardAreaLabel : AreaLabel
     Vec2f getBounds()
     {
         return size;
+    }
+
+    void Update()
+    {
+
     }
 
     void Render()

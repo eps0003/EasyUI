@@ -1,16 +1,12 @@
-interface VisibleComponent
+interface Component
 {
     void SetPosition(float x, float y);
     Vec2f getBounds();
+    void Update();
     void Render();
 }
 
-interface InteractableComponent
+interface Container : Component
 {
-    void Update();
-}
-
-interface ContainerComponent
-{
-    void AddComponent(VisibleComponent@ component);
+    void AddComponent(Component@ component);
 }

@@ -1,4 +1,4 @@
-interface Slider : VisibleComponent, InteractableComponent
+interface Slider : Component
 {
     void SetPercentage(float percentage);
     void SetSize(float width, float height);

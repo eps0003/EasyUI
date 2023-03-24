@@ -1,4 +1,4 @@
-interface Progress : VisibleComponent
+interface Progress : Component
 {
     void SetSize(float width, float height);
     void SetText(string text);
@@ -37,6 +37,11 @@ class StandardProgress : Progress
     Vec2f getBounds()
     {
         return size;
+    }
+
+    void Update()
+    {
+
     }
 
     void Render()
