@@ -52,7 +52,10 @@ class VerticalList : List
 
     void Update()
     {
-
+        for (int i = components.size() - 1; i >= 0; i--)
+        {
+            components[i].Update();
+        }
     }
 
     void Render()
@@ -67,6 +70,7 @@ class VerticalList : List
             float widthDiff = width - bounds.x;
 
             component.SetPosition(position.x + widthDiff * alignment, position.y + offset);
+            component.Render();
 
             offset += bounds.y + spacing;
         }
@@ -121,7 +125,10 @@ class HorizontalList : List
 
     void Update()
     {
-
+        for (int i = components.size() - 1; i >= 0; i--)
+        {
+            components[i].Update();
+        }
     }
 
     void Render()
@@ -136,6 +143,7 @@ class HorizontalList : List
             float heightDiff = height - bounds.y;
 
             component.SetPosition(position.x + offset, position.y + heightDiff * alignment);
+            component.Render();
 
             offset += bounds.x + spacing;
         }

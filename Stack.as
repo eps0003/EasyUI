@@ -48,7 +48,10 @@ class StandardStack : Stack
 
     void Update()
     {
-
+        for (int i = components.size() - 1; i >= 0; i--)
+        {
+            components[i].Update();
+        }
     }
 
     void Render()
@@ -63,6 +66,7 @@ class StandardStack : Stack
             Vec2f pos = position + sizeDiff * alignment;
 
             component.SetPosition(pos.x, pos.y);
+            component.Render();
         }
     }
 }
