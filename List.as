@@ -1,4 +1,4 @@
-interface List : Container
+interface List : MultiContainer
 {
     void SetSpacing(float spacing);
     void SetAlignment(float x);
@@ -7,6 +7,8 @@ interface List : Container
 class VerticalList : List
 {
     private Component@[] components;
+    private Vec2f margin = Vec2f_zero;
+    private Vec2f padding = Vec2f_zero;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
@@ -14,6 +16,18 @@ class VerticalList : List
     void AddComponent(Component@ component)
     {
         components.push_back(component);
+    }
+
+    void SetMargin(float x, float y)
+    {
+        margin.x = x;
+        margin.y = y;
+    }
+
+    void SetPadding(float x, float y)
+    {
+        padding.x = x;
+        padding.y = y;
     }
 
     void SetSpacing(float spacing)
@@ -32,7 +46,7 @@ class VerticalList : List
         position.y = y;
     }
 
-    Vec2f getBounds()
+    private Vec2f getInnerBounds()
     {
         uint n = components.size();
         if (n == 0) return Vec2f_zero;
@@ -50,6 +64,16 @@ class VerticalList : List
         return bounds;
     }
 
+    Vec2f getTrueBounds()
+    {
+        return padding + getInnerBounds() + padding;
+    }
+
+    Vec2f getBounds()
+    {
+        return margin + getTrueBounds() + margin;
+    }
+
     void Update()
     {
         for (int i = components.size() - 1; i >= 0; i--)
@@ -61,15 +85,16 @@ class VerticalList : List
     void Render()
     {
         float offset = 0.0f;
-        float width = getBounds().x;
+        Vec2f innerBounds = getInnerBounds();
+        Vec2f innerPos = position + margin + padding;
 
         for (uint i = 0; i < components.size(); i++)
         {
             Component@ component = components[i];
             Vec2f bounds = component.getBounds();
-            float widthDiff = width - bounds.x;
+            float widthDiff = innerBounds.x - bounds.x;
 
-            component.SetPosition(position.x + widthDiff * alignment, position.y + offset);
+            component.SetPosition(innerPos.x + widthDiff * alignment, innerPos.y + offset);
             component.Render();
 
             offset += bounds.y + spacing;
@@ -80,6 +105,8 @@ class VerticalList : List
 class HorizontalList : List
 {
     private Component@[] components;
+    private Vec2f margin = Vec2f_zero;
+    private Vec2f padding = Vec2f_zero;
     private float spacing = 0.0f;
     private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
@@ -87,6 +114,18 @@ class HorizontalList : List
     void AddComponent(Component@ component)
     {
         components.push_back(component);
+    }
+
+    void SetMargin(float x, float y)
+    {
+        margin.x = x;
+        margin.y = y;
+    }
+
+    void SetPadding(float x, float y)
+    {
+        padding.x = x;
+        padding.y = y;
     }
 
     void SetSpacing(float spacing)
@@ -105,7 +144,7 @@ class HorizontalList : List
         position.y = y;
     }
 
-    Vec2f getBounds()
+    private Vec2f getInnerBounds()
     {
         uint n = components.size();
         if (n == 0) return Vec2f_zero;
@@ -121,6 +160,16 @@ class HorizontalList : List
             bounds.x += childBounds.x;
         }
         return bounds;
+    }
+
+    Vec2f getTrueBounds()
+    {
+        return padding + getInnerBounds() + padding;
+    }
+
+    Vec2f getBounds()
+    {
+        return margin + getTrueBounds() + margin;
     }
 
     void Update()

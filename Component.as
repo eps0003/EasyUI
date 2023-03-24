@@ -5,8 +5,3 @@ interface Component
     void Update();
     void Render();
 }
-
-interface Container : Component
-{
-    void AddComponent(Component@ component);
-}
