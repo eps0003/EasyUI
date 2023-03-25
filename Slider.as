@@ -22,6 +22,8 @@ interface HorizontalSlider : Slider
 
 class StandardVerticalSlider : VerticalSlider
 {
+    private EasyUI@ ui;
+
     private float percentage = 0.0f;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
@@ -32,6 +34,11 @@ class StandardVerticalSlider : VerticalSlider
     private EventHandler@[] startDragHandlers;
     private EventHandler@[] endDragHandlers;
     private EventHandler@[] changeHandlers;
+
+    StandardVerticalSlider(EasyUI@ ui)
+    {
+        @this.ui = ui;
+    }
 
     void SetPercentage(float percentage)
     {
@@ -79,6 +86,11 @@ class StandardVerticalSlider : VerticalSlider
         return size;
     }
 
+    Component@ getHoveredComponent()
+    {
+        return isHovered() ? cast<Component>(this) : null;
+    }
+
     void OnStartDrag(EventHandler@ handler)
     {
         if (handler !is null)
@@ -101,6 +113,11 @@ class StandardVerticalSlider : VerticalSlider
         {
             changeHandlers.push_back(handler);
         }
+    }
+
+    private bool isHovered()
+    {
+        return isMouseInBounds(position, position + size);
     }
 
     private bool isHandleHovered()
@@ -131,7 +148,7 @@ class StandardVerticalSlider : VerticalSlider
 
         if (controls.isKeyJustPressed(KEY_LBUTTON))
         {
-            if (isHandleHovered())
+            if (isHandleHovered() && ui.isComponentHovered(this))
             {
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
@@ -170,7 +187,7 @@ class StandardVerticalSlider : VerticalSlider
         Vec2f min = position + Vec2f(0, handleY);
         Vec2f max = position + Vec2f(size.x, handleSize + handleY);
 
-        if (pressed || isHandleHovered())
+        if (pressed || (isHandleHovered() && ui.isComponentHovered(this)))
         {
             GUI::DrawButtonHover(min, max);
         }
@@ -183,6 +200,8 @@ class StandardVerticalSlider : VerticalSlider
 
 class StandardHorizontalSlider : HorizontalSlider
 {
+    private EasyUI@ ui;
+
     private float percentage = 0.0f;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
@@ -193,6 +212,11 @@ class StandardHorizontalSlider : HorizontalSlider
     private EventHandler@[] startDragHandlers;
     private EventHandler@[] endDragHandlers;
     private EventHandler@[] changeHandlers;
+
+    StandardHorizontalSlider(EasyUI@ ui)
+    {
+        @this.ui = ui;
+    }
 
     void SetPercentage(float percentage)
     {
@@ -240,6 +264,11 @@ class StandardHorizontalSlider : HorizontalSlider
         return size;
     }
 
+    Component@ getHoveredComponent()
+    {
+        return isHovered() ? cast<Component>(this) : null;
+    }
+
     void OnStartDrag(EventHandler@ handler)
     {
         if (handler !is null)
@@ -262,6 +291,11 @@ class StandardHorizontalSlider : HorizontalSlider
         {
             changeHandlers.push_back(handler);
         }
+    }
+
+    private bool isHovered()
+    {
+        return isMouseInBounds(position, position + size);
     }
 
     private bool isHandleHovered()
@@ -292,7 +326,7 @@ class StandardHorizontalSlider : HorizontalSlider
 
         if (controls.isKeyJustPressed(KEY_LBUTTON))
         {
-            if (isHandleHovered())
+            if (isHandleHovered() && ui.isComponentHovered(this))
             {
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
@@ -331,7 +365,7 @@ class StandardHorizontalSlider : HorizontalSlider
         Vec2f min = position + Vec2f(handleX, 0);
         Vec2f max = position + Vec2f(handleSize + handleX, size.y);
 
-        if (pressed || isHandleHovered())
+        if (pressed || (isHandleHovered() && ui.isComponentHovered(this)))
         {
             GUI::DrawButtonHover(min, max);
         }

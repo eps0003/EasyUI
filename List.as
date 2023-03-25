@@ -16,8 +16,13 @@ class VerticalList : List
     private uint rows = 0;
     private uint columns = 1;
     private Vec2f position = Vec2f_zero;
-    private Slider@ scrollbar = StandardVerticalSlider();
+    private Slider@ scrollbar;
     private float scrollbarSize = 24.0f;
+
+    VerticalList(EasyUI@ ui)
+    {
+        @scrollbar = StandardVerticalSlider(ui);
+    }
 
     void AddComponent(Component@ component)
     {
@@ -94,6 +99,44 @@ class VerticalList : List
     Vec2f getBounds()
     {
         return margin + getTrueBounds() + margin;
+    }
+
+    private bool isHovered()
+    {
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
+    }
+
+    Component@ getHoveredComponent()
+    {
+        if (isHovered())
+        {
+            Component@ hovered = scrollbar.getHoveredComponent();
+            if (hovered !is null)
+            {
+                return hovered;
+            }
+
+            uint totalCount = components.size();
+            uint visibleCount = getVisibleCount();
+            uint rowIndex = getRowIndex();
+
+            uint startIndex = rowIndex * columns;
+            uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
+
+            for (int i = endIndex - 1; i >= startIndex; i--)
+            {
+                Component@ component = components[i];
+                if (component is null) continue;
+
+                Component@ hovered = component.getHoveredComponent();
+                if (hovered is null) continue;
+
+                return hovered;
+            }
+        }
+        return null;
     }
 
     private Vec2f[] getCellBounds()
@@ -198,7 +241,14 @@ class VerticalList : List
 
     void Update()
     {
-        for (int i = components.size() - 1; i >= 0; i--)
+        uint totalCount = components.size();
+        uint visibleCount = getVisibleCount();
+        uint rowIndex = getRowIndex();
+
+        uint startIndex = rowIndex * columns;
+        uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
+
+        for (int i = endIndex - 1; i >= startIndex; i--)
         {
             Component@ component = components[i];
             if (component is null) continue;
@@ -221,7 +271,7 @@ class VerticalList : List
         Vec2f[] bounds = getCellBounds();
 
         uint startIndex = rowIndex * columns;
-        uint endIndex = Maths::Min(startIndex + visibleCount, components.size());
+        uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
 
         for (uint i = startIndex; i < endIndex; i++)
         {

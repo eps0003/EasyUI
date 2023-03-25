@@ -8,7 +8,7 @@ interface Progress : Component
 class StandardProgress : Progress
 {
     private string text;
-    private float progress = 0;
+    private float progress = 0.0f;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
 
@@ -37,6 +37,16 @@ class StandardProgress : Progress
     Vec2f getBounds()
     {
         return size;
+    }
+
+    private bool isHovered()
+    {
+        return isMouseInBounds(position, position + size);
+    }
+
+    Component@ getHoveredComponent()
+    {
+        return isHovered() ? cast<Component>(this) : null;
     }
 
     void Update()

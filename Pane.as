@@ -71,6 +71,30 @@ class StandardPane : Pane
         return margin + getTrueBounds() + margin;
     }
 
+    private bool isHovered()
+    {
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
+    }
+
+    Component@ getHoveredComponent()
+    {
+        if (isHovered())
+        {
+            if (component !is null)
+            {
+                Component@ hovered = component.getHoveredComponent();
+                if (hovered !is null)
+                {
+                    return hovered;
+                }
+            }
+            return cast<Component>(this);
+        }
+        return null;
+    }
+
     void Update()
     {
         if (component !is null)

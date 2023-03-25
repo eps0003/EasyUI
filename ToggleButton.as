@@ -8,6 +8,8 @@ interface ToggleButton : Button
 
 class StandardToggleButton : ToggleButton
 {
+    private EasyUI@ ui;
+
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
@@ -21,6 +23,11 @@ class StandardToggleButton : ToggleButton
     private EventHandler@[] releaseHandlers;
     private EventHandler@[] clickHandlers;
     private EventHandler@[] changeHandlers;
+
+    StandardToggleButton(EasyUI@ ui)
+    {
+        @this.ui = ui;
+    }
 
     void SetComponent(Component@ component)
     {
@@ -87,6 +94,18 @@ class StandardToggleButton : ToggleButton
         return margin + size + margin;
     }
 
+    private bool isHovered()
+    {
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
+    }
+
+    Component@ getHoveredComponent()
+    {
+        return isHovered() ? cast<Component>(this) : null;
+    }
+
     void OnPress(EventHandler@ handler)
     {
         if (handler !is null)
@@ -129,18 +148,11 @@ class StandardToggleButton : ToggleButton
         }
     }
 
-    private bool isHovered()
-    {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
-    }
-
     void Update()
     {
         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && isHovered())
+        if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.isComponentHovered(this))
         {
             pressed = true;
 
@@ -152,7 +164,7 @@ class StandardToggleButton : ToggleButton
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
-            if (isHovered())
+            if (ui.isComponentHovered(this))
             {
                 Click();
             }
@@ -176,7 +188,7 @@ class StandardToggleButton : ToggleButton
         Vec2f min = position + margin;
         Vec2f max = min + size;
 
-        if (isHovered())
+        if (ui.isComponentHovered(this))
         {
             if (pressed)
             {

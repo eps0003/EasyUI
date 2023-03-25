@@ -67,6 +67,11 @@ class StandardIcon : Icon
         return size;
     }
 
+    Component@ getHoveredComponent()
+    {
+        return null;
+    }
+
     void Update()
     {
 

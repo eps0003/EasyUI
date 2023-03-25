@@ -53,6 +53,11 @@ class StandardLabel : Label
         return dim;
     }
 
+    Component@ getHoveredComponent()
+    {
+        return null;
+    }
+
     void Update()
     {
 
@@ -116,6 +121,11 @@ class StandardAreaLabel : AreaLabel
     Vec2f getBounds()
     {
         return size;
+    }
+
+    Component@ getHoveredComponent()
+    {
+        return null;
     }
 
     void Update()

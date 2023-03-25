@@ -71,6 +71,36 @@ class StandardStack : Stack
         return margin + getTrueBounds() + margin;
     }
 
+    bool isClickable()
+    {
+        return false;
+    }
+
+    private bool isHovered()
+    {
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
+    }
+
+    Component@ getHoveredComponent()
+    {
+        if (isHovered())
+        {
+            for (int i = components.size() - 1; i >= 0; i--)
+            {
+                Component@ component = components[i];
+                if (component is null) continue;
+
+                Component@ hovered = component.getHoveredComponent();
+                if (hovered is null) continue;
+
+                return hovered;
+            }
+        }
+        return null;
+    }
+
     void Update()
     {
         for (int i = components.size() - 1; i >= 0; i--)
