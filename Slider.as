@@ -105,8 +105,9 @@ class StandardVerticalSlider : VerticalSlider
 
     private bool isHandleHovered()
     {
-        Vec2f handlePos = getHandlePosition();
-        return isMouseInBounds(handlePos, handlePos + Vec2f(size.x, handleSize));
+        Vec2f min = getHandlePosition();
+        Vec2f max = min + Vec2f(size.x, handleSize);
+        return isMouseInBounds(min, max);
     }
 
     private Vec2f getHandlePosition()
@@ -265,8 +266,9 @@ class StandardHorizontalSlider : HorizontalSlider
 
     private bool isHandleHovered()
     {
-        Vec2f handlePos = getHandlePosition();
-        return isMouseInBounds(handlePos, handlePos + Vec2f(handleSize, size.y));
+        Vec2f min = getHandlePosition();
+        Vec2f max = min + Vec2f(handleSize, size.y);
+        return isMouseInBounds(min, max);
     }
 
     private Vec2f getHandlePosition()

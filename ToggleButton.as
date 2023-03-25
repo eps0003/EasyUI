@@ -7,6 +7,8 @@ class StandardToggleButton : ToggleButton
 {
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
+    private Vec2f margin = Vec2f_zero;
+    private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool checked = false;
@@ -27,6 +29,18 @@ class StandardToggleButton : ToggleButton
         alignment.y = Maths::Clamp01(y);
     }
 
+    void SetMargin(float x, float y)
+    {
+        margin.x = x;
+        margin.y = y;
+    }
+
+    void SetPadding(float x, float y)
+    {
+        padding.x = x;
+        padding.y = y;
+    }
+
     void SetChecked(bool checked)
     {
         this.checked = checked;
@@ -44,9 +58,19 @@ class StandardToggleButton : ToggleButton
         position.y = y;
     }
 
-    Vec2f getBounds()
+    Vec2f getInnerBounds()
+    {
+        return size - padding * 2.0f;
+    }
+
+    Vec2f getTrueBounds()
     {
         return size;
+    }
+
+    Vec2f getBounds()
+    {
+        return margin + size + margin;
     }
 
     void OnPress(EventHandler@ handler)
@@ -83,7 +107,9 @@ class StandardToggleButton : ToggleButton
 
     private bool isHovered()
     {
-        return isMouseInBounds(position, position + size);
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
     void Update()
@@ -124,28 +150,31 @@ class StandardToggleButton : ToggleButton
 
     void Render()
     {
+        Vec2f min = position + margin;
+        Vec2f max = min + size;
+
         if (isHovered())
         {
             if (pressed)
             {
                 if (checked)
                 {
-                    GUI::DrawButtonPressed(position, position + size);
+                    GUI::DrawButtonPressed(min, max);
                 }
                 else
                 {
-                    GUI::DrawButtonPressed(position, position + size);
+                    GUI::DrawButtonPressed(min, max);
                 }
             }
             else
             {
                 if (checked)
                 {
-                    GUI::DrawButtonHover(position, position + size);
+                    GUI::DrawButtonHover(min, max);
                 }
                 else
                 {
-                    GUI::DrawSunkenPane(position, position + size);
+                    GUI::DrawSunkenPane(min, max);
                 }
             }
         }
@@ -155,29 +184,31 @@ class StandardToggleButton : ToggleButton
             {
                 if (checked)
                 {
-                    GUI::DrawButtonHover(position, position + size);
+                    GUI::DrawButtonHover(min, max);
                 }
                 else
                 {
-                    GUI::DrawSunkenPane(position, position + size);
+                    GUI::DrawSunkenPane(min, max);
                 }
             }
             else
             {
                 if (checked)
                 {
-                    GUI::DrawButton(position, position + size);
+                    GUI::DrawButton(min, max);
                 }
                 else
                 {
-                    GUI::DrawButtonPressed(position, position + size);
+                    GUI::DrawButtonPressed(min, max);
                 }
             }
         }
 
         if (component !is null)
         {
-            Vec2f pos = position + Vec2f(size.x * alignment.x, size.y * alignment.y);
+            Vec2f innerBounds = getInnerBounds();
+            Vec2f pos = min + padding + Vec2f(innerBounds.x * alignment.x, innerBounds.y * alignment.y);
+
             component.SetPosition(pos.x, pos.y);
             component.Render();
         }

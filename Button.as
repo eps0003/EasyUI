@@ -1,4 +1,4 @@
-interface Button : Component, SingleChild
+interface Button : Container, SingleChild
 {
     void SetSize(float width, float height);
     void Click();
@@ -12,6 +12,8 @@ class StandardButton : Button
 {
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
+    private Vec2f margin = Vec2f_zero;
+    private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool pressed = false;
@@ -31,6 +33,18 @@ class StandardButton : Button
         alignment.y = Maths::Clamp01(y);
     }
 
+    void SetMargin(float x, float y)
+    {
+        margin.x = x;
+        margin.y = y;
+    }
+
+    void SetPadding(float x, float y)
+    {
+        padding.x = x;
+        padding.y = y;
+    }
+
     void SetSize(float width, float height)
     {
         size.x = width;
@@ -43,9 +57,19 @@ class StandardButton : Button
         position.y = y;
     }
 
-    Vec2f getBounds()
+    Vec2f getInnerBounds()
+    {
+        return size - padding * 2.0f;
+    }
+
+    Vec2f getTrueBounds()
     {
         return size;
+    }
+
+    Vec2f getBounds()
+    {
+        return margin + size + margin;
     }
 
     void OnPress(EventHandler@ handler)
@@ -82,7 +106,9 @@ class StandardButton : Button
 
     private bool isHovered()
     {
-        return isMouseInBounds(position, position + size);
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
     void Update()
@@ -122,32 +148,37 @@ class StandardButton : Button
 
     void Render()
     {
+        Vec2f min = position + margin;
+        Vec2f max = min + size;
+
         if (isHovered())
         {
             if (pressed)
             {
-                GUI::DrawButtonPressed(position, position + size);
+                GUI::DrawButtonPressed(min, max);
             }
             else
             {
-                GUI::DrawButtonHover(position, position + size);
+                GUI::DrawButtonHover(min, max);
             }
         }
         else
         {
             if (pressed)
             {
-                GUI::DrawButtonHover(position, position + size);
+                GUI::DrawButtonHover(min, max);
             }
             else
             {
-                GUI::DrawButton(position, position + size);
+                GUI::DrawButton(min, max);
             }
         }
 
         if (component !is null)
         {
-            Vec2f pos = position + Vec2f(size.x * alignment.x, size.y * alignment.y);
+            Vec2f innerBounds = getInnerBounds();
+            Vec2f pos = min + padding + Vec2f(innerBounds.x * alignment.x, innerBounds.y * alignment.y);
+
             component.SetPosition(pos.x, pos.y);
             component.Render();
         }
