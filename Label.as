@@ -16,8 +16,6 @@ class StandardLabel : Label
     private string text;
     private string font = "menu";
     private SColor color = color_black;
-    private bool centerX = false;
-    private bool centerY = false;
     private Vec2f position = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
 
@@ -78,8 +76,6 @@ class StandardAreaLabel : AreaLabel
     private string text;
     private string font = "menu";
     private SColor color = color_black;
-    private bool centerX = false;
-    private bool centerY = false;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;

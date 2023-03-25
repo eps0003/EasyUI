@@ -1,6 +1,9 @@
 interface ToggleButton : Button
 {
     void SetChecked(bool checked);
+    bool isChecked();
+
+    void OnChange(EventHandler@ handler);
 }
 
 class StandardToggleButton : ToggleButton
@@ -17,6 +20,7 @@ class StandardToggleButton : ToggleButton
     private EventHandler@[] pressHandlers;
     private EventHandler@[] releaseHandlers;
     private EventHandler@[] clickHandlers;
+    private EventHandler@[] changeHandlers;
 
     void SetComponent(Component@ component)
     {
@@ -44,6 +48,16 @@ class StandardToggleButton : ToggleButton
     void SetChecked(bool checked)
     {
         this.checked = checked;
+
+        for (uint i = 0; i < changeHandlers.size(); i++)
+        {
+            changeHandlers[i].Handle();
+        }
+    }
+
+    bool isChecked()
+    {
+        return checked;
     }
 
     void SetSize(float width, float height)
@@ -97,8 +111,18 @@ class StandardToggleButton : ToggleButton
         }
     }
 
+    void OnChange(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            changeHandlers.push_back(handler);
+        }
+    }
+
     void Click()
     {
+        SetChecked(!checked);
+
         for (uint i = 0; i < clickHandlers.size(); i++)
         {
             clickHandlers[i].Handle();
@@ -130,7 +154,6 @@ class StandardToggleButton : ToggleButton
         {
             if (isHovered())
             {
-                checked = !checked;
                 Click();
             }
 
@@ -170,11 +193,11 @@ class StandardToggleButton : ToggleButton
             {
                 if (checked)
                 {
-                    GUI::DrawButtonHover(min, max);
+                    GUI::DrawSunkenPane(min, max);
                 }
                 else
                 {
-                    GUI::DrawSunkenPane(min, max);
+                    GUI::DrawButtonHover(min, max);
                 }
             }
         }
@@ -184,22 +207,22 @@ class StandardToggleButton : ToggleButton
             {
                 if (checked)
                 {
-                    GUI::DrawButtonHover(min, max);
+                    GUI::DrawSunkenPane(min, max);
                 }
                 else
                 {
-                    GUI::DrawSunkenPane(min, max);
+                    GUI::DrawButtonHover(min, max);
                 }
             }
             else
             {
                 if (checked)
                 {
-                    GUI::DrawButton(min, max);
+                    GUI::DrawButtonPressed(min, max);
                 }
                 else
                 {
-                    GUI::DrawButtonPressed(min, max);
+                    GUI::DrawButton(min, max);
                 }
             }
         }

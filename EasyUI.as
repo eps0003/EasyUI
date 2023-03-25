@@ -4,6 +4,7 @@
 #include "ToggleButton.as"
 #include "Progress.as"
 #include "Label.as"
+#include "Icon.as"
 #include "List.as"
 #include "Slider.as"
 #include "Stack.as"
