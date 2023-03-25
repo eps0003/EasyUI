@@ -4,6 +4,10 @@ interface Slider : Component
     float getPercentage();
     void SetSize(float width, float height);
     void SetHandleSize(float size);
+
+    void OnStartDrag(EventHandler@ handler);
+    void OnEndDrag(EventHandler@ handler);
+    void OnChange(EventHandler@ handler);
 }
 
 class VerticalSlider : Slider
@@ -15,9 +19,22 @@ class VerticalSlider : Slider
     private bool pressed = false;
     private float clickOffsetY;
 
+    private EventHandler@[] startDragHandlers;
+    private EventHandler@[] endDragHandlers;
+    private EventHandler@[] changeHandlers;
+
     void SetPercentage(float percentage)
     {
+        float prevPercentage = this.percentage;
         this.percentage = Maths::Clamp01(percentage);
+
+        if (this.percentage != prevPercentage)
+        {
+            for (uint i = 0; i < changeHandlers.size(); i++)
+            {
+                changeHandlers[i].Handle();
+            }
+        }
     }
 
     float getPercentage()
@@ -50,6 +67,30 @@ class VerticalSlider : Slider
     Vec2f getBounds()
     {
         return size;
+    }
+
+    void OnStartDrag(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            startDragHandlers.push_back(handler);
+        }
+    }
+
+    void OnEndDrag(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            endDragHandlers.push_back(handler);
+        }
+    }
+
+    void OnChange(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            changeHandlers.push_back(handler);
+        }
     }
 
     private bool isHovered()
@@ -101,13 +142,12 @@ class VerticalSlider : Slider
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
                 clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
+
+                for (uint i = 0; i < startDragHandlers.size(); i++)
+                {
+                    startDragHandlers[i].Handle();
+                }
             }
-            // else if (isHovered())
-            // {
-            //     // Jump handle to cursor if clicking on track
-            //     pressed = true;
-            //     clickOffsetY = 0.5f;
-            // }
         }
 
         // Call this here to override any external code updating the percentage
@@ -116,6 +156,11 @@ class VerticalSlider : Slider
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
+
+            for (uint i = 0; i < endDragHandlers.size(); i++)
+            {
+                endDragHandlers[i].Handle();
+            }
         }
     }
 

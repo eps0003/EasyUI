@@ -2,6 +2,9 @@ interface Button : Component
 {
     void SetSize(float width, float height);
     void Click();
+
+    void OnPress(EventHandler@ handler);
+    void OnRelease(EventHandler@ handler);
     void OnClick(EventHandler@ handler);
 }
 
@@ -13,25 +16,15 @@ interface TextButton : Button
 
 class StandardTextButton : TextButton
 {
-    private EventHandler@[] clickHandlers;
     private string text;
     private SColor color;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool pressed = false;
 
-    void Click()
-    {
-        for (uint i = 0; i < clickHandlers.size(); i++)
-        {
-            clickHandlers[i].Handle();
-        }
-    }
-
-    void OnClick(EventHandler@ handler)
-    {
-        clickHandlers.push_back(handler);
-    }
+    private EventHandler@[] pressHandlers;
+    private EventHandler@[] releaseHandlers;
+    private EventHandler@[] clickHandlers;
 
     void SetText(string text)
     {
@@ -60,6 +53,38 @@ class StandardTextButton : TextButton
         return size;
     }
 
+    void OnPress(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            pressHandlers.push_back(handler);
+        }
+    }
+
+    void OnRelease(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            releaseHandlers.push_back(handler);
+        }
+    }
+
+    void OnClick(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            clickHandlers.push_back(handler);
+        }
+    }
+
+    void Click()
+    {
+        for (uint i = 0; i < clickHandlers.size(); i++)
+        {
+            clickHandlers[i].Handle();
+        }
+    }
+
     private bool isHovered()
     {
         Vec2f mousePos = getControls().getInterpMouseScreenPos();
@@ -78,6 +103,11 @@ class StandardTextButton : TextButton
         if (controls.isKeyJustPressed(KEY_LBUTTON) && isHovered())
         {
             pressed = true;
+
+            for (uint i = 0; i < pressHandlers.size(); i++)
+            {
+                pressHandlers[i].Handle();
+            }
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
@@ -88,6 +118,11 @@ class StandardTextButton : TextButton
             }
 
             pressed = false;
+
+            for (uint i = 0; i < releaseHandlers.size(); i++)
+            {
+                releaseHandlers[i].Handle();
+            }
         }
     }
 
