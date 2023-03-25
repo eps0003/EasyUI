@@ -7,4 +7,5 @@
 #include "Slider.as"
 #include "Stack.as"
 #include "Pane.as"
+#include "Utilities.as"
 #include "EventHandler.as"

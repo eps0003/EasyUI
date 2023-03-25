@@ -16,7 +16,7 @@ class VerticalList : List
     private uint rows = 0;
     private uint columns = 1;
     private Vec2f position = Vec2f_zero;
-    private Slider@ scrollbar = VerticalSlider();
+    private Slider@ scrollbar = StandardVerticalSlider();
 
     void AddComponent(Component@ component)
     {
