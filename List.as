@@ -1,6 +1,6 @@
 interface List : Container, MultiChild
 {
-    void SetSpacing(float spacing);
+    void SetSpacing(float x, float y);
     void SetAlignment(float x, float y);
     void SetRows(uint rows);
     void SetColumns(uint columns);
@@ -11,12 +11,13 @@ class VerticalList : List
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
-    private float spacing = 0.0f;
+    private Vec2f spacing = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
     private uint rows = 0;
     private uint columns = 1;
     private Vec2f position = Vec2f_zero;
     private Slider@ scrollbar = StandardVerticalSlider();
+    private float scrollbarSize = 24.0f;
 
     void AddComponent(Component@ component)
     {
@@ -35,9 +36,10 @@ class VerticalList : List
         padding.y = y;
     }
 
-    void SetSpacing(float spacing)
+    void SetSpacing(float x, float y)
     {
-        this.spacing = spacing;
+        spacing.x = x;
+        spacing.y = y;
     }
 
     void SetAlignment(float x, float y)
@@ -81,12 +83,12 @@ class VerticalList : List
             bounds.y += getRowInnerHeight(index);
         }
 
-        return bounds + Vec2f(Maths::Max(visibleColumns - 1, 1), Maths::Max(visibleRows - 1, 1)) * spacing;
+        return bounds + Vec2f(Maths::Max(visibleColumns - 1, 1) * spacing.x, Maths::Max(visibleRows - 1, 1) * spacing.y);
     }
 
     Vec2f getTrueBounds()
     {
-        return padding + getInnerBounds() + padding;
+        return padding + getInnerBounds() + padding + Vec2f(scrollbarSize, 0.0f);
     }
 
     Vec2f getBounds()
@@ -244,20 +246,20 @@ class VerticalList : List
                 component.Render();
             }
 
-            offset.x += bounds[i - startIndex].x + spacing;
+            offset.x += bounds[i - startIndex].x + spacing.x;
             if (columnIndex == columns - 1)
             {
-                offset.y += bounds[i - startIndex].y + spacing;
+                offset.y += bounds[i - startIndex].y + spacing.y;
             }
         }
 
         if (totalCount != visibleCount)
         {
-            Vec2f bounds = getTrueBounds();
-            float scrollHeight = bounds.y;
-            float scrollPosX = innerPos.x + bounds.x + (padding.x + margin.x) * 2.0f;
+            Vec2f trueBounds = getTrueBounds();
+            float scrollHeight = trueBounds.y;
+            float scrollPosX = position.x + margin.x + trueBounds.x - scrollbarSize;
             scrollbar.SetPosition(scrollPosX, position.y);
-            scrollbar.SetSize(30, scrollHeight);
+            scrollbar.SetSize(scrollbarSize, scrollHeight);
             scrollbar.SetHandleSize(scrollHeight * visibleCount / Maths::Max(totalCount, 1.0f));
             scrollbar.Render();
         }
