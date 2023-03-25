@@ -3,7 +3,7 @@ interface Label : Component
     void SetText(string text);
     void SetFont(string font);
     void SetColor(SColor color);
-    void SetCentered(bool x, bool y);
+    void SetAlignment(float x, float y);
 }
 
 interface AreaLabel : Label
@@ -19,6 +19,7 @@ class StandardLabel : Label
     private bool centerX = false;
     private bool centerY = false;
     private Vec2f position = Vec2f_zero;
+    private Vec2f alignment = Vec2f_zero;
 
     void SetText(string text)
     {
@@ -35,10 +36,10 @@ class StandardLabel : Label
         this.color = color;
     }
 
-    void SetCentered(bool x, bool y)
+    void SetAlignment(float x, float y)
     {
-        centerX = x;
-        centerY = y;
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
     }
 
     void SetPosition(float x, float y)
@@ -63,15 +64,12 @@ class StandardLabel : Label
     {
         if (text == "") return;
 
-        GUI::SetFont(font);
-
+        // The hardcoded offset correctly aligns text with the bounds
         Vec2f bounds = getBounds();
-        Vec2f center(
-            centerX ? bounds.x * 0.5f : 0,
-            centerY ? bounds.y * 0.5f : 0
-        );
+        Vec2f pos = position - Vec2f(bounds.x * alignment.x, bounds.y * alignment.y) - Vec2f(2, 1);
 
-        GUI::DrawText(text, position - center, color);
+        GUI::SetFont(font);
+        GUI::DrawText(text, pos, color);
     }
 }
 
@@ -84,6 +82,7 @@ class StandardAreaLabel : AreaLabel
     private bool centerY = false;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private Vec2f alignment = Vec2f_zero;
 
     void SetText(string text)
     {
@@ -100,16 +99,16 @@ class StandardAreaLabel : AreaLabel
         this.color = color;
     }
 
-    void SetCentered(bool x, bool y)
-    {
-        centerX = x;
-        centerY = y;
-    }
-
     void SetSize(float width, float height)
     {
         size.x = width;
         size.y = height;
+    }
+
+    void SetAlignment(float x, float y)
+    {
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
     }
 
     void SetPosition(float x, float y)
@@ -132,13 +131,9 @@ class StandardAreaLabel : AreaLabel
     {
         if (text == "") return;
 
+        Vec2f pos = position - Vec2f(size.x * alignment.x, size.y * alignment.y);
+
         GUI::SetFont(font);
-
-        Vec2f center(
-            centerX ? size.x * 0.5f : 0.0f,
-            centerY ? size.y * 0.5f : 0.0f
-        );
-
-        GUI::DrawText(text, position - center, position - center + size, color, centerX, centerY);
+        GUI::DrawText(text, pos, pos + size, color, false, false);
     }
 }
