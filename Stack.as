@@ -1,19 +1,25 @@
-interface Stack : MultiContainer
+interface Stack : Container, MultiChild
 {
-    void SetAlignment(float x);
+
 }
 
 class StandardStack : Stack
 {
     private Component@[] components;
+    private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
-    private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
 
     void AddComponent(Component@ component)
     {
         components.push_back(component);
+    }
+
+    void SetAlignment(float x, float y)
+    {
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
     }
 
     void SetMargin(float x, float y)
@@ -26,11 +32,6 @@ class StandardStack : Stack
     {
         padding.x = x;
         padding.y = y;
-    }
-
-    void SetAlignment(float x)
-    {
-        alignment = Maths::Clamp01(x);
     }
 
     void SetPosition(float x, float y)
@@ -88,7 +89,7 @@ class StandardStack : Stack
             Component@ component = components[i];
             Vec2f bounds = component.getBounds();
             Vec2f boundsDiff = innerBounds - bounds;
-            Vec2f pos = innerPos + boundsDiff * alignment;
+            Vec2f pos = innerPos + Vec2f(boundsDiff.x * alignment.x, boundsDiff.y * alignment.y);
 
             component.SetPosition(pos.x, pos.y);
             component.Render();

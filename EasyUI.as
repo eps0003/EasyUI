@@ -1,6 +1,7 @@
 #include "Component.as"
 #include "Container.as"
 #include "Button.as"
+#include "ToggleButton.as"
 #include "Progress.as"
 #include "Label.as"
 #include "List.as"

@@ -1,4 +1,4 @@
-interface List : MultiContainer
+interface List : Container, MultiChild
 {
     void SetSpacing(float spacing);
     void SetAlignment(float x, float y);

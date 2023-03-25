@@ -1,4 +1,4 @@
-interface Pane : SingleContainer
+interface Pane : Container, SingleChild
 {
 
 }
@@ -13,10 +13,10 @@ enum StandardPaneType
 class StandardPane : Pane
 {
     private Component@ component;
+    private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
     private StandardPaneType type = StandardPaneType::Normal;
-    private float alignment = 0.0f;
     private Vec2f position = Vec2f_zero;
 
     StandardPane(StandardPaneType type)
@@ -29,6 +29,12 @@ class StandardPane : Pane
         @this.component = component;
     }
 
+    void SetAlignment(float x, float y)
+    {
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
+    }
+
     void SetMargin(float x, float y)
     {
         margin.x = x;
@@ -39,11 +45,6 @@ class StandardPane : Pane
     {
         padding.x = x;
         padding.y = y;
-    }
-
-    void SetAlignment(float x)
-    {
-        alignment = Maths::Clamp01(x);
     }
 
     void SetPosition(float x, float y)
@@ -85,7 +86,7 @@ class StandardPane : Pane
         Vec2f innerBounds = getInnerBounds();
         Vec2f min = position + margin;
         Vec2f max = min + padding + innerBounds + padding;
-        Vec2f innerPos = min + padding;
+        Vec2f innerPos = min + padding +  Vec2f(innerBounds.x * alignment.x, innerBounds.y * alignment.y);
 
         switch (type)
         {

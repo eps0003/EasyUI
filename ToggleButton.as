@@ -1,19 +1,15 @@
-interface Button : Component, SingleChild
+interface ToggleButton : Button
 {
-    void SetSize(float width, float height);
-    void Click();
-
-    void OnPress(EventHandler@ handler);
-    void OnRelease(EventHandler@ handler);
-    void OnClick(EventHandler@ handler);
+    void SetChecked(bool checked);
 }
 
-class StandardButton : Button
+class StandardToggleButton : ToggleButton
 {
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private bool checked = false;
     private bool pressed = false;
 
     private EventHandler@[] pressHandlers;
@@ -29,6 +25,11 @@ class StandardButton : Button
     {
         alignment.x = Maths::Clamp01(x);
         alignment.y = Maths::Clamp01(y);
+    }
+
+    void SetChecked(bool checked)
+    {
+        this.checked = checked;
     }
 
     void SetSize(float width, float height)
@@ -103,6 +104,7 @@ class StandardButton : Button
         {
             if (isHovered())
             {
+                checked = !checked;
                 Click();
             }
 
@@ -126,22 +128,50 @@ class StandardButton : Button
         {
             if (pressed)
             {
-                GUI::DrawButtonPressed(position, position + size);
+                if (checked)
+                {
+                    GUI::DrawButtonPressed(position, position + size);
+                }
+                else
+                {
+                    GUI::DrawButtonPressed(position, position + size);
+                }
             }
             else
             {
-                GUI::DrawButtonHover(position, position + size);
+                if (checked)
+                {
+                    GUI::DrawButtonHover(position, position + size);
+                }
+                else
+                {
+                    GUI::DrawSunkenPane(position, position + size);
+                }
             }
         }
         else
         {
             if (pressed)
             {
-                GUI::DrawButtonHover(position, position + size);
+                if (checked)
+                {
+                    GUI::DrawButtonHover(position, position + size);
+                }
+                else
+                {
+                    GUI::DrawSunkenPane(position, position + size);
+                }
             }
             else
             {
-                GUI::DrawButton(position, position + size);
+                if (checked)
+                {
+                    GUI::DrawButton(position, position + size);
+                }
+                else
+                {
+                    GUI::DrawButtonPressed(position, position + size);
+                }
             }
         }
 

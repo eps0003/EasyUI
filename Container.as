@@ -6,12 +6,14 @@ interface Container : Component
     Vec2f getInnerBounds();
 }
 
-interface SingleContainer : Container
+interface SingleChild
 {
     void SetComponent(Component@ component);
+    void SetAlignment(float x, float y);
 }
 
-interface MultiContainer : Container
+interface MultiChild
 {
     void AddComponent(Component@ component);
+    void SetAlignment(float x, float y);
 }
