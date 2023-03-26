@@ -109,6 +109,11 @@ class StandardToggleButton : ToggleButton
         return isHovered() ? cast<Component>(this) : null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void SetChecked(bool checked)
     {
         bool wasChecked = this.checked;

@@ -247,6 +247,31 @@ class VerticalList : List
         return null;
     }
 
+    List@ getHoveredList()
+    {
+        if (isHovered())
+        {
+            CalculateProperties();
+
+            uint startIndex = scrollIndex * visibleColumns;
+            uint endIndex = startIndex + visibleCount;
+
+            for (int i = endIndex - 1; i >= startIndex; i--)
+            {
+                Component@ component = components[i];
+                if (component is null) continue;
+
+                List@ list = component.getHoveredList();
+                if (list is null) continue;
+
+                return list;
+            }
+
+            return this;
+        }
+        return null;
+    }
+
     private void CalculateBounds()
     {
         rowHeights.clear();
@@ -323,7 +348,7 @@ class VerticalList : List
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();
 
-        if (isMouseInBounds(min, max))
+        if (ui.isListHovered(this))
         {
             uint scrollIndex = getScrollIndex();
             CControls@ controls = getControls();

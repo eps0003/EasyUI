@@ -91,6 +91,11 @@ class StandardLabel : Label
         return null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void Update()
     {
 
@@ -195,6 +200,11 @@ class StandardAreaLabel : AreaLabel
     }
 
     Component@ getHoveredComponent()
+    {
+        return null;
+    }
+
+    List@ getHoveredList()
     {
         return null;
     }

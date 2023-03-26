@@ -5,6 +5,7 @@ interface Component
 
     Vec2f getBounds();
     Component@ getHoveredComponent();
+    List@ getHoveredList();
 
     void Update();
     void PreRender();

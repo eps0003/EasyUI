@@ -111,6 +111,11 @@ class StandardIcon : Icon
         return null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void Update()
     {
 

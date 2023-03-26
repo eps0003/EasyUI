@@ -118,6 +118,11 @@ class StandardButton : Button
         return isHovered() ? cast<Component>(this) : null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void OnPress(EventHandler@ handler)
     {
         if (handler !is null)

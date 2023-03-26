@@ -110,6 +110,11 @@ class StandardVerticalSlider : VerticalSlider
         return isHovered() ? cast<Component>(this) : null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void OnStartDrag(EventHandler@ handler)
     {
         if (handler !is null)
@@ -296,6 +301,11 @@ class StandardHorizontalSlider : HorizontalSlider
     Component@ getHoveredComponent()
     {
         return isHovered() ? cast<Component>(this) : null;
+    }
+
+    List@ getHoveredList()
+    {
+        return null;
     }
 
     void OnStartDrag(EventHandler@ handler)

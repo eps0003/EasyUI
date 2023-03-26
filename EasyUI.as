@@ -45,6 +45,27 @@ class EasyUI
         return component !is null && component is getHoveredComponent();
     }
 
+    List@ getHoveredList()
+    {
+        for (int i = components.size() - 1; i >= 0; i--)
+        {
+            Component@ component = components[i];
+            if (component is null) continue;
+
+            List@ list = component.getHoveredList();
+            if (list !is null) return list;
+
+            Component@ hovered = component.getHoveredComponent();
+            if (hovered !is null) break;
+        }
+        return null;
+    }
+
+    bool isListHovered(List@ list)
+    {
+        return list !is null && list is getHoveredList();
+    }
+
     void Update()
     {
         for (int i = components.size() - 1; i >= 0; i--)

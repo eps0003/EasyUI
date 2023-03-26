@@ -126,6 +126,11 @@ class StandardProgress : Progress
         return isHovered() ? cast<Component>(this) : null;
     }
 
+    List@ getHoveredList()
+    {
+        return null;
+    }
+
     void OnChange(EventHandler@ handler)
     {
         if (handler !is null)

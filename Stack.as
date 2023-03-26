@@ -122,6 +122,25 @@ class StandardStack : Stack
         return null;
     }
 
+    List@ getHoveredList()
+    {
+        if (isHovered())
+        {
+            for (int i = components.size() - 1; i >= 0; i--)
+            {
+                Component@ component = components[i];
+                if (component is null) continue;
+
+                List@ list = component.getHoveredList();
+                if (list !is null) return list;
+
+                Component@ hovered = component.getHoveredComponent();
+                if (hovered !is null) break;
+            }
+        }
+        return null;
+    }
+
     private bool isHovered()
     {
         Vec2f min = position + margin;
@@ -141,7 +160,7 @@ class StandardStack : Stack
     {
         for (uint i = 0; i < components.size(); i++)
         {
-            components[i].Render();
+            components[i].PreRender();
         }
 
         CalculateInnerBounds();

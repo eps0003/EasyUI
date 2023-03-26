@@ -107,6 +107,19 @@ class StandardPane : Pane
         return null;
     }
 
+    List@ getHoveredList()
+    {
+        if (component !is null && isHovered())
+        {
+            List@ list = component.getHoveredList();
+            if (list !is null)
+            {
+                return list;
+            }
+        }
+        return null;
+    }
+
     private bool isHovered()
     {
         Vec2f min = position + margin;
