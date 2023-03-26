@@ -343,11 +343,30 @@ class VerticalList : List
         }
     }
 
-    void Render()
+    void PreRender()
     {
+        uint startIndex = scrollIndex * visibleColumns;
+        uint endIndex = startIndex + visibleCount;
+
+        for (uint i = startIndex; i < endIndex; i++)
+        {
+            Component@ component = components[i];
+            if (component is null) continue;
+
+            component.PreRender();
+        }
+
+        if (scrollbar !is null)
+        {
+            scrollbar.PreRender();
+        }
+
         CalculateScrollIndex();
         CalculateBounds();
+    }
 
+    void Render()
+    {
         Vec2f offset = Vec2f_zero;
         Vec2f innerPos = position + margin + padding;
 

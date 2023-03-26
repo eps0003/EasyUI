@@ -96,13 +96,21 @@ class StandardLabel : Label
 
     }
 
+    void PreRender()
+    {
+
+    }
+
     void Render()
     {
         if (text == "") return;
 
-        // The hardcoded offset correctly aligns text with the bounds
         Vec2f bounds = getBounds();
-        Vec2f pos = position - Vec2f(bounds.x * alignment.x, bounds.y * alignment.y) - Vec2f(2, 1);
+        Vec2f pos;
+
+        // The magic values correctly align the text with the bounds
+        pos.x = position.x - bounds.x * alignment.x - 2;
+        pos.y = position.x - bounds.y * alignment.y - 1;
 
         GUI::SetFont(font);
         GUI::DrawText(text, pos, color);
@@ -196,11 +204,18 @@ class StandardAreaLabel : AreaLabel
 
     }
 
+    void PreRender()
+    {
+
+    }
+
     void Render()
     {
         if (text == "") return;
 
-        Vec2f pos = position - Vec2f(size.x * alignment.x, size.y * alignment.y);
+        Vec2f pos;
+        pos.x = position.x - size.x * alignment.x;
+        pos.y = position.y - size.y * alignment.y;
 
         GUI::SetFont(font);
         GUI::DrawText(text, pos, pos + size, color, false, false);

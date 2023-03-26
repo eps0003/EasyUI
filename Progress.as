@@ -147,6 +147,14 @@ class StandardProgress : Progress
         }
     }
 
+    void PreRender()
+    {
+        if (component !is null)
+        {
+            component.PreRender();
+        }
+    }
+
     void Render()
     {
         Vec2f min = position + margin;
@@ -157,7 +165,10 @@ class StandardProgress : Progress
         if (component !is null)
         {
             Vec2f innerBounds = getInnerBounds();
-            Vec2f pos = min + padding + Vec2f(innerBounds.x * alignment.x, innerBounds.y * alignment.y);
+            Vec2f pos;
+
+            pos.x = min.x + padding.x + innerBounds.x * alignment.x;
+            pos.y = min.y + padding.y + innerBounds.y * alignment.y;
 
             component.SetPosition(pos.x, pos.y);
             component.Render();

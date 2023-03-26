@@ -18,6 +18,7 @@ class StandardStack : Stack
         if (component !is null)
         {
             components.push_back(component);
+            CalculateInnerBounds();
         }
     }
 
@@ -65,7 +66,7 @@ class StandardStack : Stack
         return position;
     }
 
-    private void CalculateBounds()
+    private void CalculateInnerBounds()
     {
         innerBounds.SetZero();
 
@@ -136,10 +137,18 @@ class StandardStack : Stack
         }
     }
 
+    void PreRender()
+    {
+        for (uint i = 0; i < components.size(); i++)
+        {
+            components[i].Render();
+        }
+
+        CalculateInnerBounds();
+    }
+
     void Render()
     {
-        CalculateBounds();
-
         Vec2f innerPos = position + margin + padding;
 
         for (uint i = 0; i < components.size(); i++)

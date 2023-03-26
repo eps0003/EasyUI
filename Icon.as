@@ -116,18 +116,27 @@ class StandardIcon : Icon
 
     }
 
+    void PreRender()
+    {
+
+    }
+
     void Render()
     {
         if (icon == "") return;
         if (size.LengthSquared() == 0) return;
         if (frameDim.LengthSquared() == 0) return;
 
-        Vec2f align(
-            size.x > 0 ? alignment.x : 1 - alignment.x,
-            size.y > 0 ? alignment.y : 1 - alignment.y
-        );
-        Vec2f scale = Vec2f(size.x / frameDim.x, size.y / frameDim.y) * 0.5f;
-        Vec2f pos = position - Vec2f(size.x * align.x, size.y * align.y);
+        Vec2f align, scale, pos;
+
+        align.x = size.x > 0 ? alignment.x : 1 - alignment.x;
+        align.y = size.y > 0 ? alignment.y : 1 - alignment.y;
+
+        scale.x = size.x / frameDim.x * 0.5f;
+        scale.y = size.y / frameDim.y * 0.5f;
+
+        pos.x = position.x - size.x * align.x;
+        pos.y = position.y - size.y * align.y;
 
         GUI::DrawIcon(icon, frameIndex, frameDim, pos, scale.x, scale.y, color_white);
     }

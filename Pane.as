@@ -19,6 +19,8 @@ class StandardPane : Pane
     private StandardPaneType type = StandardPaneType::Normal;
     private Vec2f position = Vec2f_zero;
 
+    private Vec2f innerBounds = Vec2f_zero;
+
     StandardPane(StandardPaneType type)
     {
         this.type = type;
@@ -75,10 +77,7 @@ class StandardPane : Pane
 
     Vec2f getInnerBounds()
     {
-        Vec2f componentSize = component !is null
-            ? component.getBounds()
-            : Vec2f_zero;
-        return componentSize;
+        return innerBounds;
     }
 
     Vec2f getTrueBounds()
@@ -89,13 +88,6 @@ class StandardPane : Pane
     Vec2f getBounds()
     {
         return margin + getTrueBounds() + margin;
-    }
-
-    private bool isHovered()
-    {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
     }
 
     Component@ getHoveredComponent()
@@ -115,12 +107,36 @@ class StandardPane : Pane
         return null;
     }
 
+    private bool isHovered()
+    {
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
+    }
+
+    private void CalculateInnerBounds()
+    {
+        innerBounds = component !is null
+            ? component.getBounds()
+            : Vec2f_zero;
+    }
+
     void Update()
     {
         if (component !is null)
         {
             component.Update();
         }
+    }
+
+    void PreRender()
+    {
+        if (component !is null)
+        {
+            component.PreRender();
+        }
+
+        CalculateInnerBounds();
     }
 
     void Render()

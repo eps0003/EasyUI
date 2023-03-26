@@ -60,7 +60,9 @@ class EasyUI
 
         for (uint i = 0; i < components.size(); i++)
         {
-            components[i].Render();
+            Component@ component = components[i];
+            component.PreRender();
+            component.Render();
         }
     }
 }

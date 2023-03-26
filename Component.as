@@ -7,5 +7,6 @@ interface Component
     Component@ getHoveredComponent();
 
     void Update();
+    void PreRender();
     void Render();
 }
