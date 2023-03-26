@@ -46,21 +46,13 @@ class VerticalList : List
 
     private EventHandler@[] scrollHandlers;
 
-    VerticalList()
-    {
-        CalculateDimensions();
-    }
-
-    private void CalculateDimensions()
+    private void CalculateProperties()
     {
         totalRows = Maths::Ceil(components.size() / float(columns));
         visibleRows = (rows > 0 && rows < totalRows) ? rows : totalRows;
         visibleColumns = Maths::Min(components.size(), columns);
         hiddenRows = totalRows - visibleRows;
-    }
 
-    private void CalculateScrollIndex()
-    {
         if (scrollbar !is null)
         {
             float prevScrollIndex = scrollIndex;
@@ -81,7 +73,6 @@ class VerticalList : List
     void AddComponent(Component@ component)
     {
         components.push_back(component);
-        CalculateDimensions();
     }
 
     void SetMargin(float x, float y)
@@ -131,7 +122,6 @@ class VerticalList : List
     void SetRows(uint rows)
     {
         this.rows = rows;
-        CalculateDimensions();
     }
 
     uint getRows()
@@ -142,7 +132,6 @@ class VerticalList : List
     void SetColumns(uint columns)
     {
         this.columns = Maths::Max(columns, 1);
-        CalculateDimensions();
     }
 
     uint getColumns()
@@ -239,6 +228,8 @@ class VerticalList : List
                 }
             }
 
+            CalculateProperties();
+
             uint startIndex = scrollIndex * visibleColumns;
             uint endIndex = startIndex + visibleCount;
 
@@ -329,6 +320,26 @@ class VerticalList : List
         uint startIndex = scrollIndex * visibleColumns;
         uint endIndex = startIndex + visibleCount;
 
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+
+        if (isMouseInBounds(min, max))
+        {
+            uint scrollIndex = getScrollIndex();
+            CControls@ controls = getControls();
+
+            if (controls.mouseScrollDown)
+            {
+                scrollIndex++;
+            }
+            if (controls.mouseScrollUp && scrollIndex > 0)
+            {
+                scrollIndex--;
+            }
+
+            SetScrollIndex(scrollIndex);
+        }
+
         for (int i = endIndex - 1; i >= startIndex; i--)
         {
             Component@ component = components[i];
@@ -345,6 +356,8 @@ class VerticalList : List
 
     void PreRender()
     {
+        CalculateProperties();
+
         uint startIndex = scrollIndex * visibleColumns;
         uint endIndex = startIndex + visibleCount;
 
@@ -361,7 +374,6 @@ class VerticalList : List
             scrollbar.PreRender();
         }
 
-        CalculateScrollIndex();
         CalculateBounds();
     }
 
