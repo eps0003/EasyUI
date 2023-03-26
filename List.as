@@ -1,10 +1,22 @@
 interface List : Container, MultiChild
 {
     void SetSpacing(float x, float y);
+    Vec2f getSpacing();
+
     void SetAlignment(float x, float y);
+    Vec2f getAlignment();
+
     void SetRows(uint rows);
+    uint getRows();
+
     void SetColumns(uint columns);
+    uint getColumns();
+
     void SetScrollbar(Slider@ scrollbar);
+    Slider@ getScrollbar();
+
+    void SetScrollIndex(uint index);
+    uint getScrollIndex();
 }
 
 class VerticalList : List
@@ -12,12 +24,13 @@ class VerticalList : List
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
-    private Vec2f spacing = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
+    private Vec2f spacing = Vec2f_zero;
     private uint rows = 0;
     private uint columns = 1;
     private Vec2f position = Vec2f_zero;
     private Slider@ scrollbar;
+    private uint scrollIndex = 0;
 
     void AddComponent(Component@ component)
     {
@@ -30,16 +43,20 @@ class VerticalList : List
         margin.y = y;
     }
 
+    Vec2f getMargin()
+    {
+        return margin;
+    }
+
     void SetPadding(float x, float y)
     {
         padding.x = x;
         padding.y = y;
     }
 
-    void SetSpacing(float x, float y)
+    Vec2f getPadding()
     {
-        spacing.x = x;
-        spacing.y = y;
+        return padding;
     }
 
     void SetAlignment(float x, float y)
@@ -48,9 +65,30 @@ class VerticalList : List
         alignment.y = Maths::Clamp01(y);
     }
 
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
+    void SetSpacing(float x, float y)
+    {
+        spacing.x = x;
+        spacing.y = y;
+    }
+
+    Vec2f getSpacing()
+    {
+        return spacing;
+    }
+
     void SetRows(uint rows)
     {
         this.rows = rows;
+    }
+
+    uint getRows()
+    {
+        return rows;
     }
 
     void SetColumns(uint columns)
@@ -58,15 +96,40 @@ class VerticalList : List
         this.columns = Maths::Max(columns, 1);
     }
 
+    uint getColumns()
+    {
+        return columns;
+    }
+
     void SetScrollbar(Slider@ scrollbar)
     {
         @this.scrollbar = scrollbar;
+    }
+
+    Slider@ getScrollbar()
+    {
+        return scrollbar;
+    }
+
+    void SetScrollIndex(uint index)
+    {
+        scrollIndex = index;
+    }
+
+    uint getScrollIndex()
+    {
+        return scrollIndex;
     }
 
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     private Vec2f getInnerBounds()
@@ -93,7 +156,7 @@ class VerticalList : List
 
     Vec2f getTrueBounds()
     {
-        float scrollWidth = scrollbar.getSize().x;
+        float scrollWidth = scrollbar !is null ? scrollbar.getSize().x : 0.0f;
         return padding + getInnerBounds() + padding + Vec2f(scrollWidth, 0.0f);
     }
 
@@ -113,10 +176,13 @@ class VerticalList : List
     {
         if (isHovered())
         {
-            Component@ hovered = scrollbar.getHoveredComponent();
-            if (hovered !is null)
+            if (scrollbar !is null)
             {
-                return hovered;
+                Component@ hovered = scrollbar.getHoveredComponent();
+                if (hovered !is null)
+                {
+                    return hovered;
+                }
             }
 
             uint totalCount = components.size();
@@ -236,6 +302,8 @@ class VerticalList : List
 
     private uint getRowIndex()
     {
+        if (scrollbar is null) return 0.0f;
+
         uint hiddenRows = getTotalRows() - getVisibleRows();
         return Maths::Min((hiddenRows + 1) * scrollbar.getPercentage(), hiddenRows);
     }
@@ -257,7 +325,10 @@ class VerticalList : List
             component.Update();
         }
 
-        scrollbar.Update();
+        if (scrollbar !is null)
+        {
+            scrollbar.Update();
+        }
     }
 
     void Render()
@@ -304,7 +375,7 @@ class VerticalList : List
             }
         }
 
-        if (totalCount != visibleCount)
+        if (scrollbar !is null && totalCount != visibleCount)
         {
             Vec2f trueBounds = getTrueBounds();
             float scrollWidth = scrollbar.getSize().x;

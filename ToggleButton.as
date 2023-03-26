@@ -34,16 +34,15 @@ class StandardToggleButton : ToggleButton
         @this.component = component;
     }
 
-    void SetAlignment(float x, float y)
-    {
-        alignment.x = Maths::Clamp01(x);
-        alignment.y = Maths::Clamp01(y);
-    }
-
     void SetMargin(float x, float y)
     {
         margin.x = x;
         margin.y = y;
+    }
+
+    Vec2f getMargin()
+    {
+        return margin;
     }
 
     void SetPadding(float x, float y)
@@ -52,19 +51,20 @@ class StandardToggleButton : ToggleButton
         padding.y = y;
     }
 
-    void SetChecked(bool checked)
+    Vec2f getPadding()
     {
-        this.checked = checked;
-
-        for (uint i = 0; i < changeHandlers.size(); i++)
-        {
-            changeHandlers[i].Handle();
-        }
+        return padding;
     }
 
-    bool isChecked()
+    void SetAlignment(float x, float y)
     {
-        return checked;
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getAlignment()
+    {
+        return alignment;
     }
 
     void SetSize(float width, float height)
@@ -73,10 +73,20 @@ class StandardToggleButton : ToggleButton
         size.y = height;
     }
 
+    Vec2f getSize()
+    {
+        return size;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getInnerBounds()
@@ -94,16 +104,38 @@ class StandardToggleButton : ToggleButton
         return margin + size + margin;
     }
 
-    private bool isHovered()
-    {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
-    }
-
     Component@ getHoveredComponent()
     {
         return isHovered() ? cast<Component>(this) : null;
+    }
+
+    void SetChecked(bool checked)
+    {
+        bool wasChecked = this.checked;
+        this.checked = checked;
+
+        if (this.checked != wasChecked)
+        {
+            for (uint i = 0; i < changeHandlers.size(); i++)
+            {
+                changeHandlers[i].Handle();
+            }
+        }
+    }
+
+    bool isChecked()
+    {
+        return checked;
+    }
+
+    void Click()
+    {
+        SetChecked(!checked);
+
+        for (uint i = 0; i < clickHandlers.size(); i++)
+        {
+            clickHandlers[i].Handle();
+        }
     }
 
     void OnPress(EventHandler@ handler)
@@ -138,14 +170,11 @@ class StandardToggleButton : ToggleButton
         }
     }
 
-    void Click()
+    private bool isHovered()
     {
-        SetChecked(!checked);
-
-        for (uint i = 0; i < clickHandlers.size(); i++)
-        {
-            clickHandlers[i].Handle();
-        }
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
     void Update()

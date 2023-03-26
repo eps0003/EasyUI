@@ -1,6 +1,8 @@
 interface Button : Container, SingleChild
 {
     void SetSize(float width, float height);
+    Vec2f getSize();
+
     void Click();
 
     void OnPress(EventHandler@ handler);
@@ -34,16 +36,15 @@ class StandardButton : Button
         @this.component = component;
     }
 
-    void SetAlignment(float x, float y)
-    {
-        alignment.x = Maths::Clamp01(x);
-        alignment.y = Maths::Clamp01(y);
-    }
-
     void SetMargin(float x, float y)
     {
         margin.x = x;
         margin.y = y;
+    }
+
+    Vec2f getMargin()
+    {
+        return margin;
     }
 
     void SetPadding(float x, float y)
@@ -52,16 +53,42 @@ class StandardButton : Button
         padding.y = y;
     }
 
+    Vec2f getPadding()
+    {
+        return padding;
+    }
+
+    void SetAlignment(float x, float y)
+    {
+        alignment.x = Maths::Clamp01(x);
+        alignment.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
     void SetSize(float width, float height)
     {
         size.x = width;
         size.y = height;
     }
 
+    Vec2f getSize()
+    {
+        return size;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getInnerBounds()

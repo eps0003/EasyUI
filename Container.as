@@ -1,7 +1,11 @@
 interface Container : Component
 {
     void SetMargin(float x, float y);
+    Vec2f getMargin();
+
     void SetPadding(float x, float y);
+    Vec2f getPadding();
+
     Vec2f getTrueBounds();
     Vec2f getInnerBounds();
 }

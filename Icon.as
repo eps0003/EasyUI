@@ -1,10 +1,19 @@
 interface Icon : Component
 {
     void SetIcon(string icon);
+    string getIcon();
+
     void SetFrameIndex(uint index);
+    uint getFrameIndex();
+
     void SetFrameDimension(uint width, uint height);
+    Vec2f getFrameDimension();
+
     void SetSize(float width, float height);
+    Vec2f getSize();
+
     void SetAlignment(float x, float y);
+    Vec2f getAlignment();
 }
 
 class StandardIcon : Icon
@@ -21,9 +30,19 @@ class StandardIcon : Icon
         this.icon = icon;
     }
 
+    string getIcon()
+    {
+        return icon;
+    }
+
     void SetFrameIndex(uint index)
     {
         frameIndex = index;
+    }
+
+    uint getFrameIndex()
+    {
+        return frameIndex;
     }
 
     void SetFrameDimension(uint width, uint height)
@@ -38,6 +57,11 @@ class StandardIcon : Icon
         }
     }
 
+    Vec2f getFrameDimension()
+    {
+        return frameDim;
+    }
+
     void SetSize(float width, float height)
     {
         size.x = width;
@@ -50,16 +74,31 @@ class StandardIcon : Icon
         }
     }
 
+    Vec2f getSize()
+    {
+        return size;
+    }
+
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);
         alignment.y = Maths::Clamp01(y);
     }
 
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getBounds()

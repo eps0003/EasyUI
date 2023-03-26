@@ -2,9 +2,12 @@ interface Slider : Component
 {
     void SetPercentage(float percentage);
     float getPercentage();
+
     void SetSize(float width, float height);
     Vec2f getSize();
+
     void SetHandleSize(float size);
+    float getHandleSize();
 
     void OnStartDrag(EventHandler@ handler);
     void OnEndDrag(EventHandler@ handler);
@@ -81,10 +84,20 @@ class StandardVerticalSlider : VerticalSlider
         handleSize = size;
     }
 
+    float getHandleSize()
+    {
+        return handleSize;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getBounds()
@@ -264,10 +277,20 @@ class StandardHorizontalSlider : HorizontalSlider
         handleSize = Maths::Max(size, 20.0f);
     }
 
+    float getHandleSize()
+    {
+        return handleSize;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getBounds()

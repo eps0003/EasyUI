@@ -35,10 +35,20 @@ class StandardPane : Pane
         alignment.y = Maths::Clamp01(y);
     }
 
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
     void SetMargin(float x, float y)
     {
         margin.x = x;
         margin.y = y;
+    }
+
+    Vec2f getMargin()
+    {
+        return margin;
     }
 
     void SetPadding(float x, float y)
@@ -47,10 +57,20 @@ class StandardPane : Pane
         padding.y = y;
     }
 
+    Vec2f getPadding()
+    {
+        return padding;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getInnerBounds()

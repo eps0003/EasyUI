@@ -1,8 +1,11 @@
 interface Component
 {
     void SetPosition(float x, float y);
-    Component@ getHoveredComponent();
+    Vec2f getPosition();
+
     Vec2f getBounds();
+    Component@ getHoveredComponent();
+
     void Update();
     void Render();
 }

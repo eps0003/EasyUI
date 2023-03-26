@@ -1,14 +1,22 @@
 interface Label : Component
 {
     void SetText(string text);
+    string getText();
+
     void SetFont(string font);
+    string getFont();
+
     void SetColor(SColor color);
+    SColor getColor();
+
     void SetAlignment(float x, float y);
+    Vec2f getAlignment();
 }
 
 interface AreaLabel : Label
 {
     void SetSize(float width, float height);
+    Vec2f getSize();
 }
 
 class StandardLabel : Label
@@ -24,14 +32,29 @@ class StandardLabel : Label
         this.text = text;
     }
 
+    string getText()
+    {
+        return text;
+    }
+
     void SetFont(string font)
     {
-        this.font = GUI::isFontLoaded(font) ? font : "menu";
+        this.font = font;
+    }
+
+    string getFont()
+    {
+        return font;
     }
 
     void SetColor(SColor color)
     {
         this.color = color;
+    }
+
+    SColor getColor()
+    {
+        return color;
     }
 
     void SetAlignment(float x, float y)
@@ -40,10 +63,20 @@ class StandardLabel : Label
         alignment.y = Maths::Clamp01(y);
     }
 
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getBounds()
@@ -90,14 +123,29 @@ class StandardAreaLabel : AreaLabel
         this.text = text;
     }
 
+    string getText()
+    {
+        return text;
+    }
+
     void SetFont(string font)
     {
-        this.font = GUI::isFontLoaded(font) ? font : "menu";
+        this.font = font;
+    }
+
+    string getFont()
+    {
+        return font;
     }
 
     void SetColor(SColor color)
     {
         this.color = color;
+    }
+
+    SColor getColor()
+    {
+        return color;
     }
 
     void SetSize(float width, float height)
@@ -106,16 +154,31 @@ class StandardAreaLabel : AreaLabel
         size.y = height;
     }
 
+    Vec2f getSize()
+    {
+        return size;
+    }
+
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);
         alignment.y = Maths::Clamp01(y);
     }
 
+    Vec2f getAlignment()
+    {
+        return alignment;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
         position.y = y;
+    }
+
+    Vec2f getPosition()
+    {
+        return position;
     }
 
     Vec2f getBounds()
