@@ -13,7 +13,10 @@ class StandardStack : Stack
 
     void AddComponent(Component@ component)
     {
-        components.push_back(component);
+        if (component !is null)
+        {
+            components.push_back(component);
+        }
     }
 
     void SetMargin(float x, float y)
