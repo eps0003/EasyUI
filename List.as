@@ -4,6 +4,7 @@ interface List : Container, MultiChild
     void SetAlignment(float x, float y);
     void SetRows(uint rows);
     void SetColumns(uint columns);
+    void SetScrollbar(Slider@ scrollbar);
 }
 
 class VerticalList : List
@@ -17,12 +18,6 @@ class VerticalList : List
     private uint columns = 1;
     private Vec2f position = Vec2f_zero;
     private Slider@ scrollbar;
-    private float scrollbarSize = 24.0f;
-
-    VerticalList(EasyUI@ ui)
-    {
-        @scrollbar = StandardVerticalSlider(ui);
-    }
 
     void AddComponent(Component@ component)
     {
@@ -63,6 +58,11 @@ class VerticalList : List
         this.columns = Maths::Max(columns, 1);
     }
 
+    void SetScrollbar(Slider@ scrollbar)
+    {
+        @this.scrollbar = scrollbar;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -93,7 +93,8 @@ class VerticalList : List
 
     Vec2f getTrueBounds()
     {
-        return padding + getInnerBounds() + padding + Vec2f(scrollbarSize, 0.0f);
+        float scrollWidth = scrollbar.getSize().x;
+        return padding + getInnerBounds() + padding + Vec2f(scrollWidth, 0.0f);
     }
 
     Vec2f getBounds()
@@ -306,10 +307,11 @@ class VerticalList : List
         if (totalCount != visibleCount)
         {
             Vec2f trueBounds = getTrueBounds();
+            float scrollWidth = scrollbar.getSize().x;
             float scrollHeight = trueBounds.y;
-            float scrollPosX = position.x + margin.x + trueBounds.x - scrollbarSize;
+            float scrollPosX = position.x + margin.x + trueBounds.x - scrollWidth;
             scrollbar.SetPosition(scrollPosX, position.y);
-            scrollbar.SetSize(scrollbarSize, scrollHeight);
+            scrollbar.SetSize(scrollWidth, scrollHeight);
             scrollbar.SetHandleSize(scrollHeight * visibleCount / Maths::Max(totalCount, 1.0f));
             scrollbar.Render();
         }
