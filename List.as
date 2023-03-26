@@ -32,9 +32,43 @@ class VerticalList : List
     private Slider@ scrollbar;
     private uint scrollIndex = 0;
 
+    // Properties calculated dynamically
+    private Vec2f innerBounds = Vec2f_zero;
+    private uint totalRows = 0;
+    private uint visibleRows = 0;
+    private uint visibleColumns = 0;
+    private uint visibleCount = 0;
+    private uint hiddenRows = 0;
+    private float[] columnWidths;
+    private float[] rowHeights;
+
+    VerticalList()
+    {
+        CalculateDimensions();
+    }
+
+    private void CalculateDimensions()
+    {
+        totalRows = Maths::Ceil(components.size() / float(columns));
+        visibleRows = (rows > 0 && rows < totalRows) ? rows : totalRows;
+        visibleColumns = Maths::Min(components.size(), columns);
+        hiddenRows = totalRows - visibleRows;
+    }
+
+    private void CalculateScrollIndex()
+    {
+        if (scrollbar !is null)
+        {
+            scrollIndex = Maths::Min((hiddenRows + 1) * scrollbar.getPercentage(), hiddenRows);
+        }
+
+        visibleCount = Maths::Min(components.size() - scrollIndex * visibleColumns, visibleRows * visibleColumns);
+    }
+
     void AddComponent(Component@ component)
     {
         components.push_back(component);
+        CalculateDimensions();
     }
 
     void SetMargin(float x, float y)
@@ -84,6 +118,7 @@ class VerticalList : List
     void SetRows(uint rows)
     {
         this.rows = rows;
+        CalculateDimensions();
     }
 
     uint getRows()
@@ -94,6 +129,7 @@ class VerticalList : List
     void SetColumns(uint columns)
     {
         this.columns = Maths::Max(columns, 1);
+        CalculateDimensions();
     }
 
     uint getColumns()
@@ -113,7 +149,13 @@ class VerticalList : List
 
     void SetScrollIndex(uint index)
     {
-        scrollIndex = index;
+        uint prevScrollIndex = scrollIndex;
+        scrollIndex = Maths::Min(index, hiddenRows);
+
+        if (scrollbar !is null && prevScrollIndex != scrollIndex)
+        {
+            scrollbar.SetPercentage(index / Maths::Max(hiddenRows, 1.0f));
+        }
     }
 
     uint getScrollIndex()
@@ -132,26 +174,9 @@ class VerticalList : List
         return position;
     }
 
-    private Vec2f getInnerBounds()
+    Vec2f getInnerBounds()
     {
-        uint visibleRows = getVisibleRows();
-        uint visibleColumns = getVisibleColumns();
-        uint rowIndex = getRowIndex();
-
-        Vec2f bounds = Vec2f_zero;
-
-        for (uint i = 0; i < visibleColumns; i++)
-        {
-            bounds.x += getColumnInnerWidth(i);
-        }
-
-        for (uint i = 0; i < visibleRows; i++)
-        {
-            uint index = rowIndex + i;
-            bounds.y += getRowInnerHeight(index);
-        }
-
-        return bounds + Vec2f(Maths::Max(visibleColumns - 1, 1) * spacing.x, Maths::Max(visibleRows - 1, 1) * spacing.y);
+        return innerBounds;
     }
 
     Vec2f getTrueBounds()
@@ -185,12 +210,8 @@ class VerticalList : List
                 }
             }
 
-            uint totalCount = components.size();
-            uint visibleCount = getVisibleCount();
-            uint rowIndex = getRowIndex();
-
-            uint startIndex = rowIndex * columns;
-            uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
+            uint startIndex = scrollIndex * visibleColumns;
+            uint endIndex = startIndex + visibleCount;
 
             for (int i = endIndex - 1; i >= startIndex; i--)
             {
@@ -206,43 +227,38 @@ class VerticalList : List
         return null;
     }
 
-    private Vec2f[] getCellBounds()
+    private void CalculateBounds()
     {
-        uint visibleRows = getVisibleRows();
-        uint visibleColumns = getVisibleColumns();
-        uint rowIndex = getRowIndex();
+        rowHeights.clear();
+        columnWidths.clear();
 
-        float[] widths = array<float>(visibleColumns, 0.0f);
-        float[] heights = array<float>(visibleRows, 0.0f);
-        Vec2f[] bounds = array<Vec2f>(visibleColumns * visibleRows, Vec2f_zero);
+        // Spacing between components
+        innerBounds.x = Maths::Max(visibleColumns - 1, 0) * spacing.x;
+        innerBounds.y = Maths::Max(visibleRows - 1, 0) * spacing.y;
 
+        // Component widths
         for (uint i = 0; i < visibleColumns; i++)
         {
-            widths[i] = getColumnInnerWidth(i);
+            float width = getColumnInnerWidth(i);
+            columnWidths.push_back(width);
+            innerBounds.x += width;
         }
 
+        // Component heights
         for (uint i = 0; i < visibleRows; i++)
         {
-            heights[i] = getRowInnerHeight(rowIndex + i);
+            float height = getRowInnerHeight(scrollIndex + i);
+            rowHeights.push_back(height);
+            innerBounds.y += height;
         }
-
-        for (uint y = 0; y < visibleRows; y++)
-        for (uint x = 0; x < visibleColumns; x++)
-        {
-            uint index = y * columns + x;
-            bounds[index].x = widths[x];
-            bounds[index].y = heights[y];
-        }
-
-        return bounds;
     }
 
     private float getColumnInnerWidth(float column)
     {
         float width = 0.0f;
 
-        uint startIndex = getRowIndex() * columns + column;
-        uint endIndex = Maths::Min(startIndex + getVisibleCount(), components.size());
+        uint startIndex = scrollIndex * visibleColumns + column;
+        uint endIndex = scrollIndex * visibleColumns + visibleCount;
 
         for (uint i = startIndex; i < endIndex; i += columns)
         {
@@ -279,43 +295,10 @@ class VerticalList : List
         return height;
     }
 
-    private uint getTotalRows()
-    {
-        return Maths::Ceil(components.size() / float(columns));
-    }
-
-    private uint getVisibleRows()
-    {
-        uint totalRows = getTotalRows();
-        return rows > 0 && rows < totalRows ? rows : totalRows;
-    }
-
-    private uint getVisibleColumns()
-    {
-        return Maths::Min(components.size(), columns);
-    }
-
-    private uint getVisibleCount()
-    {
-        return Maths::Min(getVisibleRows() * getVisibleColumns(), components.size());
-    }
-
-    private uint getRowIndex()
-    {
-        if (scrollbar is null) return 0.0f;
-
-        uint hiddenRows = getTotalRows() - getVisibleRows();
-        return Maths::Min((hiddenRows + 1) * scrollbar.getPercentage(), hiddenRows);
-    }
-
     void Update()
     {
-        uint totalCount = components.size();
-        uint visibleCount = getVisibleCount();
-        uint rowIndex = getRowIndex();
-
-        uint startIndex = rowIndex * columns;
-        uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
+        uint startIndex = scrollIndex * visibleColumns;
+        uint endIndex = startIndex + visibleCount;
 
         for (int i = endIndex - 1; i >= startIndex; i--)
         {
@@ -333,17 +316,14 @@ class VerticalList : List
 
     void Render()
     {
-        uint totalCount = components.size();
-        uint visibleCount = getVisibleCount();
-        uint rowIndex = getRowIndex();
+        CalculateScrollIndex();
+        CalculateBounds();
 
         Vec2f offset = Vec2f_zero;
         Vec2f innerPos = position + margin + padding;
 
-        Vec2f[] bounds = getCellBounds();
-
-        uint startIndex = rowIndex * columns;
-        uint endIndex = Maths::Min(startIndex + visibleCount, totalCount);
+        uint startIndex = scrollIndex * visibleColumns;
+        uint endIndex = startIndex + visibleCount;
 
         for (uint i = startIndex; i < endIndex; i++)
         {
@@ -352,15 +332,18 @@ class VerticalList : List
                 ? component.getBounds()
                 : Vec2f_zero;
 
-            uint columnIndex = i % columns;
-            if (columnIndex == 0)
+            uint x = i % columns;
+            uint y = (i - startIndex) / columns;
+            Vec2f cellBounds(columnWidths[x], rowHeights[y]);
+
+            if (x == 0)
             {
                 offset.x = 0.0f;
             }
 
             if (component !is null)
             {
-                Vec2f alignmentOffset = bounds[i - startIndex] - childBounds;
+                Vec2f alignmentOffset = cellBounds - childBounds;
                 alignmentOffset *= alignment;
                 Vec2f pos = innerPos + alignmentOffset + offset;
 
@@ -368,14 +351,14 @@ class VerticalList : List
                 component.Render();
             }
 
-            offset.x += bounds[i - startIndex].x + spacing.x;
-            if (columnIndex == columns - 1)
+            offset.x += cellBounds.x + spacing.x;
+            if (x == columns - 1)
             {
-                offset.y += bounds[i - startIndex].y + spacing.y;
+                offset.y += cellBounds.y + spacing.y;
             }
         }
 
-        if (scrollbar !is null && totalCount != visibleCount)
+        if (scrollbar !is null && visibleRows != totalRows)
         {
             Vec2f trueBounds = getTrueBounds();
             float scrollWidth = scrollbar.getSize().x;
@@ -383,7 +366,7 @@ class VerticalList : List
             float scrollPosX = position.x + margin.x + trueBounds.x - scrollWidth;
             scrollbar.SetPosition(scrollPosX, position.y);
             scrollbar.SetSize(scrollWidth, scrollHeight);
-            scrollbar.SetHandleSize(scrollHeight * visibleCount / Maths::Max(totalCount, 1.0f));
+            scrollbar.SetHandleSize(scrollHeight * visibleRows * visibleColumns / components.size());
             scrollbar.Render();
         }
     }

@@ -11,6 +11,8 @@ class StandardStack : Stack
     private Vec2f alignment = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
 
+    private Vec2f innerBounds = Vec2f_zero;
+
     void AddComponent(Component@ component)
     {
         if (component !is null)
@@ -63,25 +65,27 @@ class StandardStack : Stack
         return position;
     }
 
-    Vec2f getInnerBounds()
+    private void CalculateBounds()
     {
-        uint n = components.size();
-        if (n == 0) return Vec2f_zero;
+        innerBounds.SetZero();
 
-        Vec2f bounds = Vec2f_zero;
-        for (uint i = 0; i < n; i++)
+        for (uint i = 0; i < components.size(); i++)
         {
             Vec2f childBounds = components[i].getBounds();
-            if (childBounds.x > bounds.x)
+            if (childBounds.x > innerBounds.x)
             {
-                bounds.x = childBounds.x;
+                innerBounds.x = childBounds.x;
             }
-            if (childBounds.y > bounds.y)
+            if (childBounds.y > innerBounds.y)
             {
-                bounds.y = childBounds.y;
+                innerBounds.y = childBounds.y;
             }
         }
-        return bounds;
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return innerBounds;
     }
 
     Vec2f getTrueBounds()
@@ -134,7 +138,8 @@ class StandardStack : Stack
 
     void Render()
     {
-        Vec2f innerBounds = getInnerBounds();
+        CalculateBounds();
+
         Vec2f innerPos = position + margin + padding;
 
         for (uint i = 0; i < components.size(); i++)
