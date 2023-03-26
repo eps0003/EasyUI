@@ -17,6 +17,8 @@ interface List : Container, MultiChild
 
     void SetScrollIndex(uint index);
     uint getScrollIndex();
+
+    void OnScroll(EventHandler@ handler);
 }
 
 class VerticalList : List
@@ -42,6 +44,8 @@ class VerticalList : List
     private float[] columnWidths;
     private float[] rowHeights;
 
+    private EventHandler@[] scrollHandlers;
+
     VerticalList()
     {
         CalculateDimensions();
@@ -59,7 +63,16 @@ class VerticalList : List
     {
         if (scrollbar !is null)
         {
+            float prevScrollIndex = scrollIndex;
             scrollIndex = Maths::Min((hiddenRows + 1) * scrollbar.getPercentage(), hiddenRows);
+
+            if (scrollIndex != prevScrollIndex)
+            {
+                for (uint i = 0; i < scrollHandlers.size(); i++)
+                {
+                    scrollHandlers[i].Handle();
+                }
+            }
         }
 
         visibleCount = Maths::Min(components.size() - scrollIndex * visibleColumns, visibleRows * visibleColumns);
@@ -152,9 +165,17 @@ class VerticalList : List
         uint prevScrollIndex = scrollIndex;
         scrollIndex = Maths::Min(index, hiddenRows);
 
-        if (scrollbar !is null && prevScrollIndex != scrollIndex)
+        if (scrollIndex != prevScrollIndex)
         {
-            scrollbar.SetPercentage(index / Maths::Max(hiddenRows, 1.0f));
+            if (scrollbar !is null)
+            {
+                scrollbar.SetPercentage(index / Maths::Max(hiddenRows, 1.0f));
+            }
+
+            for (uint i = 0; i < scrollHandlers.size(); i++)
+            {
+                scrollHandlers[i].Handle();
+            }
         }
     }
 
@@ -188,6 +209,14 @@ class VerticalList : List
     Vec2f getBounds()
     {
         return margin + getTrueBounds() + margin;
+    }
+
+    void OnScroll(EventHandler@ handler)
+    {
+        if (handler !is null)
+        {
+            scrollHandlers.push_back(handler);
+        }
     }
 
     private bool isHovered()
