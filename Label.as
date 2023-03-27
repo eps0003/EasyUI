@@ -28,9 +28,20 @@ class StandardLabel : Label
     private Vec2f alignment = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
 
+    // Dynamic properties
+    private Vec2f bounds = Vec2f_zero;
+
+    StandardLabel()
+    {
+        CalculateBounds();
+    }
+
     void SetText(string text)
     {
+        if (this.text == text) return;
+
         this.text = text;
+        CalculateBounds();
     }
 
     string getText()
@@ -40,7 +51,10 @@ class StandardLabel : Label
 
     void SetFont(string font)
     {
+        if (this.font == font) return;
+
         this.font = font;
+        CalculateBounds();
     }
 
     string getFont()
@@ -82,9 +96,13 @@ class StandardLabel : Label
 
     Vec2f getBounds()
     {
-        Vec2f dim;
-        GUI::GetTextDimensions(text, dim);
-        return dim;
+        return bounds;
+    }
+
+    private void CalculateBounds()
+    {
+        GUI::SetFont(font);
+        GUI::GetTextDimensions(text, bounds);
     }
 
     Component@ getHoveredComponent()
@@ -126,10 +144,8 @@ class StandardLabel : Label
     {
         if (text == "") return;
 
-        Vec2f bounds = getBounds();
-        Vec2f pos;
-
         // The magic values correctly align the text with the bounds
+        Vec2f pos;
         pos.x = position.x - bounds.x * alignment.x - 2;
         pos.y = position.x - bounds.y * alignment.y - 1;
 

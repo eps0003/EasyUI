@@ -19,16 +19,6 @@ class StandardProgress : Progress
     private Vec2f position = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
 
-    void SetText(string text)
-    {
-        this.text = text;
-    }
-
-    string getText()
-    {
-        return text;
-    }
-
     void SetProgress(float progress)
     {
         float prevProgress = this.progress;
