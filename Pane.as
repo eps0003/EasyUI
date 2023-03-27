@@ -18,6 +18,7 @@ class StandardPane : Pane
     private Vec2f padding = Vec2f_zero;
     private StandardPaneType type = StandardPaneType::Normal;
     private Vec2f position = Vec2f_zero;
+    private EventListener@ events = StandardEventListener();
 
     private Vec2f innerBounds = Vec2f_zero;
 
@@ -118,6 +119,21 @@ class StandardPane : Pane
             }
         }
         return null;
+    }
+
+    void AddEventListener(string type, EventHandler@ handler)
+    {
+        events.AddEventListener(type, handler);
+    }
+
+    void RemoveEventListener(string type, EventHandler@ handler)
+    {
+        events.RemoveEventListener(type, handler);
+    }
+
+    void DispatchEvent(string type)
+    {
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()

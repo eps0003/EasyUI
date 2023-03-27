@@ -26,6 +26,7 @@ class StandardLabel : Label
     private SColor color = color_black;
     private Vec2f position = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
+    private EventListener@ events = StandardEventListener();
 
     void SetText(string text)
     {
@@ -96,6 +97,21 @@ class StandardLabel : Label
         return null;
     }
 
+    void AddEventListener(string type, EventHandler@ handler)
+    {
+        events.AddEventListener(type, handler);
+    }
+
+    void RemoveEventListener(string type, EventHandler@ handler)
+    {
+        events.RemoveEventListener(type, handler);
+    }
+
+    void DispatchEvent(string type)
+    {
+        events.DispatchEvent(type);
+    }
+
     void Update()
     {
 
@@ -128,8 +144,9 @@ class StandardAreaLabel : AreaLabel
     private string font = "menu";
     private SColor color = color_black;
     private Vec2f size = Vec2f_zero;
-    private Vec2f position = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
+    private Vec2f position = Vec2f_zero;
+    private EventListener@ events = StandardEventListener();
 
     void SetText(string text)
     {
@@ -207,6 +224,21 @@ class StandardAreaLabel : AreaLabel
     List@ getHoveredList()
     {
         return null;
+    }
+
+    void AddEventListener(string type, EventHandler@ handler)
+    {
+        events.AddEventListener(type, handler);
+    }
+
+    void RemoveEventListener(string type, EventHandler@ handler)
+    {
+        events.RemoveEventListener(type, handler);
+    }
+
+    void DispatchEvent(string type)
+    {
+        events.DispatchEvent(type);
     }
 
     void Update()

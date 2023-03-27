@@ -2,12 +2,6 @@ interface Button : Container, SingleChild
 {
     void SetSize(float width, float height);
     Vec2f getSize();
-
-    void Click();
-
-    void OnPress(EventHandler@ handler);
-    void OnRelease(EventHandler@ handler);
-    void OnClick(EventHandler@ handler);
 }
 
 class StandardButton : Button
@@ -20,11 +14,9 @@ class StandardButton : Button
     private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private bool pressed = false;
+    private EventListener@ events = StandardEventListener();
 
-    private EventHandler@[] pressHandlers;
-    private EventHandler@[] releaseHandlers;
-    private EventHandler@[] clickHandlers;
+    private bool pressed = false;
 
     StandardButton(EasyUI@ ui)
     {
@@ -123,36 +115,19 @@ class StandardButton : Button
         return null;
     }
 
-    void OnPress(EventHandler@ handler)
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            pressHandlers.push_back(handler);
-        }
+        events.AddEventListener(type, handler);
     }
 
-    void OnRelease(EventHandler@ handler)
+    void RemoveEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            releaseHandlers.push_back(handler);
-        }
+        events.RemoveEventListener(type, handler);
     }
 
-    void OnClick(EventHandler@ handler)
+    void DispatchEvent(string type)
     {
-        if (handler !is null)
-        {
-            clickHandlers.push_back(handler);
-        }
-    }
-
-    void Click()
-    {
-        for (uint i = 0; i < clickHandlers.size(); i++)
-        {
-            clickHandlers[i].Handle();
-        }
+        events.DispatchEvent(type);
     }
 
     void Update()
@@ -162,26 +137,18 @@ class StandardButton : Button
         if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.isComponentHovered(this))
         {
             pressed = true;
-
-            for (uint i = 0; i < pressHandlers.size(); i++)
-            {
-                pressHandlers[i].Handle();
-            }
+            events.DispatchEvent("press");
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             if (ui.isComponentHovered(this))
             {
-                Click();
+                events.DispatchEvent("click");
             }
 
             pressed = false;
-
-            for (uint i = 0; i < releaseHandlers.size(); i++)
-            {
-                releaseHandlers[i].Handle();
-            }
+            events.DispatchEvent("release");
         }
 
         if (component !is null)

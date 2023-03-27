@@ -8,10 +8,6 @@ interface Slider : Component
 
     void SetHandleSize(float size);
     float getHandleSize();
-
-    void OnStartDrag(EventHandler@ handler);
-    void OnEndDrag(EventHandler@ handler);
-    void OnChange(EventHandler@ handler);
 }
 
 interface VerticalSlider : Slider
@@ -34,10 +30,7 @@ class StandardVerticalSlider : VerticalSlider
     private float handleSize = 0.0f;
     private bool pressed = false;
     private float clickOffsetY;
-
-    private EventHandler@[] startDragHandlers;
-    private EventHandler@[] endDragHandlers;
-    private EventHandler@[] changeHandlers;
+    private EventListener@ events = StandardEventListener();
 
     StandardVerticalSlider(EasyUI@ ui)
     {
@@ -51,10 +44,7 @@ class StandardVerticalSlider : VerticalSlider
 
         if (this.percentage != prevPercentage)
         {
-            for (uint i = 0; i < changeHandlers.size(); i++)
-            {
-                changeHandlers[i].Handle();
-            }
+            events.DispatchEvent("change");
         }
     }
 
@@ -115,28 +105,19 @@ class StandardVerticalSlider : VerticalSlider
         return null;
     }
 
-    void OnStartDrag(EventHandler@ handler)
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            startDragHandlers.push_back(handler);
-        }
+        events.AddEventListener(type, handler);
     }
 
-    void OnEndDrag(EventHandler@ handler)
+    void RemoveEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            endDragHandlers.push_back(handler);
-        }
+        events.RemoveEventListener(type, handler);
     }
 
-    void OnChange(EventHandler@ handler)
+    void DispatchEvent(string type)
     {
-        if (handler !is null)
-        {
-            changeHandlers.push_back(handler);
-        }
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()
@@ -178,22 +159,14 @@ class StandardVerticalSlider : VerticalSlider
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
                 clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
-
-                for (uint i = 0; i < startDragHandlers.size(); i++)
-                {
-                    startDragHandlers[i].Handle();
-                }
+                events.DispatchEvent("dragstart");
             }
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
-
-            for (uint i = 0; i < endDragHandlers.size(); i++)
-            {
-                endDragHandlers[i].Handle();
-            }
+            events.DispatchEvent("dragend");
         }
     }
 
@@ -227,10 +200,7 @@ class StandardHorizontalSlider : HorizontalSlider
     private float handleSize = 0.0f;
     private bool pressed = false;
     private float clickOffsetX;
-
-    private EventHandler@[] startDragHandlers;
-    private EventHandler@[] endDragHandlers;
-    private EventHandler@[] changeHandlers;
+    private EventListener@ events = StandardEventListener();
 
     StandardHorizontalSlider(EasyUI@ ui)
     {
@@ -244,10 +214,7 @@ class StandardHorizontalSlider : HorizontalSlider
 
         if (this.percentage != prevPercentage)
         {
-            for (uint i = 0; i < changeHandlers.size(); i++)
-            {
-                changeHandlers[i].Handle();
-            }
+            events.DispatchEvent("change");
         }
     }
 
@@ -308,28 +275,19 @@ class StandardHorizontalSlider : HorizontalSlider
         return null;
     }
 
-    void OnStartDrag(EventHandler@ handler)
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            startDragHandlers.push_back(handler);
-        }
+        events.AddEventListener(type, handler);
     }
 
-    void OnEndDrag(EventHandler@ handler)
+    void RemoveEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            endDragHandlers.push_back(handler);
-        }
+        events.RemoveEventListener(type, handler);
     }
 
-    void OnChange(EventHandler@ handler)
+    void DispatchEvent(string type)
     {
-        if (handler !is null)
-        {
-            changeHandlers.push_back(handler);
-        }
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()
@@ -361,22 +319,14 @@ class StandardHorizontalSlider : HorizontalSlider
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
                 clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
-
-                for (uint i = 0; i < startDragHandlers.size(); i++)
-                {
-                    startDragHandlers[i].Handle();
-                }
+                events.DispatchEvent("dragstart");
             }
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
-
-            for (uint i = 0; i < endDragHandlers.size(); i++)
-            {
-                endDragHandlers[i].Handle();
-            }
+            events.DispatchEvent("dragend");
         }
     }
 

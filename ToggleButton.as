@@ -2,8 +2,6 @@ interface ToggleButton : Button
 {
     void SetChecked(bool checked);
     bool isChecked();
-
-    void OnChange(EventHandler@ handler);
 }
 
 class StandardToggleButton : ToggleButton
@@ -16,13 +14,10 @@ class StandardToggleButton : ToggleButton
     private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private EventListener@ events = StandardEventListener();
+
     private bool checked = false;
     private bool pressed = false;
-
-    private EventHandler@[] pressHandlers;
-    private EventHandler@[] releaseHandlers;
-    private EventHandler@[] clickHandlers;
-    private EventHandler@[] changeHandlers;
 
     StandardToggleButton(EasyUI@ ui)
     {
@@ -121,10 +116,7 @@ class StandardToggleButton : ToggleButton
 
         if (this.checked != wasChecked)
         {
-            for (uint i = 0; i < changeHandlers.size(); i++)
-            {
-                changeHandlers[i].Handle();
-            }
+            events.DispatchEvent("change");
         }
     }
 
@@ -133,46 +125,19 @@ class StandardToggleButton : ToggleButton
         return checked;
     }
 
-    void Click()
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        SetChecked(!checked);
-
-        for (uint i = 0; i < clickHandlers.size(); i++)
-        {
-            clickHandlers[i].Handle();
-        }
+        events.AddEventListener(type, handler);
     }
 
-    void OnPress(EventHandler@ handler)
+    void RemoveEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            pressHandlers.push_back(handler);
-        }
+        events.RemoveEventListener(type, handler);
     }
 
-    void OnRelease(EventHandler@ handler)
+    void DispatchEvent(string type)
     {
-        if (handler !is null)
-        {
-            releaseHandlers.push_back(handler);
-        }
-    }
-
-    void OnClick(EventHandler@ handler)
-    {
-        if (handler !is null)
-        {
-            clickHandlers.push_back(handler);
-        }
-    }
-
-    void OnChange(EventHandler@ handler)
-    {
-        if (handler !is null)
-        {
-            changeHandlers.push_back(handler);
-        }
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()
@@ -189,26 +154,18 @@ class StandardToggleButton : ToggleButton
         if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.isComponentHovered(this))
         {
             pressed = true;
-
-            for (uint i = 0; i < pressHandlers.size(); i++)
-            {
-                pressHandlers[i].Handle();
-            }
+            events.DispatchEvent("press");
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             if (ui.isComponentHovered(this))
             {
-                Click();
+                events.DispatchEvent("click");
             }
 
             pressed = false;
-
-            for (uint i = 0; i < releaseHandlers.size(); i++)
-            {
-                releaseHandlers[i].Handle();
-            }
+            events.DispatchEvent("release");
         }
 
         if (component !is null)

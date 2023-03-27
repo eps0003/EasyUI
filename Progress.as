@@ -5,8 +5,6 @@ interface Progress : Container, SingleChild
 
     void SetProgress(float progress);
     float getProgress();
-
-    void OnChange(EventHandler@ handler);
 }
 
 class StandardProgress : Progress
@@ -19,8 +17,7 @@ class StandardProgress : Progress
     private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-
-    private EventHandler@[] changeHandlers;
+    private EventListener@ events = StandardEventListener();
 
     void SetText(string text)
     {
@@ -39,10 +36,7 @@ class StandardProgress : Progress
 
         if (this.progress != prevProgress)
         {
-            for (uint i = 0; i < changeHandlers.size(); i++)
-            {
-                changeHandlers[i].Handle();
-            }
+            events.DispatchEvent("change");
         }
     }
 
@@ -131,12 +125,19 @@ class StandardProgress : Progress
         return null;
     }
 
-    void OnChange(EventHandler@ handler)
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            changeHandlers.push_back(handler);
-        }
+        events.AddEventListener(type, handler);
+    }
+
+    void RemoveEventListener(string type, EventHandler@ handler)
+    {
+        events.RemoveEventListener(type, handler);
+    }
+
+    void DispatchEvent(string type)
+    {
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()

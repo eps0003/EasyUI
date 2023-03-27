@@ -17,8 +17,6 @@ interface List : Container, MultiChild
 
     void SetScrollIndex(uint index);
     uint getScrollIndex();
-
-    void OnScroll(EventHandler@ handler);
 }
 
 class VerticalList : List
@@ -33,6 +31,7 @@ class VerticalList : List
     private Vec2f position = Vec2f_zero;
     private Slider@ scrollbar;
     private uint scrollIndex = 0;
+    private EventListener@ events = StandardEventListener();
 
     // Properties calculated dynamically
     private Vec2f innerBounds = Vec2f_zero;
@@ -43,8 +42,6 @@ class VerticalList : List
     private uint hiddenRows = 0;
     private float[] columnWidths;
     private float[] rowHeights;
-
-    private EventHandler@[] scrollHandlers;
 
     private void CalculateProperties()
     {
@@ -60,10 +57,7 @@ class VerticalList : List
 
             if (scrollIndex != prevScrollIndex)
             {
-                for (uint i = 0; i < scrollHandlers.size(); i++)
-                {
-                    scrollHandlers[i].Handle();
-                }
+                events.DispatchEvent("scroll");
             }
         }
 
@@ -161,10 +155,7 @@ class VerticalList : List
                 scrollbar.SetPercentage(index / Maths::Max(hiddenRows, 1.0f));
             }
 
-            for (uint i = 0; i < scrollHandlers.size(); i++)
-            {
-                scrollHandlers[i].Handle();
-            }
+            events.DispatchEvent("scroll");
         }
     }
 
@@ -200,12 +191,19 @@ class VerticalList : List
         return margin + getTrueBounds() + margin;
     }
 
-    void OnScroll(EventHandler@ handler)
+    void AddEventListener(string type, EventHandler@ handler)
     {
-        if (handler !is null)
-        {
-            scrollHandlers.push_back(handler);
-        }
+        events.AddEventListener(type, handler);
+    }
+
+    void RemoveEventListener(string type, EventHandler@ handler)
+    {
+        events.RemoveEventListener(type, handler);
+    }
+
+    void DispatchEvent(string type)
+    {
+        events.DispatchEvent(type);
     }
 
     private bool isHovered()

@@ -1,4 +1,0 @@
-interface EventHandler
-{
-    void Handle();
-}
