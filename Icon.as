@@ -112,7 +112,7 @@ class StandardIcon : Icon
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }

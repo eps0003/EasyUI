@@ -100,7 +100,7 @@ class StandardVerticalSlider : VerticalSlider
         return isHovered() ? cast<Component>(this) : null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }
@@ -154,7 +154,7 @@ class StandardVerticalSlider : VerticalSlider
 
         if (controls.isKeyJustPressed(KEY_LBUTTON))
         {
-            if (isHandleHovered() && ui.isComponentHovered(this))
+            if (isHandleHovered() && ui.canClick(this))
             {
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
@@ -179,7 +179,7 @@ class StandardVerticalSlider : VerticalSlider
         Vec2f min = position + Vec2f(0, handleY);
         Vec2f max = position + Vec2f(size.x, handleSize + handleY);
 
-        if (pressed || (isHandleHovered() && ui.isComponentHovered(this)))
+        if (pressed || (isHandleHovered() && ui.canClick(this)))
         {
             GUI::DrawButtonHover(min, max);
         }
@@ -270,7 +270,7 @@ class StandardHorizontalSlider : HorizontalSlider
         return isHovered() ? cast<Component>(this) : null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }
@@ -314,7 +314,7 @@ class StandardHorizontalSlider : HorizontalSlider
 
         if (controls.isKeyJustPressed(KEY_LBUTTON))
         {
-            if (isHandleHovered() && ui.isComponentHovered(this))
+            if (isHandleHovered() && ui.canClick(this))
             {
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
@@ -349,7 +349,7 @@ class StandardHorizontalSlider : HorizontalSlider
         Vec2f min = position + Vec2f(handleX, 0);
         Vec2f max = position + Vec2f(handleSize + handleX, size.y);
 
-        if (pressed || (isHandleHovered() && ui.isComponentHovered(this)))
+        if (pressed || (isHandleHovered() && ui.canClick(this)))
         {
             GUI::DrawButtonHover(min, max);
         }

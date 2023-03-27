@@ -110,7 +110,7 @@ class StandardProgress : Progress
         return isHovered() ? cast<Component>(this) : null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }

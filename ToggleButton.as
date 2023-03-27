@@ -104,7 +104,7 @@ class StandardToggleButton : ToggleButton
         return isHovered() ? cast<Component>(this) : null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }
@@ -151,7 +151,7 @@ class StandardToggleButton : ToggleButton
     {
         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.isComponentHovered(this))
+        if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.canClick(this))
         {
             pressed = true;
             events.DispatchEvent("press");
@@ -159,7 +159,7 @@ class StandardToggleButton : ToggleButton
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
-            if (ui.isComponentHovered(this))
+            if (ui.canClick(this))
             {
                 events.DispatchEvent("click");
             }
@@ -187,7 +187,7 @@ class StandardToggleButton : ToggleButton
         Vec2f min = position + margin;
         Vec2f max = min + size;
 
-        if (ui.isComponentHovered(this))
+        if (ui.canClick(this))
         {
             if (pressed)
             {

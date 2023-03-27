@@ -15,8 +15,12 @@
 class EasyUI
 {
     private Component@[] components;
+
     private Component@ hovered;
-    private bool queried = false;
+    private bool queriedHover = false;
+
+    private Component@ scrollable;
+    private bool queriedScroll = false;
 
     void AddComponent(Component@ component)
     {
@@ -26,9 +30,20 @@ class EasyUI
         }
     }
 
+    bool canClick(Component@ component)
+    {
+        return component !is null && component is getHoveredComponent();
+    }
+
+    bool canScroll(Component@ component)
+    {
+        return component !is null && component is getScrollableComponent();
+    }
+
     Component@ getHoveredComponent()
     {
-        if (queried) return hovered;
+        if (queriedHover) return hovered;
+        queriedHover = true;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -36,38 +51,36 @@ class EasyUI
             if (hovered !is null) break;
         }
 
-        queried = true;
         return hovered;
     }
 
-    bool isComponentHovered(Component@ component)
+    Component@ getScrollableComponent()
     {
-        return component !is null && component is getHoveredComponent();
-    }
+        if (queriedScroll) return scrollable;
+        queriedScroll = true;
 
-    List@ getHoveredList()
-    {
         for (int i = components.size() - 1; i >= 0; i--)
         {
             Component@ component = components[i];
             if (component is null) continue;
 
-            List@ list = component.getHoveredList();
-            if (list !is null) return list;
+            @scrollable = component.getScrollableComponent();
+            if (scrollable !is null) return scrollable;
 
             Component@ hovered = component.getHoveredComponent();
             if (hovered !is null) break;
         }
-        return null;
-    }
 
-    bool isListHovered(List@ list)
-    {
-        return list !is null && list is getHoveredList();
+        return null;
     }
 
     void Update()
     {
+        @hovered = null;
+        @scrollable = null;
+        queriedHover = false;
+        queriedScroll = false;
+
         for (int i = components.size() - 1; i >= 0; i--)
         {
             components[i].Update();
@@ -77,7 +90,9 @@ class EasyUI
     void Render()
     {
         @hovered = null;
-        queried = false;
+        @scrollable = null;
+        queriedHover = false;
+        queriedScroll = false;
 
         for (uint i = 0; i < components.size(); i++)
         {

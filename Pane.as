@@ -108,14 +108,14 @@ class StandardPane : Pane
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         if (component !is null && isHovered())
         {
-            List@ list = component.getHoveredList();
-            if (list !is null)
+            Component@ scrollable = component.getScrollableComponent();
+            if (scrollable !is null)
             {
-                return list;
+                return scrollable;
             }
         }
         return null;

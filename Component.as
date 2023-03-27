@@ -4,10 +4,11 @@ interface Component : EventListener
     Vec2f getPosition();
 
     Vec2f getBounds();
-    Component@ getHoveredComponent();
-    List@ getHoveredList();
 
     void Update();
     void PreRender();
     void Render();
+
+    Component@ getHoveredComponent();
+    Component@ getScrollableComponent();
 }

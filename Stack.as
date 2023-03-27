@@ -123,7 +123,7 @@ class StandardStack : Stack
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         if (isHovered())
         {
@@ -132,8 +132,8 @@ class StandardStack : Stack
                 Component@ component = components[i];
                 if (component is null) continue;
 
-                List@ list = component.getHoveredList();
-                if (list !is null) return list;
+                Component@ scrollable = component.getScrollableComponent();
+                if (scrollable !is null) return scrollable;
 
                 Component@ hovered = component.getHoveredComponent();
                 if (hovered !is null) break;

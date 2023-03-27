@@ -245,7 +245,7 @@ class VerticalList : List
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         if (isHovered())
         {
@@ -259,13 +259,13 @@ class VerticalList : List
                 Component@ component = components[i];
                 if (component is null) continue;
 
-                List@ list = component.getHoveredList();
-                if (list is null) continue;
+                Component@ scrollable = component.getScrollableComponent();
+                if (scrollable is null) continue;
 
-                return list;
+                return scrollable;
             }
 
-            return this;
+            return cast<Component>(this);
         }
         return null;
     }
@@ -346,7 +346,7 @@ class VerticalList : List
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();
 
-        if (ui.isListHovered(this))
+        if (ui.canScroll(this))
         {
             uint scrollIndex = getScrollIndex();
             CControls@ controls = getControls();

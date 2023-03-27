@@ -110,7 +110,7 @@ class StandardLabel : Label
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }
@@ -237,7 +237,7 @@ class StandardAreaLabel : AreaLabel
         return null;
     }
 
-    List@ getHoveredList()
+    Component@ getScrollableComponent()
     {
         return null;
     }
