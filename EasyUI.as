@@ -11,16 +11,11 @@
 #include "Pane.as"
 #include "Utilities.as"
 #include "EventListener.as"
+#include "CachedBounds.as"
 
 class EasyUI
 {
     private Component@[] components;
-
-    private Component@ hovered;
-    private bool queriedHover = false;
-
-    private Component@ scrollable;
-    private bool queriedScroll = false;
 
     void AddComponent(Component@ component)
     {
@@ -42,8 +37,7 @@ class EasyUI
 
     Component@ getHoveredComponent()
     {
-        if (queriedHover) return hovered;
-        queriedHover = true;
+        Component@ hovered;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -56,8 +50,7 @@ class EasyUI
 
     Component@ getScrollableComponent()
     {
-        if (queriedScroll) return scrollable;
-        queriedScroll = true;
+        Component@ scrollable;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -76,11 +69,6 @@ class EasyUI
 
     void Update()
     {
-        @hovered = null;
-        @scrollable = null;
-        queriedHover = false;
-        queriedScroll = false;
-
         for (int i = components.size() - 1; i >= 0; i--)
         {
             components[i].Update();
@@ -89,16 +77,9 @@ class EasyUI
 
     void Render()
     {
-        @hovered = null;
-        @scrollable = null;
-        queriedHover = false;
-        queriedScroll = false;
-
         for (uint i = 0; i < components.size(); i++)
         {
-            Component@ component = components[i];
-            component.PreRender();
-            component.Render();
+            components[i].Render();
         }
     }
 }

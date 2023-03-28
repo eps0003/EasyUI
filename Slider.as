@@ -39,13 +39,13 @@ class StandardVerticalSlider : VerticalSlider
 
     void SetPercentage(float percentage)
     {
-        float prevPercentage = this.percentage;
-        this.percentage = Maths::Clamp01(percentage);
+        percentage = Maths::Clamp01(percentage);
 
-        if (this.percentage != prevPercentage)
-        {
-            events.DispatchEvent("change");
-        }
+        if (this.percentage == percentage) return;
+
+        this.percentage = percentage;
+
+        events.DispatchEvent("change");
     }
 
     float getPercentage()
@@ -55,8 +55,12 @@ class StandardVerticalSlider : VerticalSlider
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
+
+        events.DispatchEvent("resize");
 
         if (handleSize == 0.0f)
         {
@@ -138,14 +142,13 @@ class StandardVerticalSlider : VerticalSlider
         return position + Vec2f(0.0f, handleY);
     }
 
-    void PreRender()
+    private void MoveHandleIfDragging()
     {
-        if (pressed)
-        {
-            float mouseY = getControls().getInterpMouseScreenPos().y;
-            float handleY = mouseY - handleSize * clickOffsetY;
-            SetPercentage((handleY - position.y) / Maths::Max(size.y - handleSize, 1.0f));
-        }
+        if (!pressed) return;
+
+        float mouseY = getControls().getInterpMouseScreenPos().y;
+        float handleY = mouseY - handleSize * clickOffsetY;
+        SetPercentage((handleY - position.y) / Maths::Max(size.y - handleSize, 1.0f));
     }
 
     void Update()
@@ -163,6 +166,9 @@ class StandardVerticalSlider : VerticalSlider
             }
         }
 
+        // Call this here to override any external code updating the percentage
+        MoveHandleIfDragging();
+
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
@@ -172,10 +178,12 @@ class StandardVerticalSlider : VerticalSlider
 
     void Render()
     {
-        float handleY = (size.y - handleSize) * percentage;
-
         GUI::DrawSunkenPane(position, position + size);
 
+        // Call this here to make dragging look smooth
+        MoveHandleIfDragging();
+
+        float handleY = (size.y - handleSize) * percentage;
         Vec2f min = position + Vec2f(0, handleY);
         Vec2f max = position + Vec2f(size.x, handleSize + handleY);
 
@@ -209,13 +217,13 @@ class StandardHorizontalSlider : HorizontalSlider
 
     void SetPercentage(float percentage)
     {
-        float prevPercentage = this.percentage;
-        this.percentage = Maths::Clamp01(percentage);
+        percentage = Maths::Clamp01(percentage);
 
-        if (this.percentage != prevPercentage)
-        {
-            events.DispatchEvent("change");
-        }
+        if (this.percentage == percentage) return;
+
+        this.percentage = percentage;
+
+        events.DispatchEvent("change");
     }
 
     float getPercentage()
@@ -225,8 +233,12 @@ class StandardHorizontalSlider : HorizontalSlider
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
+
+        events.DispatchEvent("resize");
 
         if (handleSize == 0.0f)
         {
@@ -330,14 +342,13 @@ class StandardHorizontalSlider : HorizontalSlider
         }
     }
 
-    void PreRender()
+    private void MoveHandleIfDragging()
     {
-        if (pressed)
-        {
-            float mouseX = getControls().getInterpMouseScreenPos().x;
-            float handleX = mouseX - handleSize * clickOffsetX;
-            SetPercentage((handleX - position.x) / Maths::Max(size.x - handleSize, 1.0f));
-        }
+        if (!pressed) return;
+
+        float mouseX = getControls().getInterpMouseScreenPos().x;
+        float handleX = mouseX - handleSize * clickOffsetX;
+        SetPercentage((handleX - position.x) / Maths::Max(size.x - handleSize, 1.0f));
     }
 
     void Render()

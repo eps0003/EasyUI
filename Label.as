@@ -19,7 +19,7 @@ interface AreaLabel : Label
     Vec2f getSize();
 }
 
-class StandardLabel : Label
+class StandardLabel : Label, CachedBounds
 {
     private string text;
     private string font = "menu";
@@ -28,20 +28,17 @@ class StandardLabel : Label
     private Vec2f alignment = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
 
-    // Dynamic properties
     private Vec2f bounds = Vec2f_zero;
-
-    StandardLabel()
-    {
-        CalculateBounds();
-    }
+    private bool calculateBounds = true;
 
     void SetText(string text)
     {
         if (this.text == text) return;
 
         this.text = text;
+
         CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     string getText()
@@ -54,7 +51,9 @@ class StandardLabel : Label
         if (this.font == font) return;
 
         this.font = font;
+
         CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     string getFont()
@@ -96,13 +95,20 @@ class StandardLabel : Label
 
     Vec2f getBounds()
     {
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+
+            GUI::SetFont(font);
+            GUI::GetTextDimensions(text, bounds);
+        }
+
         return bounds;
     }
 
     private void CalculateBounds()
     {
-        GUI::SetFont(font);
-        GUI::GetTextDimensions(text, bounds);
+        calculateBounds = true;
     }
 
     Component@ getHoveredComponent()
@@ -131,11 +137,6 @@ class StandardLabel : Label
     }
 
     void Update()
-    {
-
-    }
-
-    void PreRender()
     {
 
     }
@@ -196,8 +197,12 @@ class StandardAreaLabel : AreaLabel
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -258,11 +263,6 @@ class StandardAreaLabel : AreaLabel
     }
 
     void Update()
-    {
-
-    }
-
-    void PreRender()
     {
 
     }

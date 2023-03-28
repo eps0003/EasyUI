@@ -48,14 +48,10 @@ class StandardIcon : Icon
 
     void SetFrameDimension(uint width, uint height)
     {
+        if (frameDim.x == width && frameDim.y == height) return;
+
         frameDim.x = width;
         frameDim.y = height;
-
-        if (size.LengthSquared() == 0)
-        {
-            size.x = width;
-            size.y = height;
-        }
     }
 
     Vec2f getFrameDimension()
@@ -65,14 +61,12 @@ class StandardIcon : Icon
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
 
-        if (frameDim.LengthSquared() == 0)
-        {
-            frameDim.x = width;
-            frameDim.y = height;
-        }
+        events.DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -137,16 +131,18 @@ class StandardIcon : Icon
 
     }
 
-    void PreRender()
+    private bool canRender()
     {
-
+        return (
+            icon != "" &&
+            size.LengthSquared() > 0 &&
+            frameDim.LengthSquared() > 0
+        );
     }
 
     void Render()
     {
-        if (icon == "") return;
-        if (size.LengthSquared() == 0) return;
-        if (frameDim.LengthSquared() == 0) return;
+        if (!canRender()) return;
 
         Vec2f align, scale, pos;
 

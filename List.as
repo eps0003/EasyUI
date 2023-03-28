@@ -177,6 +177,31 @@ class VerticalList : List
 
     Vec2f getInnerBounds()
     {
+        CalculateProperties();
+
+        rowHeights.clear();
+        columnWidths.clear();
+
+        // Spacing between components
+        innerBounds.x = Maths::Max(visibleColumns - 1, 0) * spacing.x;
+        innerBounds.y = Maths::Max(visibleRows - 1, 0) * spacing.y;
+
+        // Component widths
+        for (uint i = 0; i < visibleColumns; i++)
+        {
+            float width = getColumnInnerWidth(i);
+            columnWidths.push_back(width);
+            innerBounds.x += width;
+        }
+
+        // Component heights
+        for (uint i = 0; i < visibleRows; i++)
+        {
+            float height = getRowInnerHeight(scrollIndex + i);
+            rowHeights.push_back(height);
+            innerBounds.y += height;
+        }
+
         return innerBounds;
     }
 
@@ -270,32 +295,6 @@ class VerticalList : List
         return null;
     }
 
-    private void CalculateBounds()
-    {
-        rowHeights.clear();
-        columnWidths.clear();
-
-        // Spacing between components
-        innerBounds.x = Maths::Max(visibleColumns - 1, 0) * spacing.x;
-        innerBounds.y = Maths::Max(visibleRows - 1, 0) * spacing.y;
-
-        // Component widths
-        for (uint i = 0; i < visibleColumns; i++)
-        {
-            float width = getColumnInnerWidth(i);
-            columnWidths.push_back(width);
-            innerBounds.x += width;
-        }
-
-        // Component heights
-        for (uint i = 0; i < visibleRows; i++)
-        {
-            float height = getRowInnerHeight(scrollIndex + i);
-            rowHeights.push_back(height);
-            innerBounds.y += height;
-        }
-    }
-
     private float getColumnInnerWidth(float column)
     {
         float width = 0.0f;
@@ -377,31 +376,10 @@ class VerticalList : List
         }
     }
 
-    void PreRender()
+    void Render()
     {
         CalculateProperties();
 
-        uint startIndex = scrollIndex * visibleColumns;
-        uint endIndex = startIndex + visibleCount;
-
-        for (uint i = startIndex; i < endIndex; i++)
-        {
-            Component@ component = components[i];
-            if (component is null) continue;
-
-            component.PreRender();
-        }
-
-        if (scrollbar !is null)
-        {
-            scrollbar.PreRender();
-        }
-
-        CalculateBounds();
-    }
-
-    void Render()
-    {
         Vec2f offset = Vec2f_zero;
         Vec2f innerPos = position + margin + padding;
 

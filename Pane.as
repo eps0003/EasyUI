@@ -10,7 +10,7 @@ enum StandardPaneType
     Framed
 }
 
-class StandardPane : Pane
+class StandardPane : Pane, CachedBounds
 {
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
@@ -20,16 +20,32 @@ class StandardPane : Pane
     private Vec2f position = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
 
-    private Vec2f innerBounds = Vec2f_zero;
+    private Vec2f bounds = Vec2f_zero;
+    private bool calculateBounds = false;
+    private EventHandler@ cachedBoundsHandler;
 
     StandardPane(StandardPaneType type)
     {
         this.type = type;
+        @cachedBoundsHandler = CachedBoundsHandler(this);
     }
 
     void SetComponent(Component@ component)
     {
+        if (this.component is component) return;
+
+        if (component !is null)
+        {
+            component.AddEventListener("resize", cachedBoundsHandler);
+        }
+        else
+        {
+            this.component.RemoveEventListener("resize", cachedBoundsHandler);
+        }
+
         @this.component = component;
+
+        CalculateBounds();
     }
 
     void SetAlignment(float x, float y)
@@ -45,8 +61,13 @@ class StandardPane : Pane
 
     void SetMargin(float x, float y)
     {
+        if (margin.x == x && margin.y == y) return;
+
         margin.x = x;
         margin.y = y;
+
+        CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -56,8 +77,13 @@ class StandardPane : Pane
 
     void SetPadding(float x, float y)
     {
+        if (padding.x == x && padding.y == y) return;
+
         padding.x = x;
         padding.y = y;
+
+        CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -78,7 +104,16 @@ class StandardPane : Pane
 
     Vec2f getInnerBounds()
     {
-        return innerBounds;
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+
+            bounds = component !is null
+                ? component.getBounds()
+                : Vec2f_zero;
+        }
+
+        return bounds;
     }
 
     Vec2f getTrueBounds()
@@ -89,6 +124,11 @@ class StandardPane : Pane
     Vec2f getBounds()
     {
         return margin + getTrueBounds() + margin;
+    }
+
+    void CalculateBounds()
+    {
+        calculateBounds = true;
     }
 
     Component@ getHoveredComponent()
@@ -143,13 +183,6 @@ class StandardPane : Pane
         return isMouseInBounds(min, max);
     }
 
-    private void CalculateInnerBounds()
-    {
-        innerBounds = component !is null
-            ? component.getBounds()
-            : Vec2f_zero;
-    }
-
     void Update()
     {
         if (component !is null)
@@ -158,20 +191,8 @@ class StandardPane : Pane
         }
     }
 
-    void PreRender()
-    {
-        if (component !is null)
-        {
-            component.PreRender();
-        }
-
-        CalculateInnerBounds();
-    }
-
     void Render()
     {
-        if (component is null) return;
-
         Vec2f innerBounds = getInnerBounds();
         Vec2f min = position + margin;
         Vec2f max = min + padding + innerBounds + padding;
@@ -193,7 +214,10 @@ class StandardPane : Pane
                 break;
         }
 
-        component.SetPosition(innerPos.x, innerPos.y);
-        component.Render();
+        if (component !is null)
+        {
+            component.SetPosition(innerPos.x, innerPos.y);
+            component.Render();
+        }
     }
 }

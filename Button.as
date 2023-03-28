@@ -30,8 +30,12 @@ class StandardButton : Button
 
     void SetMargin(float x, float y)
     {
+        if (margin.x == x && margin.y == y) return;
+
         margin.x = x;
         margin.y = y;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -41,8 +45,12 @@ class StandardButton : Button
 
     void SetPadding(float x, float y)
     {
+        if (padding.x == x && padding.y == y) return;
+
         padding.x = x;
         padding.y = y;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -63,8 +71,12 @@ class StandardButton : Button
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -154,14 +166,6 @@ class StandardButton : Button
         if (component !is null)
         {
             component.Update();
-        }
-    }
-
-    void PreRender()
-    {
-        if (component !is null)
-        {
-            component.PreRender();
         }
     }
 

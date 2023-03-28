@@ -3,7 +3,7 @@ interface Stack : Container, MultiChild
 
 }
 
-class StandardStack : Stack
+class StandardStack : Stack, CachedBounds
 {
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;
@@ -13,20 +13,27 @@ class StandardStack : Stack
     private EventListener@ events = StandardEventListener();
 
     private Vec2f innerBounds = Vec2f_zero;
+    private bool calculateBounds = false;
 
     void AddComponent(Component@ component)
     {
-        if (component !is null)
-        {
-            components.push_back(component);
-            CalculateInnerBounds();
-        }
+        if (component is null) return;
+
+        components.push_back(component);
+
+        CalculateBounds();
+        component.AddEventListener("resize", CachedBoundsHandler(this));
     }
 
     void SetMargin(float x, float y)
     {
+        if (margin.x == x && margin.y == y) return;
+
         margin.x = x;
         margin.y = y;
+
+        CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -36,8 +43,13 @@ class StandardStack : Stack
 
     void SetPadding(float x, float y)
     {
+        if (padding.x == x && padding.y == y) return;
+
         padding.x = x;
         padding.y = y;
+
+        CalculateBounds();
+        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -67,26 +79,27 @@ class StandardStack : Stack
         return position;
     }
 
-    private void CalculateInnerBounds()
-    {
-        innerBounds.SetZero();
-
-        for (uint i = 0; i < components.size(); i++)
-        {
-            Vec2f childBounds = components[i].getBounds();
-            if (childBounds.x > innerBounds.x)
-            {
-                innerBounds.x = childBounds.x;
-            }
-            if (childBounds.y > innerBounds.y)
-            {
-                innerBounds.y = childBounds.y;
-            }
-        }
-    }
-
     Vec2f getInnerBounds()
     {
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+            innerBounds.SetZero();
+
+            for (uint i = 0; i < components.size(); i++)
+            {
+                Vec2f childBounds = components[i].getBounds();
+                if (childBounds.x > innerBounds.x)
+                {
+                    innerBounds.x = childBounds.x;
+                }
+                if (childBounds.y > innerBounds.y)
+                {
+                    innerBounds.y = childBounds.y;
+                }
+            }
+        }
+
         return innerBounds;
     }
 
@@ -98,6 +111,11 @@ class StandardStack : Stack
     Vec2f getBounds()
     {
         return margin + getTrueBounds() + margin;
+    }
+
+    void CalculateBounds()
+    {
+        calculateBounds = true;
     }
 
     bool isClickable()
@@ -172,19 +190,10 @@ class StandardStack : Stack
         }
     }
 
-    void PreRender()
-    {
-        for (uint i = 0; i < components.size(); i++)
-        {
-            components[i].PreRender();
-        }
-
-        CalculateInnerBounds();
-    }
-
     void Render()
     {
         Vec2f innerPos = position + margin + padding;
+        Vec2f innerBounds = getInnerBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {

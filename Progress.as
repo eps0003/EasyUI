@@ -21,13 +21,13 @@ class StandardProgress : Progress
 
     void SetProgress(float progress)
     {
-        float prevProgress = this.progress;
-        this.progress = Maths::Clamp01(progress);
+        progress = Maths::Clamp01(progress);
 
-        if (this.progress != prevProgress)
-        {
-            events.DispatchEvent("change");
-        }
+        if (this.progress == progress) return;
+
+        this.progress = progress;
+
+        events.DispatchEvent("change");
     }
 
     float getProgress()
@@ -48,8 +48,12 @@ class StandardProgress : Progress
 
     void SetMargin(float x, float y)
     {
+        if (margin.x == x && margin.y == y) return;
+
         margin.x = x;
         margin.y = y;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -59,8 +63,12 @@ class StandardProgress : Progress
 
     void SetPadding(float x, float y)
     {
+        if (padding.x == x && padding.y == y) return;
+
         padding.x = x;
         padding.y = y;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -70,8 +78,12 @@ class StandardProgress : Progress
 
     void SetSize(float width, float height)
     {
+        if (size.x == width && size.y == height) return;
+
         size.x = width;
         size.y = height;
+
+        events.DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -140,14 +152,6 @@ class StandardProgress : Progress
         if (component !is null)
         {
             component.Update();
-        }
-    }
-
-    void PreRender()
-    {
-        if (component !is null)
-        {
-            component.PreRender();
         }
     }
 

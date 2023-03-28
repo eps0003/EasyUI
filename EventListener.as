@@ -34,6 +34,8 @@ class StandardEventListener : EventListener
 
             eventTypes.removeAt(i);
             eventHandlers.removeAt(i);
+
+            break;
         }
     }
 

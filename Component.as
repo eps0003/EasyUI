@@ -6,7 +6,6 @@ interface Component : EventListener
     Vec2f getBounds();
 
     void Update();
-    void PreRender();
     void Render();
 
     Component@ getHoveredComponent();
