@@ -17,6 +17,12 @@ class EasyUI
 {
     private Component@[] components;
 
+    private Component@ hovered;
+    private bool queriedHover = false;
+
+    private Component@ scrollable;
+    private bool queriedScroll = false;
+
     void AddComponent(Component@ component)
     {
         if (component !is null)
@@ -37,7 +43,8 @@ class EasyUI
 
     Component@ getHoveredComponent()
     {
-        Component@ hovered;
+        if (queriedHover) return hovered;
+        queriedHover = true;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -50,7 +57,8 @@ class EasyUI
 
     Component@ getScrollableComponent()
     {
-        Component@ scrollable;
+        if (queriedScroll) return scrollable;
+        queriedScroll = true;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -69,6 +77,11 @@ class EasyUI
 
     void Update()
     {
+        @hovered = null;
+        @scrollable = null;
+        queriedHover = false;
+        queriedScroll = false;
+
         for (int i = components.size() - 1; i >= 0; i--)
         {
             components[i].Update();
@@ -77,6 +90,11 @@ class EasyUI
 
     void Render()
     {
+        @hovered = null;
+        @scrollable = null;
+        queriedHover = false;
+        queriedScroll = false;
+
         for (uint i = 0; i < components.size(); i++)
         {
             components[i].Render();
