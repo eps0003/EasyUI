@@ -33,7 +33,6 @@ class StandardStack : Stack, CachedBounds
         margin.y = y;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -49,7 +48,6 @@ class StandardStack : Stack, CachedBounds
         padding.y = y;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -116,6 +114,7 @@ class StandardStack : Stack, CachedBounds
     void CalculateBounds()
     {
         calculateBounds = true;
+        events.DispatchEvent("resize");
     }
 
     bool isClickable()

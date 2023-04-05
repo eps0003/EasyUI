@@ -9,7 +9,6 @@ interface Progress : Container, SingleChild
 
 class StandardProgress : Progress
 {
-    private string text;
     private float progress = 0.0f;
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;

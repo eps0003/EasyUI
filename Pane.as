@@ -67,7 +67,6 @@ class StandardPane : Pane, CachedBounds
         margin.y = y;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -83,7 +82,6 @@ class StandardPane : Pane, CachedBounds
         padding.y = y;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -129,6 +127,7 @@ class StandardPane : Pane, CachedBounds
     void CalculateBounds()
     {
         calculateBounds = true;
+        events.DispatchEvent("resize");
     }
 
     Component@ getHoveredComponent()

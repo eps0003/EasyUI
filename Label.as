@@ -38,7 +38,6 @@ class StandardLabel : Label, CachedBounds
         this.text = text;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     string getText()
@@ -53,7 +52,6 @@ class StandardLabel : Label, CachedBounds
         this.font = font;
 
         CalculateBounds();
-        events.DispatchEvent("resize");
     }
 
     string getFont()
@@ -109,6 +107,7 @@ class StandardLabel : Label, CachedBounds
     private void CalculateBounds()
     {
         calculateBounds = true;
+        events.DispatchEvent("resize");
     }
 
     Component@ getHoveredComponent()
