@@ -22,12 +22,12 @@ class StandardPane : Pane, CachedBounds
 
     private Vec2f bounds = Vec2f_zero;
     private bool calculateBounds = false;
-    private EventHandler@ cachedBoundsHandler;
+    private EventHandler@ componentResizeHandler;
 
     StandardPane(StandardPaneType type)
     {
         this.type = type;
-        @cachedBoundsHandler = CachedBoundsHandler(this);
+        @componentResizeHandler = CachedBoundsHandler(this);
     }
 
     void SetComponent(Component@ component)
@@ -36,11 +36,11 @@ class StandardPane : Pane, CachedBounds
 
         if (component !is null)
         {
-            component.AddEventListener("resize", cachedBoundsHandler);
+            component.AddEventListener("resize", componentResizeHandler);
         }
         else
         {
-            this.component.RemoveEventListener("resize", cachedBoundsHandler);
+            this.component.RemoveEventListener("resize", componentResizeHandler);
         }
 
         @this.component = component;

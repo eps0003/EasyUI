@@ -32,12 +32,18 @@ class VerticalList : List, CachedBounds
     private Slider@ scrollbar;
     private uint scrollIndex = 0;
     private EventListener@ events = StandardEventListener();
+    private EventHandler@ scrollbarResizeHandler;
 
     // Properties calculated dynamically
     private Vec2f innerBounds = Vec2f_zero;
     private bool calculateBounds = true;
     private float[] columnWidths;
     private float[] rowHeights;
+
+    VerticalList()
+    {
+        @scrollbarResizeHandler = CachedBoundsHandler(this);
+    }
 
     private uint getTotalRows()
     {
@@ -168,7 +174,20 @@ class VerticalList : List, CachedBounds
 
     void SetScrollbar(Slider@ scrollbar)
     {
+        if (this.scrollbar is scrollbar) return;
+
+        if (scrollbar !is null)
+        {
+            scrollbar.AddEventListener("resize", scrollbarResizeHandler);
+        }
+        else
+        {
+            this.scrollbar.RemoveEventListener("resize", scrollbarResizeHandler);
+        }
+
         @this.scrollbar = scrollbar;
+
+        CalculateBounds();
     }
 
     Slider@ getScrollbar()
