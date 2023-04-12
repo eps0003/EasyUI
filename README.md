@@ -36,8 +36,8 @@ void onRender(CRules@ this)
 
 ## Usage
 
-1. Put the EasyUI folder in your `Base/Mods` folder.
-2. Add `EasyUI` to a new line in `Base/mods.cfg` above any mod that will use it.
+1. Put the EasyUI folder in your `Mods` folder.
+2. Add `EasyUI` to a new line in `mods.cfg` above any mod that will use it.
 3. Configure, update, and render your UI in a new or existing client-only script.
 
 ## Components
