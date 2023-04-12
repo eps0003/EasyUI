@@ -1,4 +1,4 @@
-bool isMouseInBounds(Vec2f min, Vec2f max)
+bool isMouseInBounds(Vec2f &in min, Vec2f &in max)
 {
     Vec2f mousePos = getControls().getInterpMouseScreenPos();
     return (
