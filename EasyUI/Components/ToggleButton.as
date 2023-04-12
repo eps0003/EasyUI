@@ -1,10 +1,10 @@
-interface ToggleButton : Button
+interface Toggle : Button
 {
     void SetChecked(bool checked);
     bool isChecked();
 }
 
-class StandardToggleButton : ToggleButton
+class StandardToggle : Toggle
 {
     private EasyUI@ ui;
 
@@ -19,7 +19,7 @@ class StandardToggleButton : ToggleButton
     private bool checked = false;
     private bool pressed = false;
 
-    StandardToggleButton(EasyUI@ ui)
+    StandardToggle(EasyUI@ ui)
     {
         @this.ui = ui;
     }
