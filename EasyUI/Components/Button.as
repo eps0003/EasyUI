@@ -30,11 +30,6 @@ class StandardButton : Button
         @this.component = component;
     }
 
-    Component@ getComponent()
-    {
-        return component;
-    }
-
     bool isPressed()
     {
         return pressed;
@@ -122,21 +117,27 @@ class StandardButton : Button
         return margin + size + margin;
     }
 
-    private bool isHovered()
+    bool isHovered()
     {
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();
         return isMouseInBounds(min, max);
     }
 
-    Component@ getHoveredComponent()
+    bool canClick()
     {
-        return isHovered() ? cast<Component>(this) : null;
+        return true;
     }
 
-    Component@ getScrollableComponent()
+    bool canScroll()
     {
-        return null;
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components = { component };
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)

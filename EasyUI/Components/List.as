@@ -73,22 +73,12 @@ class VerticalList : List, CachedBounds
         return Maths::Min(visibleCount, maxVisible);
     }
 
-    private bool isScrollbarVisible()
-    {
-        return getVisibleRows() != getTotalRows();
-    }
-
     void AddComponent(Component@ component)
     {
         components.push_back(component);
 
         CalculateBounds();
         component.AddEventListener("resize", CachedBoundsHandler(this));
-    }
-
-    Component@[] getComponents()
-    {
-        return components;
     }
 
     void SetMargin(float x, float y)
@@ -304,64 +294,36 @@ class VerticalList : List, CachedBounds
         events.DispatchEvent(type);
     }
 
-    private bool isHovered()
+    bool isHovered()
     {
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();
         return isMouseInBounds(min, max);
     }
 
-    Component@ getHoveredComponent()
+    bool canClick()
     {
-        if (isHovered())
-        {
-            if (scrollbar !is null)
-            {
-                Component@ hovered = scrollbar.getHoveredComponent();
-                if (hovered !is null)
-                {
-                    return hovered;
-                }
-            }
-
-            uint startIndex = scrollIndex * columns;
-            uint endIndex = startIndex + getVisibleCount();
-
-            for (int i = endIndex - 1; i >= startIndex; i--)
-            {
-                Component@ component = components[i];
-                if (component is null) continue;
-
-                Component@ hovered = component.getHoveredComponent();
-                if (hovered is null) continue;
-
-                return hovered;
-            }
-        }
-        return null;
+        return false;
     }
 
-    Component@ getScrollableComponent()
+    bool canScroll()
     {
-        if (isHovered())
+        return getVisibleRows() != getTotalRows();
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components = { scrollbar };
+
+        uint startIndex = scrollIndex * columns;
+        uint endIndex = startIndex + getVisibleCount();
+
+        for (int i = endIndex - 1; i >= startIndex; i--)
         {
-            uint startIndex = scrollIndex * columns;
-            uint endIndex = startIndex + getVisibleCount();
-
-            for (int i = endIndex - 1; i >= startIndex; i--)
-            {
-                Component@ component = components[i];
-                if (component is null) continue;
-
-                Component@ scrollable = component.getScrollableComponent();
-                if (scrollable is null) continue;
-
-                return scrollable;
-            }
-
-            return cast<Component>(this);
+            components.push_back(this.components[i]);
         }
-        return null;
+
+        return components;
     }
 
     private float getColumnInnerWidth(float column)
@@ -447,7 +409,7 @@ class VerticalList : List, CachedBounds
 
     void Render()
     {
-        if (scrollbar !is null && isScrollbarVisible())
+        if (scrollbar !is null && canScroll())
         {
             SetScrollIndex((getHiddenRows() + 1) * scrollbar.getPercentage());
 

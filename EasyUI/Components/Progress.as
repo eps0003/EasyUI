@@ -39,11 +39,6 @@ class StandardProgress : Progress
         @this.component = component;
     }
 
-    Component@ getComponent()
-    {
-        return component;
-    }
-
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);
@@ -126,14 +121,25 @@ class StandardProgress : Progress
         return margin + size + margin;
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        return isHovered() ? cast<Component>(this) : null;
+        return isMouseInBounds(position, position + size);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        return null;
+        return true;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components = { component };
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)
@@ -149,11 +155,6 @@ class StandardProgress : Progress
     void DispatchEvent(string type)
     {
         events.DispatchEvent(type);
-    }
-
-    private bool isHovered()
-    {
-        return isMouseInBounds(position, position + size);
     }
 
     void Update()

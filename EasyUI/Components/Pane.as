@@ -48,11 +48,6 @@ class StandardPane : Pane, CachedBounds
         CalculateBounds();
     }
 
-    Component@ getComponent()
-    {
-        return component;
-    }
-
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);
@@ -137,34 +132,27 @@ class StandardPane : Pane, CachedBounds
         DispatchEvent("resize");
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        if (isHovered())
-        {
-            if (component !is null)
-            {
-                Component@ hovered = component.getHoveredComponent();
-                if (hovered !is null)
-                {
-                    return hovered;
-                }
-            }
-            return cast<Component>(this);
-        }
-        return null;
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        if (component !is null && isHovered())
-        {
-            Component@ scrollable = component.getScrollableComponent();
-            if (scrollable !is null)
-            {
-                return scrollable;
-            }
-        }
-        return null;
+        return true;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components = { component };
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)
@@ -180,13 +168,6 @@ class StandardPane : Pane, CachedBounds
     void DispatchEvent(string type)
     {
         events.DispatchEvent(type);
-    }
-
-    private bool isHovered()
-    {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
     }
 
     void Update()

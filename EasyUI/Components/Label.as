@@ -112,14 +112,25 @@ class StandardLabel : Label, CachedBounds
         DispatchEvent("resize");
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        return null;
+        return isMouseInBounds(position, position + bounds);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        return null;
+        return false;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components;
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)
@@ -238,14 +249,25 @@ class StandardAreaLabel : AreaLabel
         return size;
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        return null;
+        return isMouseInBounds(position, position + size);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        return null;
+        return false;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components;
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)

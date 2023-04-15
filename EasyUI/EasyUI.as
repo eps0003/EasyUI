@@ -18,10 +18,7 @@ class EasyUI
     private Component@[] components;
 
     private Component@ hovered;
-    private bool queriedHover = false;
-
     private Component@ scrollable;
-    private bool queriedScroll = false;
 
     void AddComponent(Component@ component)
     {
@@ -33,54 +30,101 @@ class EasyUI
 
     bool canClick(Component@ component)
     {
-        return component !is null && component is getHoveredComponent();
+        return component !is null && component is hovered;
     }
 
     bool canScroll(Component@ component)
     {
-        return component !is null && component is getScrollableComponent();
+        return component !is null && component is scrollable;
     }
 
     Component@ getHoveredComponent()
     {
-        if (queriedHover) return hovered;
-        queriedHover = true;
-
-        for (int i = components.size() - 1; i >= 0; i--)
-        {
-            @hovered = components[i].getHoveredComponent();
-            if (hovered !is null) break;
-        }
-
         return hovered;
     }
 
     Component@ getScrollableComponent()
     {
-        if (queriedScroll) return scrollable;
-        queriedScroll = true;
+        return scrollable;
+    }
 
+    private void CacheComponents()
+    {
         for (int i = components.size() - 1; i >= 0; i--)
         {
             Component@ component = components[i];
-            if (component is null) continue;
 
-            @scrollable = component.getScrollableComponent();
-            if (scrollable !is null) return scrollable;
+            @hovered = getHoveredComponent(component);
+            @scrollable = getScrollableComponent(component);
 
-            Component@ hovered = component.getHoveredComponent();
-            if (hovered !is null) break;
+            if (hovered !is null)
+            {
+                break;
+            }
+        }
+    }
+
+    private Component@ getHoveredComponent(Component@ component)
+    {
+        // Ignore nonexistent components
+        if (component is null || !component.isHovered())
+        {
+            return null;
         }
 
+        // Check if child components are hovered
+        Component@[] children = component.getComponents();
+        for (int i = children.size() - 1; i >= 0; i--)
+        {
+            Component@ hovered = getHoveredComponent(children[i]);
+            if (hovered !is null)
+            {
+                return hovered;
+            }
+        }
+
+        // Check if component is hovered
+        if (component.canClick())
+        {
+            return component;
+        }
+
+        // Component is not hovered
+        return null;
+    }
+
+    private Component@ getScrollableComponent(Component@ component)
+    {
+        // Ignore nonexistent components
+        if (component is null || !component.isHovered())
+        {
+            return null;
+        }
+
+        // Check if child components are scrollable
+        Component@[] children = component.getComponents();
+        for (int i = children.size() - 1; i >= 0; i--)
+        {
+            Component@ scrollable = getScrollableComponent(children[i]);
+            if (scrollable !is null)
+            {
+                return scrollable;
+            }
+        }
+
+        // Check if component is scrollable
+        if (component.canScroll())
+        {
+            return component;
+        }
+
+        // Component is not scrollable
         return null;
     }
 
     void Update()
     {
-        @hovered = null;
-        @scrollable = null;
-        queriedHover = false;
-        queriedScroll = false;
+        CacheComponents();
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -90,10 +134,7 @@ class EasyUI
 
     void Render()
     {
-        @hovered = null;
-        @scrollable = null;
-        queriedHover = false;
-        queriedScroll = false;
+        CacheComponents();
 
         for (uint i = 0; i < components.size(); i++)
         {

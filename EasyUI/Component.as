@@ -8,6 +8,9 @@ interface Component : EventListener
     void Update();
     void Render();
 
-    Component@ getHoveredComponent();
-    Component@ getScrollableComponent();
+    bool isHovered();
+    bool canClick();
+    bool canScroll();
+
+    Component@[] getComponents();
 }

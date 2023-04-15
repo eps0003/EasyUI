@@ -99,14 +99,25 @@ class StandardVerticalSlider : VerticalSlider
         return size;
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        return isHovered() ? cast<Component>(this) : null;
+        return isMouseInBounds(position, position + size);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        return null;
+        return true;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components;
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)
@@ -122,11 +133,6 @@ class StandardVerticalSlider : VerticalSlider
     void DispatchEvent(string type)
     {
         events.DispatchEvent(type);
-    }
-
-    private bool isHovered()
-    {
-        return isMouseInBounds(position, position + size);
     }
 
     private bool isHandleHovered()
@@ -277,14 +283,25 @@ class StandardHorizontalSlider : HorizontalSlider
         return size;
     }
 
-    Component@ getHoveredComponent()
+    bool isHovered()
     {
-        return isHovered() ? cast<Component>(this) : null;
+        return isMouseInBounds(position, position + size);
     }
 
-    Component@ getScrollableComponent()
+    bool canClick()
     {
-        return null;
+        return true;
+    }
+
+    bool canScroll()
+    {
+        return false;
+    }
+
+    Component@[] getComponents()
+    {
+        Component@[] components;
+        return components;
     }
 
     void AddEventListener(string type, EventHandler@ handler)
@@ -300,11 +317,6 @@ class StandardHorizontalSlider : HorizontalSlider
     void DispatchEvent(string type)
     {
         events.DispatchEvent(type);
-    }
-
-    private bool isHovered()
-    {
-        return isMouseInBounds(position, position + size);
     }
 
     private bool isHandleHovered()
