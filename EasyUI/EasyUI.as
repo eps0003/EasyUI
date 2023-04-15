@@ -24,7 +24,7 @@ class EasyUI
     {
         if (component !is null)
         {
-            this.components.push_back(component);
+            components.push_back(component);
         }
     }
 
@@ -50,76 +50,48 @@ class EasyUI
 
     private void CacheComponents()
     {
+        @hovered = null;
+        @scrollable = null;
+
         for (int i = components.size() - 1; i >= 0; i--)
         {
-            Component@ component = components[i];
-
-            @hovered = getHoveredComponent(component);
-            @scrollable = getScrollableComponent(component);
-
-            if (hovered !is null)
-            {
-                break;
-            }
+            TraverseComponentTree(components[i]);
         }
     }
 
-    private Component@ getHoveredComponent(Component@ component)
+    private void TraverseComponentTree(Component@ component)
     {
-        // Ignore nonexistent components
-        if (component is null || !component.isHovered())
-        {
-            return null;
-        }
+        // Exit early if components have been found
+        if (hovered !is null) return;
 
-        // Check if child components are hovered
+        // Component is nonexistent
+        if (component is null) return;
+
+        // Component is not hovered
+        if (!component.isHovered()) return;
+
+        // Traverse child components
         Component@[] children = component.getComponents();
         for (int i = children.size() - 1; i >= 0; i--)
         {
-            Component@ hovered = getHoveredComponent(children[i]);
-            if (hovered !is null)
-            {
-                return hovered;
-            }
+            TraverseComponentTree(children[i]);
+
+            // Exit early if hovering over child of stack component
+            // Prevents scrolling components underneath the hovered component
+            if (hovered !is null && cast<Stack>(component) !is null) return;
         }
 
         // Check if component is hovered
-        if (component.canClick())
+        if (hovered is null && component.canClick())
         {
-            return component;
-        }
-
-        // Component is not hovered
-        return null;
-    }
-
-    private Component@ getScrollableComponent(Component@ component)
-    {
-        // Ignore nonexistent components
-        if (component is null || !component.isHovered())
-        {
-            return null;
-        }
-
-        // Check if child components are scrollable
-        Component@[] children = component.getComponents();
-        for (int i = children.size() - 1; i >= 0; i--)
-        {
-            Component@ scrollable = getScrollableComponent(children[i]);
-            if (scrollable !is null)
-            {
-                return scrollable;
-            }
+            @hovered = component;
         }
 
         // Check if component is scrollable
-        if (component.canScroll())
+        if (scrollable is null && component.canScroll())
         {
-            return component;
+            @scrollable = component;
         }
-
-        // Component is not scrollable
-        return null;
     }
 
     void Update()
