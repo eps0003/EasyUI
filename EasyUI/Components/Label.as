@@ -159,8 +159,8 @@ class StandardLabel : Label, CachedBounds
 
         // The magic values correctly align the text with the bounds
         Vec2f pos;
-        pos.x = position.x - bounds.x * alignment.x - 2;
-        pos.y = position.x - bounds.y * alignment.y - 1;
+        pos.x = position.x - getBounds().x * alignment.x - 2;
+        pos.y = position.y - getBounds().y * alignment.y - 1;
 
         GUI::SetFont(font);
         GUI::DrawText(text, pos, color);
