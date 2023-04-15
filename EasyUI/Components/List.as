@@ -86,6 +86,11 @@ class VerticalList : List, CachedBounds
         component.AddEventListener("resize", CachedBoundsHandler(this));
     }
 
+    Component@[] getComponents()
+    {
+        return components;
+    }
+
     void SetMargin(float x, float y)
     {
         if (margin.x == x && margin.y == y) return;

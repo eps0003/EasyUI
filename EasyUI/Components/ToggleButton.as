@@ -7,108 +7,102 @@ interface Toggle : Button
 class StandardToggle : Toggle
 {
     private EasyUI@ ui;
+    private Button@ button;
 
-    private Component@ component;
-    private Vec2f alignment = Vec2f_zero;
-    private Vec2f margin = Vec2f_zero;
-    private Vec2f padding = Vec2f_zero;
-    private Vec2f size = Vec2f_zero;
-    private Vec2f position = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
-
-    private bool checked = false;
     private bool pressed = false;
+    private bool checked = false;
 
     StandardToggle(EasyUI@ ui)
     {
         @this.ui = ui;
+        @button = StandardButton(ui);
     }
 
     void SetComponent(Component@ component)
     {
-        @this.component = component;
+        button.SetComponent(component);
+    }
+
+    Component@ getComponent()
+    {
+        return button.getComponent();
+    }
+
+    bool isPressed()
+    {
+        return pressed;
     }
 
     void SetMargin(float x, float y)
     {
-        if (margin.x == x && margin.y == y) return;
-
-        margin.x = x;
-        margin.y = y;
-
-        DispatchEvent("resize");
+        button.SetMargin(x, y);
     }
 
     Vec2f getMargin()
     {
-        return margin;
+        return button.getMargin();
     }
 
     void SetPadding(float x, float y)
     {
-        if (padding.x == x && padding.y == y) return;
-
-        padding.x = x;
-        padding.y = y;
-
-        DispatchEvent("resize");
+        button.SetPadding(x, y);
     }
 
     Vec2f getPadding()
     {
-        return padding;
+        return button.getPadding();
     }
 
     void SetAlignment(float x, float y)
     {
-        alignment.x = Maths::Clamp01(x);
-        alignment.y = Maths::Clamp01(y);
+        button.SetAlignment(x, y);
     }
 
     Vec2f getAlignment()
     {
-        return alignment;
+        return button.getAlignment();
     }
 
     void SetSize(float width, float height)
     {
-        if (size.x == width && size.y == height) return;
-
-        size.x = width;
-        size.y = height;
-
-        DispatchEvent("resize");
+        button.SetSize(width, height);
     }
 
     Vec2f getSize()
     {
-        return size;
+        return button.getSize();
     }
 
     void SetPosition(float x, float y)
     {
-        position.x = x;
-        position.y = y;
+        button.SetPosition(x, y);
     }
 
     Vec2f getPosition()
     {
-        return position;
+        return button.getPosition();
     }
 
     Vec2f getInnerBounds()
     {
-        return size - padding * 2.0f;
+        return button.getInnerBounds();
     }
 
     Vec2f getTrueBounds()
     {
-        return size;
+        return button.getTrueBounds();
     }
 
     Vec2f getBounds()
     {
-        return margin + size + margin;
+        return button.getBounds();
+    }
+
+    private bool isHovered()
+    {
+        Vec2f min = getPosition() + getMargin();
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
     Component@ getHoveredComponent()
@@ -139,24 +133,17 @@ class StandardToggle : Toggle
 
     void AddEventListener(string type, EventHandler@ handler)
     {
-        events.AddEventListener(type, handler);
+        button.AddEventListener(type, handler);
     }
 
     void RemoveEventListener(string type, EventHandler@ handler)
     {
-        events.RemoveEventListener(type, handler);
+        button.RemoveEventListener(type, handler);
     }
 
     void DispatchEvent(string type)
     {
-        events.DispatchEvent(type);
-    }
-
-    private bool isHovered()
-    {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
+        button.DispatchEvent(type);
     }
 
     void Update()
@@ -173,6 +160,7 @@ class StandardToggle : Toggle
         {
             if (ui.canClick(this))
             {
+                SetChecked(!checked);
                 DispatchEvent("click");
             }
 
@@ -180,6 +168,7 @@ class StandardToggle : Toggle
             DispatchEvent("release");
         }
 
+        Component@ component = getComponent();
         if (component !is null)
         {
             component.Update();
@@ -188,8 +177,8 @@ class StandardToggle : Toggle
 
     void Render()
     {
-        Vec2f min = position + margin;
-        Vec2f max = min + size;
+        Vec2f min = getPosition() + getMargin();
+        Vec2f max = min + getSize();
 
         if (ui.canClick(this))
         {
@@ -242,11 +231,14 @@ class StandardToggle : Toggle
             }
         }
 
+        Component@ component = getComponent();
         if (component !is null)
         {
+            Vec2f padding = getPadding();
             Vec2f innerBounds = getInnerBounds();
-            Vec2f pos;
+            Vec2f alignment = getAlignment();
 
+            Vec2f pos;
             pos.x = min.x + padding.x + innerBounds.x * alignment.x;
             pos.y = min.y + padding.y + innerBounds.y * alignment.y;
 

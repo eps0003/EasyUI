@@ -39,10 +39,20 @@ class StandardProgress : Progress
         @this.component = component;
     }
 
+    Component@ getComponent()
+    {
+        return component;
+    }
+
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);
         alignment.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getAlignment()
+    {
+        return alignment;
     }
 
     void SetMargin(float x, float y)

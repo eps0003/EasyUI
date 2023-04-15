@@ -2,6 +2,8 @@ interface Button : Container, SingleChild
 {
     void SetSize(float width, float height);
     Vec2f getSize();
+
+    bool isPressed();
 }
 
 class StandardButton : Button
@@ -26,6 +28,16 @@ class StandardButton : Button
     void SetComponent(Component@ component)
     {
         @this.component = component;
+    }
+
+    Component@ getComponent()
+    {
+        return component;
+    }
+
+    bool isPressed()
+    {
+        return pressed;
     }
 
     void SetMargin(float x, float y)
