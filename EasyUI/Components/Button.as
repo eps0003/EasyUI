@@ -136,7 +136,11 @@ class StandardButton : Button
 
     Component@[] getComponents()
     {
-        Component@[] components = { component };
+        Component@[] components;
+        if (component !is null)
+        {
+            components.push_back(component);
+        }
         return components;
     }
 
