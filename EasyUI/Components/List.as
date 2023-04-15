@@ -278,6 +278,8 @@ class VerticalList : List, CachedBounds
 
     void CalculateBounds()
     {
+        if (calculateBounds) return;
+
         calculateBounds = true;
         events.DispatchEvent("resize");
     }

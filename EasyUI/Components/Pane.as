@@ -21,7 +21,7 @@ class StandardPane : Pane, CachedBounds
     private EventListener@ events = StandardEventListener();
 
     private Vec2f bounds = Vec2f_zero;
-    private bool calculateBounds = false;
+    private bool calculateBounds = true;
     private EventHandler@ componentResizeHandler;
 
     StandardPane(StandardPaneType type)
@@ -126,6 +126,8 @@ class StandardPane : Pane, CachedBounds
 
     void CalculateBounds()
     {
+        if (calculateBounds) return;
+
         calculateBounds = true;
         events.DispatchEvent("resize");
     }

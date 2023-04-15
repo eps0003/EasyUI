@@ -104,8 +104,10 @@ class StandardLabel : Label, CachedBounds
         return bounds;
     }
 
-    private void CalculateBounds()
+    void CalculateBounds()
     {
+        if (calculateBounds) return;
+
         calculateBounds = true;
         events.DispatchEvent("resize");
     }
@@ -200,8 +202,6 @@ class StandardAreaLabel : AreaLabel
 
         size.x = width;
         size.y = height;
-
-        events.DispatchEvent("resize");
     }
 
     Vec2f getSize()

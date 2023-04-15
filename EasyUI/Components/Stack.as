@@ -13,7 +13,7 @@ class StandardStack : Stack, CachedBounds
     private EventListener@ events = StandardEventListener();
 
     private Vec2f innerBounds = Vec2f_zero;
-    private bool calculateBounds = false;
+    private bool calculateBounds = true;
 
     void AddComponent(Component@ component)
     {
@@ -113,6 +113,8 @@ class StandardStack : Stack, CachedBounds
 
     void CalculateBounds()
     {
+        if (calculateBounds) return;
+
         calculateBounds = true;
         events.DispatchEvent("resize");
     }
