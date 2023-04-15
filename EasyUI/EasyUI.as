@@ -141,4 +141,23 @@ class EasyUI
             components[i].Render();
         }
     }
+
+    void Debug()
+    {
+        if (scrollable !is null)
+        {
+            Vec2f min = scrollable.getPosition();
+            Vec2f max = min + scrollable.getBounds();
+            SColor color(255, 0, 0, 255);
+            GUI::DrawOutlinedRectangle(min, max, 2, color);
+        }
+
+        if (hovered !is null)
+        {
+            Vec2f min = hovered.getPosition();
+            Vec2f max = min + hovered.getBounds();
+            SColor color(255, 255, 0, 0);
+            GUI::DrawOutlinedRectangle(min, max, 2, color);
+        }
+    }
 }
