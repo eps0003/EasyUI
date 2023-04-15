@@ -208,7 +208,7 @@ class VerticalList : List, CachedBounds
                 scrollbar.SetPercentage(index / Maths::Max(hiddenRows, 1.0f));
             }
 
-            events.DispatchEvent("scroll");
+            DispatchEvent("scroll");
             CalculateBounds();
         }
     }
@@ -281,7 +281,7 @@ class VerticalList : List, CachedBounds
         if (calculateBounds) return;
 
         calculateBounds = true;
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     void AddEventListener(string type, EventHandler@ handler)

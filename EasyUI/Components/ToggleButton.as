@@ -36,7 +36,7 @@ class StandardToggle : Toggle
         margin.x = x;
         margin.y = y;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -51,7 +51,7 @@ class StandardToggle : Toggle
         padding.x = x;
         padding.y = y;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -77,7 +77,7 @@ class StandardToggle : Toggle
         size.x = width;
         size.y = height;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -128,7 +128,7 @@ class StandardToggle : Toggle
 
         if (this.checked != wasChecked)
         {
-            events.DispatchEvent("change");
+            DispatchEvent("change");
         }
     }
 
@@ -166,18 +166,18 @@ class StandardToggle : Toggle
         if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.canClick(this))
         {
             pressed = true;
-            events.DispatchEvent("press");
+            DispatchEvent("press");
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             if (ui.canClick(this))
             {
-                events.DispatchEvent("click");
+                DispatchEvent("click");
             }
 
             pressed = false;
-            events.DispatchEvent("release");
+            DispatchEvent("release");
         }
 
         if (component !is null)

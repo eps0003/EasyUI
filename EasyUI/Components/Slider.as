@@ -45,7 +45,7 @@ class StandardVerticalSlider : VerticalSlider
 
         this.percentage = percentage;
 
-        events.DispatchEvent("change");
+        DispatchEvent("change");
     }
 
     float getPercentage()
@@ -60,7 +60,7 @@ class StandardVerticalSlider : VerticalSlider
         size.x = width;
         size.y = height;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
 
         if (handleSize == 0.0f)
         {
@@ -162,7 +162,7 @@ class StandardVerticalSlider : VerticalSlider
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
                 clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
-                events.DispatchEvent("dragstart");
+                DispatchEvent("dragstart");
             }
         }
 
@@ -172,7 +172,7 @@ class StandardVerticalSlider : VerticalSlider
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
-            events.DispatchEvent("dragend");
+            DispatchEvent("dragend");
         }
     }
 
@@ -223,7 +223,7 @@ class StandardHorizontalSlider : HorizontalSlider
 
         this.percentage = percentage;
 
-        events.DispatchEvent("change");
+        DispatchEvent("change");
     }
 
     float getPercentage()
@@ -238,7 +238,7 @@ class StandardHorizontalSlider : HorizontalSlider
         size.x = width;
         size.y = height;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
 
         if (handleSize == 0.0f)
         {
@@ -331,14 +331,14 @@ class StandardHorizontalSlider : HorizontalSlider
                 // Drag handle relative to cursor if clicking on handle
                 pressed = true;
                 clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
-                events.DispatchEvent("dragstart");
+                DispatchEvent("dragstart");
             }
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
         {
             pressed = false;
-            events.DispatchEvent("dragend");
+            DispatchEvent("dragend");
         }
     }
 

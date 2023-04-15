@@ -26,7 +26,7 @@ class StandardProgress : Progress
 
         this.progress = progress;
 
-        events.DispatchEvent("change");
+        DispatchEvent("change");
     }
 
     float getProgress()
@@ -52,7 +52,7 @@ class StandardProgress : Progress
         margin.x = x;
         margin.y = y;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getMargin()
@@ -67,7 +67,7 @@ class StandardProgress : Progress
         padding.x = x;
         padding.y = y;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getPadding()
@@ -82,7 +82,7 @@ class StandardProgress : Progress
         size.x = width;
         size.y = height;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getSize()

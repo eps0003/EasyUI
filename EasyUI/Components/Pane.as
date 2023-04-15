@@ -129,7 +129,7 @@ class StandardPane : Pane, CachedBounds
         if (calculateBounds) return;
 
         calculateBounds = true;
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Component@ getHoveredComponent()

@@ -116,7 +116,7 @@ class StandardStack : Stack, CachedBounds
         if (calculateBounds) return;
 
         calculateBounds = true;
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     bool isClickable()

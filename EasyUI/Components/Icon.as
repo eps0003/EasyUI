@@ -66,7 +66,7 @@ class StandardIcon : Icon
         size.x = width;
         size.y = height;
 
-        events.DispatchEvent("resize");
+        DispatchEvent("resize");
     }
 
     Vec2f getSize()
