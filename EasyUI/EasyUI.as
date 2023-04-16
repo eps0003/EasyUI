@@ -19,6 +19,7 @@ class EasyUI
 
     private Component@ hovered;
     private Component@ scrollable;
+    private Component@ interacting;
 
     void AddComponent(Component@ component)
     {
@@ -26,6 +27,21 @@ class EasyUI
         {
             components.push_back(component);
         }
+    }
+
+    bool isHovered()
+    {
+        return hovered !is null;
+    }
+
+    bool isInteracting()
+    {
+        return interacting !is null;
+    }
+
+    bool hasControl()
+    {
+        return isHovered() || isInteracting();
     }
 
     bool canClick(Component@ component)
@@ -52,6 +68,7 @@ class EasyUI
     {
         @hovered = null;
         @scrollable = null;
+        @interacting = null;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -61,36 +78,45 @@ class EasyUI
 
     private void TraverseComponentTree(Component@ component)
     {
-        // Exit early if components have been found
-        if (hovered !is null) return;
-
         // Component is nonexistent
         if (component is null) return;
 
-        // Component is not hovered
-        if (!component.isHovered()) return;
+        // Remember scrollable component and if hovering
+        Component@ scroll = scrollable;
+        bool hover = isHovered();
 
         // Traverse child components
         Component@[] children = component.getComponents();
         for (int i = children.size() - 1; i >= 0; i--)
         {
             TraverseComponentTree(children[i]);
-
-            // Exit early if hovering over child of stack component
-            // Prevents scrolling components underneath the hovered component
-            if (hovered !is null && cast<Stack>(component) !is null) return;
         }
 
-        // Check if component is hovered
-        if (hovered is null && component.canClick())
+        // Reapply scrollable component if hovering
+        if (hover)
         {
-            @hovered = component;
+            @scrollable = scroll;
         }
 
-        // Check if component is scrollable
-        if (scrollable is null && component.canScroll())
+        if (component.isHovered())
         {
-            @scrollable = component;
+            // Check if component is hovered
+            if (hovered is null && component.canClick())
+            {
+                @hovered = component;
+            }
+
+            // Check if component is scrollable
+            if (scrollable is null && component.canScroll())
+            {
+                @scrollable = component;
+            }
+        }
+
+        // Check if interacting with component
+        if (interacting is null && component.isInteracting())
+        {
+            @interacting = component;
         }
     }
 
@@ -129,6 +155,14 @@ class EasyUI
             Vec2f min = hovered.getPosition();
             Vec2f max = min + hovered.getBounds();
             SColor color(255, 255, 0, 0);
+            GUI::DrawOutlinedRectangle(min, max, 2, color);
+        }
+
+        if (interacting !is null)
+        {
+            Vec2f min = interacting.getPosition();
+            Vec2f max = min + interacting.getBounds();
+            SColor color(255, 0, 255, 0);
             GUI::DrawOutlinedRectangle(min, max, 2, color);
         }
     }

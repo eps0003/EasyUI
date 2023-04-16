@@ -104,6 +104,11 @@ class StandardVerticalSlider : VerticalSlider
         return isMouseInBounds(position, position + size);
     }
 
+    bool isInteracting()
+    {
+        return pressed;
+    }
+
     bool canClick()
     {
         return true;
@@ -286,6 +291,11 @@ class StandardHorizontalSlider : HorizontalSlider
     bool isHovered()
     {
         return isMouseInBounds(position, position + size);
+    }
+
+    bool isInteracting()
+    {
+        return pressed;
     }
 
     bool canClick()

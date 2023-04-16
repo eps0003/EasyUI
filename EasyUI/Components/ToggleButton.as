@@ -95,19 +95,22 @@ class StandardToggle : Toggle
 
     bool isHovered()
     {
-        Vec2f min = getPosition() + getMargin();
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
+        return button.isHovered();
+    }
+
+    bool isInteracting()
+    {
+        return button.isInteracting();
     }
 
     bool canClick()
     {
-        return true;
+        return button.canClick();
     }
 
     bool canScroll()
     {
-        return false;
+        return button.canScroll();
     }
 
     Component@[] getComponents()

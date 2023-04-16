@@ -9,6 +9,8 @@ interface Component : EventListener
     void Render();
 
     bool isHovered();
+    bool isInteracting();
+
     bool canClick();
     bool canScroll();
 

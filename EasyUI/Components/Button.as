@@ -124,6 +124,11 @@ class StandardButton : Button
         return isMouseInBounds(min, max);
     }
 
+    bool isInteracting()
+    {
+        return isPressed();
+    }
+
     bool canClick()
     {
         return true;

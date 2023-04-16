@@ -117,6 +117,11 @@ class StandardLabel : Label, CachedBounds
         return isMouseInBounds(position, position + bounds);
     }
 
+    bool isInteracting()
+    {
+        return false;
+    }
+
     bool canClick()
     {
         return false;
@@ -252,6 +257,11 @@ class StandardAreaLabel : AreaLabel
     bool isHovered()
     {
         return isMouseInBounds(position, position + size);
+    }
+
+    bool isInteracting()
+    {
+        return false;
     }
 
     bool canClick()
