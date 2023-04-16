@@ -7,7 +7,9 @@ enum StandardPaneType
 {
     Normal,
     Sunken,
-    Framed
+    Framed,
+    Window,
+    Bubble
 }
 
 class StandardPane : Pane, CachedBounds
@@ -204,6 +206,12 @@ class StandardPane : Pane, CachedBounds
                 break;
             case StandardPaneType::Framed:
                 GUI::DrawFramedPane(min, max);
+                break;
+            case StandardPaneType::Window:
+                GUI::DrawWindow(min, max);
+                break;
+            case StandardPaneType::Bubble:
+                GUI::DrawBubble(min, max);
                 break;
             default:
                 GUI::DrawPane(min, max);
