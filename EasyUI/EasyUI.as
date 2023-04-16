@@ -24,10 +24,29 @@ class EasyUI
 
     void AddComponent(Component@ component)
     {
-        if (component !is null)
+        if (component is null) return;
+
+        components.push_back(component);
+    }
+
+    void RemoveComponent(Component@ component)
+    {
+        if (component is null) return;
+
+        for (int i = components.size() - 1; i >= 0; i--)
         {
-            components.push_back(component);
+            Component@ other = components[i];
+            if (other !is component) continue;
+
+            components.removeAt(i);
+
+            break;
         }
+    }
+
+    void SetComponents(Component@[] components)
+    {
+        this.components = components;
     }
 
     bool isHovered()
