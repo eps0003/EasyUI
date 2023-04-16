@@ -19,6 +19,8 @@ class StandardPane : Pane, CachedBounds
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
     private StandardPaneType type = StandardPaneType::Normal;
+    private SColor color;
+    private bool hasColor = false;
     private Vec2f position = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
 
@@ -26,9 +28,21 @@ class StandardPane : Pane, CachedBounds
     private bool calculateBounds = true;
     private EventHandler@ componentResizeHandler;
 
+    StandardPane()
+    {
+        @componentResizeHandler = CachedBoundsHandler(this);
+    }
+
     StandardPane(StandardPaneType type)
     {
         this.type = type;
+        @componentResizeHandler = CachedBoundsHandler(this);
+    }
+
+    StandardPane(SColor color)
+    {
+        this.color = color;
+        hasColor = true;
         @componentResizeHandler = CachedBoundsHandler(this);
     }
 
@@ -199,7 +213,9 @@ class StandardPane : Pane, CachedBounds
         switch (type)
         {
             case StandardPaneType::Normal:
-                GUI::DrawPane(min, max);
+                hasColor
+                    ? GUI::DrawPane(min, max, color)
+                    : GUI::DrawPane(min, max);
                 break;
             case StandardPaneType::Sunken:
                 GUI::DrawSunkenPane(min, max);
