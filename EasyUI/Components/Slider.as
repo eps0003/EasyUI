@@ -75,7 +75,7 @@ class StandardVerticalSlider : VerticalSlider
 
     void SetHandleSize(float size)
     {
-        handleSize = size;
+        handleSize = Maths::Max(size, 12.0f);
     }
 
     float getHandleSize()
@@ -264,7 +264,7 @@ class StandardHorizontalSlider : HorizontalSlider
 
     void SetHandleSize(float size)
     {
-        handleSize = Maths::Max(size, 20.0f);
+        handleSize = Maths::Max(size, 12.0f);
     }
 
     float getHandleSize()

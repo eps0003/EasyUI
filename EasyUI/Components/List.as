@@ -318,7 +318,7 @@ class VerticalList : List, CachedBounds
 
     Component@[] getComponents()
     {
-        Component@[] components = { scrollbar };
+        Component@[] components;
 
         uint startIndex = scrollIndex * columns;
         uint endIndex = startIndex + getVisibleCount();
@@ -326,6 +326,11 @@ class VerticalList : List, CachedBounds
         for (int i = endIndex - 1; i >= startIndex; i--)
         {
             components.push_back(this.components[i]);
+        }
+
+        if (scrollbar !is null)
+        {
+            components.push_back(scrollbar);
         }
 
         return components;
@@ -422,9 +427,11 @@ class VerticalList : List, CachedBounds
             float scrollWidth = scrollbar.getSize().x;
             float scrollHeight = trueBounds.y;
             float scrollPosX = position.x + margin.x + trueBounds.x - scrollWidth;
+            float handleSize = scrollHeight * getVisibleRows() / getTotalRows();
+
             scrollbar.SetPosition(scrollPosX, position.y);
             scrollbar.SetSize(scrollWidth, scrollHeight);
-            scrollbar.SetHandleSize(scrollHeight * getVisibleRows() / getTotalRows());
+            scrollbar.SetHandleSize(handleSize);
             scrollbar.Render();
         }
 
