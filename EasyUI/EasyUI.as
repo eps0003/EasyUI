@@ -24,14 +24,14 @@ class EasyUI
 
     void AddComponent(Component@ component)
     {
-        if (component is null) return;
+        if (component is null || !isClient()) return;
 
         components.push_back(component);
     }
 
     void RemoveComponent(Component@ component)
     {
-        if (component is null) return;
+        if (component is null || !isClient()) return;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -46,6 +46,8 @@ class EasyUI
 
     void SetComponents(Component@[] components)
     {
+        if (!isClient()) return;
+
         this.components = components;
     }
 
@@ -142,6 +144,8 @@ class EasyUI
 
     void Update()
     {
+        if (!isClient()) return;
+
         CacheComponents();
 
         for (int i = components.size() - 1; i >= 0; i--)
@@ -152,6 +156,8 @@ class EasyUI
 
     void Render()
     {
+        if (!isClient()) return;
+
         CacheComponents();
 
         for (uint i = 0; i < components.size(); i++)
@@ -162,6 +168,8 @@ class EasyUI
 
     void Debug()
     {
+        if (!isClient()) return;
+
         if (scrollable !is null)
         {
             Vec2f min = scrollable.getPosition();
