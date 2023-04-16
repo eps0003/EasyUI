@@ -42,11 +42,13 @@ void onRender(CRules@ this)
 
 ## Components
 
-| Category       | Components                                                |
-| -------------- | --------------------------------------------------------- |
-| Input Controls | [Button](#button) • [Slider](#slider) • [Toggle](#toggle) |
-| Informational  | [Icon](#icon) • [Label](#label) • [Progress](#progress)   |
-| Containers     | [List](#list) • [Pane](#pane) • [Stack](#stack)           |
+| Category       | Components                                                                  |
+| -------------- | --------------------------------------------------------------------------- |
+| Input Controls | [Button](#button) • [Slider](#slider) • [Toggle](#toggle)                   |
+| Informational  | [Avatar](#avatar) • [Icon](#icon) • [Label](#label) • [Progress](#progress) |
+| Containers     | [List](#list) • [Pane](#pane) • [Stack](#stack)                             |
+
+### Avatar
 
 ### Button
 

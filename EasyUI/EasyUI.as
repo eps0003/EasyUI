@@ -1,3 +1,4 @@
+#include "Avatar.as"
 #include "Button.as"
 #include "CachedBounds.as"
 #include "Component.as"
