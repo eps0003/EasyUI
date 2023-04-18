@@ -17,12 +17,12 @@ class StandardButton : Button
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
-
-    private bool pressed = false;
+    private ClickHandler@ clickHandler;
 
     StandardButton(EasyUI@ ui)
     {
         @this.ui = ui;
+        @clickHandler = ClickHandler(ui, this);
     }
 
     void SetComponent(Component@ component)
@@ -32,7 +32,7 @@ class StandardButton : Button
 
     bool isPressed()
     {
-        return pressed;
+        return clickHandler.isPressed();
     }
 
     void SetMargin(float x, float y)
@@ -166,24 +166,7 @@ class StandardButton : Button
 
     void Update()
     {
-        CControls@ controls = getControls();
-
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.canClick(this))
-        {
-            pressed = true;
-            DispatchEvent("press");
-        }
-
-        if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
-        {
-            if (ui.canClick(this))
-            {
-                DispatchEvent("click");
-            }
-
-            pressed = false;
-            DispatchEvent("release");
-        }
+        clickHandler.Update();
 
         if (component !is null)
         {
@@ -198,7 +181,7 @@ class StandardButton : Button
 
         if (ui.canClick(this))
         {
-            if (pressed)
+            if (isPressed())
             {
                 GUI::DrawButtonPressed(min, max);
             }
@@ -209,7 +192,7 @@ class StandardButton : Button
         }
         else
         {
-            if (pressed)
+            if (isPressed())
             {
                 GUI::DrawButtonHover(min, max);
             }
