@@ -30,7 +30,7 @@ class StandardVerticalSlider : VerticalSlider
     private float handleSize = 0.0f;
     private bool pressed = false;
     private float clickOffsetY;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     StandardVerticalSlider(EasyUI@ ui)
     {
@@ -211,7 +211,7 @@ class StandardHorizontalSlider : HorizontalSlider
     private float handleSize = 0.0f;
     private bool pressed = false;
     private float clickOffsetX;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     StandardHorizontalSlider(EasyUI@ ui)
     {

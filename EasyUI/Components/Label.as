@@ -26,7 +26,7 @@ class StandardLabel : Label, CachedBounds
     private SColor color = color_black;
     private Vec2f position = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f bounds = Vec2f_zero;
     private bool calculateBounds = true;
@@ -175,7 +175,7 @@ class StandardAreaLabel : AreaLabel
     private Vec2f size = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetText(string text)
     {

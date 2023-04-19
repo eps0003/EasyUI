@@ -16,7 +16,7 @@ class StandardAvatar : Avatar
     private float size = 0.0f;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetPlayer(CPlayer@ player)
     {

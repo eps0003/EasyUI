@@ -16,7 +16,7 @@ class StandardProgress : Progress
     private Vec2f padding = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetProgress(float progress)
     {

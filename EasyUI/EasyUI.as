@@ -5,7 +5,7 @@
 #include "Container.as"
 #include "Draggable.as"
 #include "DragHandle.as"
-#include "EventListener.as"
+#include "EventDispatcher.as"
 #include "Icon.as"
 #include "Label.as"
 #include "List.as"

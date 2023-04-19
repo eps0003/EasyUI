@@ -1,4 +1,4 @@
-interface EventListener
+interface EventDispatcher
 {
     void AddEventListener(string type, EventHandler@ handler);
     void RemoveEventListener(string type, EventHandler@ handler);
@@ -10,7 +10,7 @@ interface EventHandler
     void Handle();
 }
 
-class StandardEventListener : EventListener
+class StandardEventDispatcher : EventDispatcher
 {
     private string[] eventTypes;
     private EventHandler@[] eventHandlers;

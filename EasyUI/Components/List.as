@@ -31,7 +31,7 @@ class VerticalList : List, CachedBounds
     private Vec2f position = Vec2f_zero;
     private Slider@ scrollbar;
     private uint scrollIndex = 0;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
     private EventHandler@ scrollbarResizeHandler;
 
     // Properties calculated dynamically

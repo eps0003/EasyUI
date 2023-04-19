@@ -22,7 +22,7 @@ class StandardPane : Pane, CachedBounds
     private SColor color;
     private bool hasColor = false;
     private Vec2f position = Vec2f_zero;
-    private EventListener@ events = StandardEventListener();
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f bounds = Vec2f_zero;
     private bool calculateBounds = true;

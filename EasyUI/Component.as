@@ -1,4 +1,4 @@
-interface Component : EventListener
+interface Component : EventDispatcher
 {
     void SetPosition(float x, float y);
     Vec2f getPosition();
