@@ -17,12 +17,10 @@ class StandardButton : Button
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventListener@ events = StandardEventListener();
-    private ClickHandler@ clickHandler;
 
     StandardButton(EasyUI@ ui)
     {
         @this.ui = ui;
-        @clickHandler = ClickHandler(ui, this);
     }
 
     void SetComponent(Component@ component)
@@ -32,7 +30,7 @@ class StandardButton : Button
 
     bool isPressed()
     {
-        return clickHandler.isPressed();
+        return ui.isInteractingWith(this);
     }
 
     void SetMargin(float x, float y)
@@ -124,11 +122,6 @@ class StandardButton : Button
         return isMouseInBounds(min, max);
     }
 
-    bool isInteracting()
-    {
-        return isPressed();
-    }
-
     bool canClick()
     {
         return true;
@@ -166,8 +159,6 @@ class StandardButton : Button
 
     void Update()
     {
-        clickHandler.Update();
-
         if (component !is null)
         {
             component.Update();

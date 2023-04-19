@@ -155,11 +155,6 @@ class StandardPane : Pane, CachedBounds
         return isMouseInBounds(min, max);
     }
 
-    bool isInteracting()
-    {
-        return false;
-    }
-
     bool canClick()
     {
         return true;

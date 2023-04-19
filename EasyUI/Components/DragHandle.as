@@ -3,7 +3,6 @@ class DragHandle : Draggable
     private EasyUI@ ui;
     private Component@ handle;
     private Component@ component;
-    private ClickHandler@ clickHandler;
 
     private bool dragging = false;
     private bool wasDragging = false;
@@ -11,26 +10,37 @@ class DragHandle : Draggable
 
     DragHandle(EasyUI@ ui, Component@ handle, Component@ component)
     {
+        @this.ui = ui;
         @this.handle = handle;
         @this.component = component;
-        @clickHandler = ClickHandler(ui, handle);
     }
 
     bool isDragging()
     {
-        return clickHandler.isPressed();
+        return dragging;
     }
 
     void Update()
     {
-        wasDragging = isDragging();
-        clickHandler.Update();
+        dragging = ui.isInteractingWith(handle);
 
         if (!wasDragging && isDragging())
         {
-            dragOffset = getControls().getInterpMouseScreenPos() - component.getPosition();
-            dragOffset /= component.getBounds();
+            Vec2f bounds = handle.getBounds();
+            if (bounds.LengthSquared() > 0)
+            {
+                dragOffset = getControls().getInterpMouseScreenPos() - handle.getPosition();
+                dragOffset /= bounds;
+            }
+            else
+            {
+                dragOffset.Set(0.5f, 0.5f);
+            }
+
+            print(dragOffset.toString());
         }
+
+        wasDragging = dragging;
     }
 
     void Render()
@@ -41,10 +51,10 @@ class DragHandle : Draggable
         mousePos.x = Maths::Clamp(mousePos.x, 0, getScreenWidth());
         mousePos.y = Maths::Clamp(mousePos.y, 0, getScreenHeight());
 
-        Vec2f offset = component.getBounds();
+        Vec2f offset = handle.getBounds();
         offset *= dragOffset;
 
-        Vec2f pos = mousePos - offset;
+        Vec2f pos = mousePos - offset - handle.getPosition() + component.getPosition();
 
         component.SetPosition(pos.x, pos.y);
     }

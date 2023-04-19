@@ -301,11 +301,6 @@ class VerticalList : List, CachedBounds
         return isMouseInBounds(min, max);
     }
 
-    bool isInteracting()
-    {
-        return false;
-    }
-
     bool canClick()
     {
         return false;

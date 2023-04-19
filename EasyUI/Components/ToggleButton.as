@@ -98,11 +98,6 @@ class StandardToggle : Toggle
         return button.isHovered();
     }
 
-    bool isInteracting()
-    {
-        return button.isInteracting();
-    }
-
     bool canClick()
     {
         return button.canClick();

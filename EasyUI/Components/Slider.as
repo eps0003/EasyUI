@@ -104,11 +104,6 @@ class StandardVerticalSlider : VerticalSlider
         return isMouseInBounds(position, position + size);
     }
 
-    bool isInteracting()
-    {
-        return pressed;
-    }
-
     bool canClick()
     {
         return true;
@@ -166,15 +161,12 @@ class StandardVerticalSlider : VerticalSlider
     {
         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON))
+        if (controls.isKeyJustPressed(KEY_LBUTTON) && isHandleHovered() && ui.canClick(this))
         {
-            if (isHandleHovered() && ui.canClick(this))
-            {
-                // Drag handle relative to cursor if clicking on handle
-                pressed = true;
-                clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
-                DispatchEvent("dragstart");
-            }
+            // Drag handle relative to cursor if clicking on handle
+            pressed = true;
+            clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
+            DispatchEvent("dragstart");
         }
 
         // Call this here to override any external code updating the percentage
@@ -293,11 +285,6 @@ class StandardHorizontalSlider : HorizontalSlider
         return isMouseInBounds(position, position + size);
     }
 
-    bool isInteracting()
-    {
-        return pressed;
-    }
-
     bool canClick()
     {
         return true;
@@ -346,15 +333,12 @@ class StandardHorizontalSlider : HorizontalSlider
     {
         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON))
+        if (controls.isKeyJustPressed(KEY_LBUTTON) && isHandleHovered() && ui.canClick(this))
         {
-            if (isHandleHovered() && ui.canClick(this))
-            {
-                // Drag handle relative to cursor if clicking on handle
-                pressed = true;
-                clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
-                DispatchEvent("dragstart");
-            }
+            // Drag handle relative to cursor if clicking on handle
+            pressed = true;
+            clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
+            DispatchEvent("dragstart");
         }
 
         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)

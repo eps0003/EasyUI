@@ -106,11 +106,6 @@ class StandardIcon : Icon
         return isMouseInBounds(position, position + size);
     }
 
-    bool isInteracting()
-    {
-        return false;
-    }
-
     bool canClick()
     {
         return false;

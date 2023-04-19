@@ -74,11 +74,6 @@ class StandardAvatar : Avatar
         return false;
     }
 
-    bool isInteracting()
-    {
-        return false;
-    }
-
     bool canClick()
     {
         return false;
