@@ -4,7 +4,6 @@ class DragHandle : Draggable
     private Component@ handle;
     private Component@ component;
 
-    private bool dragging = false;
     private bool wasDragging = false;
     private Vec2f dragOffset = Vec2f_zero;
 
@@ -17,45 +16,41 @@ class DragHandle : Draggable
 
     bool isDragging()
     {
-        return dragging;
-    }
-
-    void Update()
-    {
-        dragging = ui.isInteractingWith(handle);
-
-        if (!wasDragging && isDragging())
-        {
-            Vec2f bounds = handle.getBounds();
-            if (bounds.LengthSquared() > 0)
-            {
-                dragOffset = getControls().getInterpMouseScreenPos() - handle.getPosition();
-                dragOffset /= bounds;
-            }
-            else
-            {
-                dragOffset.Set(0.5f, 0.5f);
-            }
-
-            print(dragOffset.toString());
-        }
-
-        wasDragging = dragging;
+        return ui.isInteractingWith(handle);
     }
 
     void Render()
     {
-        if (!isDragging()) return;
+        bool dragging = isDragging();
 
-        Vec2f mousePos = getControls().getInterpMouseScreenPos();
-        mousePos.x = Maths::Clamp(mousePos.x, 0, getScreenWidth());
-        mousePos.y = Maths::Clamp(mousePos.y, 0, getScreenHeight());
+        if (dragging)
+        {
+            if (!wasDragging)
+            {
+                Vec2f bounds = handle.getBounds();
+                if (bounds.LengthSquared() > 0)
+                {
+                    dragOffset = getControls().getInterpMouseScreenPos() - handle.getPosition();
+                    dragOffset /= bounds;
+                }
+                else
+                {
+                    dragOffset.Set(0.5f, 0.5f);
+                }
+            }
 
-        Vec2f offset = handle.getBounds();
-        offset *= dragOffset;
+            Vec2f mousePos = getControls().getInterpMouseScreenPos();
+            mousePos.x = Maths::Clamp(mousePos.x, 0, getScreenWidth());
+            mousePos.y = Maths::Clamp(mousePos.y, 0, getScreenHeight());
 
-        Vec2f pos = mousePos - offset - handle.getPosition() + component.getPosition();
+            Vec2f offset = handle.getBounds();
+            offset *= dragOffset;
 
-        component.SetPosition(pos.x, pos.y);
+            Vec2f pos = mousePos - offset - handle.getPosition() + component.getPosition();
+
+            component.SetPosition(pos.x, pos.y);
+        }
+
+        wasDragging = dragging;
     }
 }
