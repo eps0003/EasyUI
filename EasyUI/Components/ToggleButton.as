@@ -243,9 +243,11 @@ class StandardToggle : Toggle
         Component@ component = getComponent();
         if (component !is null)
         {
+            Vec2f boundsDiff = innerBounds - component.getBounds();
+
             Vec2f innerPos;
-            innerPos.x = min.x + padding.x + innerBounds.x * alignment.x;
-            innerPos.y = min.y + padding.y + innerBounds.y * alignment.y;
+            innerPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
+            innerPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
 
             component.SetPosition(innerPos.x, innerPos.y);
             component.Render();

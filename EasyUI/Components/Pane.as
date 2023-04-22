@@ -229,7 +229,6 @@ class StandardPane : Pane, CachedBounds
         Vec2f innerBounds = getInnerBounds();
         Vec2f min = position + margin;
         Vec2f max = min + padding + innerBounds + padding;
-        Vec2f innerPos = min + padding +  Vec2f(innerBounds.x * alignment.x, innerBounds.y * alignment.y);
 
         switch (type)
         {
@@ -257,6 +256,12 @@ class StandardPane : Pane, CachedBounds
 
         if (component !is null)
         {
+            Vec2f boundsDiff = innerBounds - component.getBounds();
+
+            Vec2f innerPos;
+            innerPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
+            innerPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
+
             component.SetPosition(innerPos.x, innerPos.y);
             component.Render();
         }

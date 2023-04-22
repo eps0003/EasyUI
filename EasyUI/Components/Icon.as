@@ -11,9 +11,6 @@ interface Icon : Component
 
     void SetSize(float width, float height);
     Vec2f getSize();
-
-    void SetAlignment(float x, float y);
-    Vec2f getAlignment();
 }
 
 class StandardIcon : Icon
@@ -22,7 +19,6 @@ class StandardIcon : Icon
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
-    private Vec2f alignment = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
 
@@ -72,17 +68,6 @@ class StandardIcon : Icon
     Vec2f getSize()
     {
         return size;
-    }
-
-    void SetAlignment(float x, float y)
-    {
-        alignment.x = Maths::Clamp01(x);
-        alignment.y = Maths::Clamp01(y);
-    }
-
-    Vec2f getAlignment()
-    {
-        return alignment;
     }
 
     void SetPosition(float x, float y)
@@ -155,17 +140,9 @@ class StandardIcon : Icon
     {
         if (!canRender()) return;
 
-        Vec2f align, scale, pos;
+        float scaleX = size.x / frameDim.x * 0.5f;
+        float scaleY = size.y / frameDim.y * 0.5f;
 
-        align.x = size.x > 0 ? alignment.x : 1 - alignment.x;
-        align.y = size.y > 0 ? alignment.y : 1 - alignment.y;
-
-        scale.x = size.x / frameDim.x * 0.5f;
-        scale.y = size.y / frameDim.y * 0.5f;
-
-        pos.x = position.x - size.x * align.x;
-        pos.y = position.y - size.y * align.y;
-
-        GUI::DrawIcon(icon, frameIndex, frameDim, pos, scale.x, scale.y, color_white);
+        GUI::DrawIcon(icon, frameIndex, frameDim, position, scaleX, scaleY, color_white);
     }
 }

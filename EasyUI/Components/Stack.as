@@ -179,7 +179,10 @@ class StandardStack : Stack, CachedBounds
             Component@ component = components[i];
             Vec2f bounds = component.getBounds();
             Vec2f boundsDiff = innerBounds - bounds;
-            Vec2f pos = innerPos + Vec2f(boundsDiff.x * alignment.x, boundsDiff.y * alignment.y);
+
+            Vec2f pos;
+            pos.x = innerPos.x + boundsDiff.x * alignment.x;
+            pos.y = innerPos.y + boundsDiff.y * alignment.y;
 
             component.SetPosition(pos.x, pos.y);
             component.Render();

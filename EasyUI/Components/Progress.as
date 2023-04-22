@@ -7,7 +7,7 @@ interface Progress : Container, SingleChild
     float getProgress();
 }
 
-class StandardProgress : Progress
+class StandardProgress : Progress, CachedBounds
 {
     private float progress = 0.0f;
     private Component@ component;
@@ -17,6 +17,15 @@ class StandardProgress : Progress
     private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
+
+    private Vec2f bounds = Vec2f_zero;
+    private bool calculateBounds = true;
+    private EventHandler@ componentResizeHandler;
+
+    StandardProgress()
+    {
+        @componentResizeHandler = CachedBoundsHandler(this);
+    }
 
     void SetProgress(float progress)
     {
@@ -62,7 +71,7 @@ class StandardProgress : Progress
         margin.x = x;
         margin.y = y;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getMargin()
@@ -77,7 +86,7 @@ class StandardProgress : Progress
         padding.x = x;
         padding.y = y;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getPadding()
@@ -92,7 +101,7 @@ class StandardProgress : Progress
         size.x = width;
         size.y = height;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getSize()
@@ -113,22 +122,44 @@ class StandardProgress : Progress
 
     Vec2f getInnerBounds()
     {
-        return size - padding * 2.0f;
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+
+            bounds = component !is null
+                ? component.getBounds()
+                : Vec2f_zero;
+
+            bounds.x = Maths::Max(bounds.x, size.x);
+            bounds.y = Maths::Max(bounds.y, size.y);
+        }
+
+        return bounds;
     }
 
     Vec2f getTrueBounds()
     {
-        return size;
+        return padding + getInnerBounds() + padding;
     }
 
     Vec2f getBounds()
     {
-        return margin + size + margin;
+        return margin + getTrueBounds() + margin;
+    }
+
+    void CalculateBounds()
+    {
+        if (calculateBounds) return;
+
+        calculateBounds = true;
+        DispatchEvent("resize");
     }
 
     bool isHovered()
     {
-        return isMouseInBounds(position, position + size);
+        Vec2f min = position + margin;
+        Vec2f max = min + getTrueBounds();
+        return isMouseInBounds(min, max);
     }
 
     bool canClick()
@@ -176,20 +207,21 @@ class StandardProgress : Progress
 
     void Render()
     {
+        Vec2f innerBounds = getInnerBounds();
         Vec2f min = position + margin;
-        Vec2f max = min + size;
+        Vec2f max = min + padding + innerBounds + padding;
 
         GUI::DrawProgressBar(min, max, progress);
 
         if (component !is null)
         {
-            Vec2f innerBounds = getInnerBounds();
-            Vec2f pos;
+            Vec2f boundsDiff = innerBounds - component.getBounds();
 
-            pos.x = min.x + padding.x + innerBounds.x * alignment.x;
-            pos.y = min.y + padding.y + innerBounds.y * alignment.y;
+            Vec2f innerPos;
+            innerPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
+            innerPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
 
-            component.SetPosition(pos.x, pos.y);
+            component.SetPosition(innerPos.x, innerPos.y);
             component.Render();
         }
     }
