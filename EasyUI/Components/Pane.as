@@ -1,6 +1,7 @@
 interface Pane : Container, SingleChild
 {
-
+    void SetSize(float width, float height);
+    Vec2f getSize();
 }
 
 enum StandardPaneType
@@ -21,6 +22,7 @@ class StandardPane : Pane, CachedBounds
     private StandardPaneType type = StandardPaneType::Normal;
     private SColor color;
     private bool hasColor = false;
+    private Vec2f size = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
 
@@ -50,16 +52,17 @@ class StandardPane : Pane, CachedBounds
     {
         if (this.component is component) return;
 
-        if (component !is null)
-        {
-            component.AddEventListener("resize", componentResizeHandler);
-        }
-        else
+        if (this.component !is null)
         {
             this.component.RemoveEventListener("resize", componentResizeHandler);
         }
 
         @this.component = component;
+
+        if (this.component !is null)
+        {
+            this.component.AddEventListener("resize", componentResizeHandler);
+        }
 
         CalculateBounds();
     }
@@ -105,6 +108,21 @@ class StandardPane : Pane, CachedBounds
         return padding;
     }
 
+    void SetSize(float width, float height)
+    {
+        if (size.x == width && size.y == height) return;
+
+        size.x = width;
+        size.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getSize()
+    {
+        return size;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -125,6 +143,9 @@ class StandardPane : Pane, CachedBounds
             bounds = component !is null
                 ? component.getBounds()
                 : Vec2f_zero;
+
+            bounds.x = Maths::Max(bounds.x, size.x);
+            bounds.y = Maths::Max(bounds.y, size.y);
         }
 
         return bounds;
