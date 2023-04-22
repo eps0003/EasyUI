@@ -208,36 +208,43 @@ class EasyUI
     {
         if (!isClient()) return;
 
-        if (hovered !is null)
-        {
-            Vec2f min = hovered.getPosition();
-            Vec2f max = min + hovered.getBounds();
-            SColor color(255, 255, 165, 0);
-            GUI::DrawOutlinedRectangle(min, max, 2, color);
-        }
+        DrawDebug(hovered, "hovered", SColor(255, 255, 165, 0));
+        DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255));
+        DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0));
+        DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0));
+    }
 
-        if (scrollable !is null)
-        {
-            Vec2f min = scrollable.getPosition();
-            Vec2f max = min + scrollable.getBounds();
-            SColor color(255, 0, 0, 255);
-            GUI::DrawOutlinedRectangle(min, max, 2, color);
-        }
+    private void DrawDebug(Component@ component, string text, SColor color)
+    {
+        DrawDebugOutline(component, color);
+        DrawDebugLabel(component, text, color);
+    }
 
-        if (clickable !is null)
-        {
-            Vec2f min = clickable.getPosition();
-            Vec2f max = min + clickable.getBounds();
-            SColor color(255, 255, 0, 0);
-            GUI::DrawOutlinedRectangle(min, max, 2, color);
-        }
+    private void DrawDebugOutline(Component@ component, SColor color)
+    {
+        if (component is null) return;
 
-        if (interacting !is null)
-        {
-            Vec2f min = interacting.getPosition();
-            Vec2f max = min + interacting.getBounds();
-            SColor color(255, 0, 255, 0);
-            GUI::DrawOutlinedRectangle(min, max, 2, color);
-        }
+        Vec2f min = component.getPosition();
+        Vec2f max = min + component.getBounds();
+        GUI::DrawOutlinedRectangle(min, max, 2, color);
+    }
+
+    private void DrawDebugLabel(Component@ component, string text, SColor color)
+    {
+        if (component is null) return;
+
+        GUI::SetFont("");
+
+        Vec2f dim;
+        GUI::GetTextDimensions(text, dim);
+
+        Vec2f position = component.getPosition();
+        Vec2f padding = Vec2f(2.0f, 0.0f);
+
+        Vec2f min = position - Vec2f(0, 12 + padding.y * 2.0f);
+        Vec2f max = position + Vec2f(dim.x + padding.x * 2.0f, 0);
+
+        GUI::DrawRectangle(min, max, color);
+        GUI::DrawText(text, min + padding - Vec2f(3, 1), color_white);
     }
 }
