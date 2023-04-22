@@ -23,6 +23,11 @@ class StandardToggle : Toggle
         button.SetComponent(component);
     }
 
+    Component@ getComponent()
+    {
+        return button.getComponent();
+    }
+
     bool isPressed()
     {
         return pressed;
@@ -166,17 +171,23 @@ class StandardToggle : Toggle
             DispatchEvent("release");
         }
 
-        // Component@ component = getComponent();
-        // if (component !is null)
-        // {
-        //     component.Update();
-        // }
+        Component@ component = getComponent();
+        if (component !is null)
+        {
+            component.Update();
+        }
     }
 
     void Render()
     {
-        Vec2f min = getPosition() + getMargin();
-        Vec2f max = min + getSize();
+        Vec2f position = getPosition();
+        Vec2f margin = getMargin();
+        Vec2f padding = getPadding();
+        Vec2f alignment = getAlignment();
+        Vec2f innerBounds = getInnerBounds();
+
+        Vec2f min = position + margin;
+        Vec2f max = min + padding + innerBounds + padding;
 
         if (ui.canClick(this))
         {
@@ -229,19 +240,15 @@ class StandardToggle : Toggle
             }
         }
 
-        // Component@ component = getComponent();
-        // if (component !is null)
-        // {
-        //     Vec2f padding = getPadding();
-        //     Vec2f innerBounds = getInnerBounds();
-        //     Vec2f alignment = getAlignment();
+        Component@ component = getComponent();
+        if (component !is null)
+        {
+            Vec2f innerPos;
+            innerPos.x = min.x + padding.x + innerBounds.x * alignment.x;
+            innerPos.y = min.y + padding.y + innerBounds.y * alignment.y;
 
-        //     Vec2f pos;
-        //     pos.x = min.x + padding.x + innerBounds.x * alignment.x;
-        //     pos.y = min.y + padding.y + innerBounds.y * alignment.y;
-
-        //     component.SetPosition(pos.x, pos.y);
-        //     component.Render();
-        // }
+            component.SetPosition(innerPos.x, innerPos.y);
+            component.Render();
+        }
     }
 }

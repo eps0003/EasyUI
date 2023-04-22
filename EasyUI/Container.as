@@ -13,6 +13,7 @@ interface Container : Component
 interface SingleChild
 {
     void SetComponent(Component@ component);
+    Component@ getComponent();
 
     void SetAlignment(float x, float y);
     Vec2f getAlignment();
@@ -21,6 +22,7 @@ interface SingleChild
 interface MultiChild
 {
     void AddComponent(Component@ component);
+    Component@[] getComponents();
 
     void SetAlignment(float x, float y);
     Vec2f getAlignment();

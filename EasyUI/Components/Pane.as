@@ -67,6 +67,11 @@ class StandardPane : Pane, CachedBounds
         CalculateBounds();
     }
 
+    Component@ getComponent()
+    {
+        return component;
+    }
+
     void SetAlignment(float x, float y)
     {
         alignment.x = Maths::Clamp01(x);

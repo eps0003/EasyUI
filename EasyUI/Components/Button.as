@@ -6,7 +6,7 @@ interface Button : Container, SingleChild
     bool isPressed();
 }
 
-class StandardButton : Button
+class StandardButton : Button, CachedBounds
 {
     private EasyUI@ ui;
 
@@ -18,14 +18,24 @@ class StandardButton : Button
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
 
+    private Vec2f bounds = Vec2f_zero;
+    private bool calculateBounds = true;
+    private EventHandler@ componentResizeHandler;
+
     StandardButton(EasyUI@ ui)
     {
         @this.ui = ui;
+        @componentResizeHandler = CachedBoundsHandler(this);
     }
 
     void SetComponent(Component@ component)
     {
         @this.component = component;
+    }
+
+    Component@ getComponent()
+    {
+        return component;
     }
 
     bool isPressed()
@@ -102,17 +112,37 @@ class StandardButton : Button
 
     Vec2f getInnerBounds()
     {
-        return size - padding * 2.0f;
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+
+            bounds = component !is null
+                ? component.getBounds()
+                : Vec2f_zero;
+
+            bounds.x = Maths::Max(bounds.x, size.x);
+            bounds.y = Maths::Max(bounds.y, size.y);
+        }
+
+        return bounds;
     }
 
     Vec2f getTrueBounds()
     {
-        return size;
+        return padding + getInnerBounds() + padding;
     }
 
     Vec2f getBounds()
     {
-        return margin + size + margin;
+        return margin + getTrueBounds() + margin;
+    }
+
+    void CalculateBounds()
+    {
+        if (calculateBounds) return;
+
+        calculateBounds = true;
+        DispatchEvent("resize");
     }
 
     bool isHovered()
@@ -167,8 +197,9 @@ class StandardButton : Button
 
     void Render()
     {
+        Vec2f innerBounds = getInnerBounds();
         Vec2f min = position + margin;
-        Vec2f max = min + size;
+        Vec2f max = min + padding + innerBounds + padding;
 
         if (ui.canClick(this))
         {
@@ -195,13 +226,11 @@ class StandardButton : Button
 
         if (component !is null)
         {
-            Vec2f innerBounds = getInnerBounds();
-            Vec2f pos;
+            Vec2f innerPos;
+            innerPos.x = min.x + padding.x + innerBounds.x * alignment.x;
+            innerPos.y = min.y + padding.y + innerBounds.y * alignment.y;
 
-            pos.x = min.x + padding.x + innerBounds.x * alignment.x;
-            pos.y = min.y + padding.y + innerBounds.y * alignment.y;
-
-            component.SetPosition(pos.x, pos.y);
+            component.SetPosition(innerPos.x, innerPos.y);
             component.Render();
         }
     }
