@@ -124,7 +124,7 @@ class StandardStack : Stack, CachedBounds
         return false;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();

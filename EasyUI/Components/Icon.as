@@ -86,7 +86,7 @@ class StandardIcon : Icon
         return size;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return isMouseInBounds(position, position + size);
     }

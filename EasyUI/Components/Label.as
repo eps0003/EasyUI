@@ -97,7 +97,7 @@ class StandardLabel : Label, CachedBounds
         DispatchEvent("resize");
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return isMouseInBounds(position, position + bounds);
     }
@@ -218,7 +218,7 @@ class StandardAreaLabel : AreaLabel
         return size;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return isMouseInBounds(position, position + size);
     }

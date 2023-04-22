@@ -20,7 +20,7 @@ class EasyUI
 {
     private Component@[] components;
 
-    private Component@ hovered;
+    private Component@ hovering;
     private Component@ clickable;
     private Component@ scrollable;
     private Component@ interacting;
@@ -63,9 +63,9 @@ class EasyUI
         this.components = components;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
-        return hovered !is null;
+        return hovering !is null;
     }
 
     bool isInteracting()
@@ -75,7 +75,7 @@ class EasyUI
 
     bool hasControl()
     {
-        return isHovered() || isInteracting();
+        return isHovering() || isInteracting();
     }
 
     bool canClick(Component@ component)
@@ -90,7 +90,7 @@ class EasyUI
 
     bool isHovering(Component@ component)
     {
-        return component !is null && component is hovered;
+        return component !is null && component is hovering;
     }
 
     bool isInteractingWith(Component@ component)
@@ -98,19 +98,9 @@ class EasyUI
         return component !is null && component is interacting;
     }
 
-    Component@ getHoveredComponent()
-    {
-        return hovered;
-    }
-
-    Component@ getScrollableComponent()
-    {
-        return scrollable;
-    }
-
     private void CacheComponents()
     {
-        @hovered = null;
+        @hovering = null;
         @clickable = null;
         @scrollable = null;
 
@@ -127,7 +117,7 @@ class EasyUI
 
         // Remember scrollable component and if hovering
         Component@ scroll = scrollable;
-        bool hover = isHovered();
+        bool hover = isHovering();
 
         // Traverse child components
         Component@[] children = component.getComponents();
@@ -142,11 +132,11 @@ class EasyUI
             @scrollable = scroll;
         }
 
-        if (component.isHovered())
+        if (component.isHovering())
         {
-            if (hovered is null)
+            if (hovering is null)
             {
-                @hovered = component;
+                @hovering = component;
             }
 
             if (clickable is null && component.canClick())
@@ -208,7 +198,7 @@ class EasyUI
     {
         if (!isClient()) return;
 
-        DrawDebug(hovered, "hovered", SColor(255, 255, 165, 0));
+        DrawDebug(hovering, "hovering", SColor(255, 255, 165, 0));
         DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255));
         DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0));
         DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0));

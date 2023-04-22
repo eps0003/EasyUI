@@ -99,7 +99,7 @@ class StandardVerticalSlider : VerticalSlider
         return size;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return isMouseInBounds(position, position + size);
     }
@@ -280,7 +280,7 @@ class StandardHorizontalSlider : HorizontalSlider
         return size;
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return isMouseInBounds(position, position + size);
     }

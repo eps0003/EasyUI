@@ -69,7 +69,7 @@ class StandardAvatar : Avatar
         return getSize();
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         return false;
     }

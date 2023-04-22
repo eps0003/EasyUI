@@ -8,7 +8,7 @@ interface Component : EventDispatcher
     void Update();
     void Render();
 
-    bool isHovered();
+    bool isHovering();
 
     bool canClick();
     bool canScroll();

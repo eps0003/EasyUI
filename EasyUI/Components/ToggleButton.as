@@ -98,9 +98,9 @@ class StandardToggle : Toggle
         return button.getBounds();
     }
 
-    bool isHovered()
+    bool isHovering()
     {
-        return button.isHovered();
+        return button.isHovering();
     }
 
     bool canClick()

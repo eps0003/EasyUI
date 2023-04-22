@@ -294,7 +294,7 @@ class VerticalList : List, CachedBounds
         events.DispatchEvent(type);
     }
 
-    bool isHovered()
+    bool isHovering()
     {
         Vec2f min = position + margin;
         Vec2f max = min + getTrueBounds();
