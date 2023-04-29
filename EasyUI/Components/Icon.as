@@ -31,8 +31,17 @@ class StandardIcon : Icon
 
     private void CalculateScale()
     {
-        scale.x = size.x / frameDim.x * 0.5f;
-        scale.y = size.y / frameDim.y * 0.5f;
+        Vec2f croppedDim;
+        croppedDim.x = frameDim.x - cropLeft - cropRight;
+        croppedDim.y = frameDim.y - cropTop - cropBottom;
+
+        scale.x = croppedDim.x != 0.0f
+            ? size.x / croppedDim.x * 0.5f
+            : 0.0f;
+
+        scale.y = croppedDim.y != 0.0f
+            ? size.y / croppedDim.y * 0.5f
+            : 0.0f;
     }
 
     void SetIcon(string icon)
@@ -107,11 +116,7 @@ class StandardIcon : Icon
 
     Vec2f getBounds()
     {
-        Vec2f offset;
-        offset.x = (cropLeft + cropRight) * scale.x;
-        offset.y = (cropTop + cropBottom) * scale.y;
-
-        return size - offset;
+        return Vec2f_abs(size);
     }
 
     bool isHovering()
@@ -159,8 +164,10 @@ class StandardIcon : Icon
     {
         return (
             icon != "" &&
-            size.LengthSquared() > 0 &&
-            frameDim.LengthSquared() > 0
+            size.x != 0.0f &&
+            size.y != 0.0f &&
+            frameDim.x != 0.0f &&
+            frameDim.y != 0.0f
         );
     }
 
@@ -168,10 +175,11 @@ class StandardIcon : Icon
     {
         if (!canRender()) return;
 
-        Vec2f offset;
-        offset.x = cropLeft * scale.x;
-        offset.y = cropTop * scale.y;
+        Vec2f offset = Vec2f_zero;
+        offset.x = size.x > 0.0f ? -cropLeft : frameDim.x - cropRight;
+        offset.y = size.y > 0.0f ? -cropTop : frameDim.y - cropBottom;
+        offset *= Vec2f_abs(scale) * 2.0f;
 
-        GUI::DrawIcon(icon, frameIndex, frameDim, position - offset, scale.x, scale.y, color_white);
+        GUI::DrawIcon(icon, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
     }
 }

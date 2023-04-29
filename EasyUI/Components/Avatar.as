@@ -51,8 +51,7 @@ class StandardAvatar : Avatar
 
     Vec2f getBounds()
     {
-        float absSize = Maths::Abs(size);
-        return Vec2f(absSize, absSize);
+        return Vec2f_abs(getSize());
     }
 
     bool isHovering()

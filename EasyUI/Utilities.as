@@ -9,13 +9,23 @@ bool isMouseInBounds(Vec2f &in min, Vec2f &in max)
     );
 }
 
+Vec2f Vec2f_abs(Vec2f &in vec)
+{
+    return Vec2f(Maths::Abs(vec.x), Maths::Abs(vec.y));
+}
+
 namespace GUI
 {
     void DrawOutlinedRectangle(Vec2f min, Vec2f max, float thickness, SColor color)
     {
-        GUI::DrawRectangle(min, Vec2f(min.x + thickness, max.y), color); // Left
-        GUI::DrawRectangle(min, Vec2f(max.x, min.y + thickness), color); // Top
-        GUI::DrawRectangle(Vec2f(max.x - thickness, min.y), max, color); // Right
-        GUI::DrawRectangle(Vec2f(min.x, max.y - thickness), max, color); // Bottom
+        float minX = Maths::Min(min.x, max.x);
+        float minY = Maths::Min(min.y, max.y);
+        float maxY = Maths::Max(min.y, max.y);
+        float maxX = Maths::Max(min.x, max.x);
+
+        GUI::DrawRectangle(min, Vec2f(minX + thickness, maxY), color); // Left
+        GUI::DrawRectangle(min, Vec2f(maxX, minY + thickness), color); // Top
+        GUI::DrawRectangle(Vec2f(maxX - thickness, minY), max, color); // Right
+        GUI::DrawRectangle(Vec2f(minX, maxY - thickness), max, color); // Bottom
     }
 }
