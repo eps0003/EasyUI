@@ -194,20 +194,25 @@ class EasyUI
         }
     }
 
-    void Debug()
+    void Debug(bool detailed = false)
     {
         if (!isClient()) return;
 
-        DrawDebug(hovering, "hovering", SColor(255, 255, 165, 0));
-        DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255));
-        DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0));
-        DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0));
+        DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255), detailed);
+        DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0), detailed);
+        DrawDebug(hovering, "hovering", SColor(255, 255, 165, 0), detailed);
+        DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0), detailed);
+
+        if (detailed)
+        {
+            DrawDebugCursor();
+        }
     }
 
-    private void DrawDebug(Component@ component, string text, SColor color)
+    private void DrawDebug(Component@ component, string text, SColor color, bool detailed = false)
     {
         DrawDebugOutline(component, color);
-        DrawDebugLabel(component, text, color);
+        DrawDebugLabel(component, text, color, detailed);
     }
 
     private void DrawDebugOutline(Component@ component, SColor color)
@@ -219,22 +224,50 @@ class EasyUI
         GUI::DrawOutlinedRectangle(min, max, 2, color);
     }
 
-    private void DrawDebugLabel(Component@ component, string text, SColor color)
+    private void DrawDebugLabel(Component@ component, string text, SColor color, bool detailed = false)
     {
         if (component is null) return;
 
         GUI::SetFont("");
 
-        Vec2f dim;
-        GUI::GetTextDimensions(text, dim);
+        string[] lines = { text };
+
+        if (detailed)
+        {
+            lines.push_back("pos: " + component.getPosition().toString());
+            lines.push_back("size: " + component.getBounds().toString());
+        }
+
+        float dimX = 0.0f;
+
+        for (uint i = 0; i < lines.size(); i++)
+        {
+            Vec2f dim;
+            GUI::GetTextDimensions(lines[i], dim);
+
+            if (dim.x > dimX)
+            {
+                dimX = dim.x;
+            }
+        }
 
         Vec2f position = component.getPosition();
         Vec2f padding = Vec2f(2.0f, 0.0f);
 
-        Vec2f min = position - Vec2f(0, 12 + padding.y * 2.0f);
-        Vec2f max = position + Vec2f(dim.x + padding.x * 2.0f, 0);
+        Vec2f min = position - Vec2f(0, 12 * lines.size() + padding.y * (lines.size() + 1));
+        Vec2f max = position + Vec2f(dimX + padding.x * 2, 0);
 
         GUI::DrawRectangle(min, max, color);
-        GUI::DrawText(text, min + padding - Vec2f(3, 1), color_white);
+
+        for (uint i = 0; i < lines.size(); i++)
+        {
+            GUI::DrawText(lines[i], min + padding - Vec2f(3, 1) + Vec2f(0, 12 * i), color_white);
+        }
+    }
+
+    private void DrawDebugCursor()
+    {
+        Vec2f mousePos = getControls().getInterpMouseScreenPos();
+        GUI::DrawRectangle(mousePos - Vec2f(1, 1), mousePos + Vec2f(1, 1), SColor(255, 255, 0, 255));
     }
 }
