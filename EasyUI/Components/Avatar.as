@@ -5,16 +5,12 @@ interface Avatar : Component
 
     void SetSize(float size);
     Vec2f getSize();
-
-    void SetAlignment(float x, float y);
-    Vec2f getAlignment();
 }
 
 class StandardAvatar : Avatar
 {
     private CPlayer@ player;
     private float size = 0.0f;
-    private Vec2f alignment = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
 
@@ -42,17 +38,6 @@ class StandardAvatar : Avatar
         return Vec2f(size, size);
     }
 
-    void SetAlignment(float x, float y)
-    {
-        alignment.x = Maths::Clamp01(x);
-        alignment.y = Maths::Clamp01(y);
-    }
-
-    Vec2f getAlignment()
-    {
-        return alignment;
-    }
-
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -66,12 +51,13 @@ class StandardAvatar : Avatar
 
     Vec2f getBounds()
     {
-        return getSize();
+        float absSize = Maths::Abs(size);
+        return Vec2f(absSize, absSize);
     }
 
     bool isHovering()
     {
-        return false;
+        return isMouseInBounds(position, position + getBounds());
     }
 
     bool canClick()
@@ -119,13 +105,8 @@ class StandardAvatar : Avatar
     {
         if (!canRender()) return;
 
-        Vec2f align, pos;
-
-        align.x = size > 0 ? alignment.x : 1 - alignment.x;
-        align.y = size > 0 ? alignment.y : 1 - alignment.y;
-
-        pos.x = position.x - size * align.x;
-        pos.y = position.y - size * align.y;
+        float offset = Maths::Min(size, 0.0f);
+        Vec2f pos = position - Vec2f(offset, offset);
 
         player.drawAvatar(pos, size / 96.0f);
     }
