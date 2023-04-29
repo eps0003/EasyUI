@@ -9,6 +9,8 @@ interface Icon : Component
     void SetFrameDimension(uint width, uint height);
     Vec2f getFrameDimension();
 
+    void SetCrop(float top, float right, float bottom, float left);
+
     void SetSize(float width, float height);
     Vec2f getSize();
 }
@@ -19,8 +21,19 @@ class StandardIcon : Icon
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
+    private float cropTop = 0.0f;
+    private float cropRight = 0.0f;
+    private float cropBottom = 0.0f;
+    private float cropLeft = 0.0f;
+    private Vec2f scale = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
+
+    private void CalculateScale()
+    {
+        scale.x = size.x / frameDim.x * 0.5f;
+        scale.y = size.y / frameDim.y * 0.5f;
+    }
 
     void SetIcon(string icon)
     {
@@ -48,11 +61,21 @@ class StandardIcon : Icon
 
         frameDim.x = width;
         frameDim.y = height;
+
+        CalculateScale();
     }
 
     Vec2f getFrameDimension()
     {
         return frameDim;
+    }
+
+    void SetCrop(float top, float right, float bottom, float left)
+    {
+        cropTop = top;
+        cropRight = right;
+        cropBottom = bottom;
+        cropLeft = left;
     }
 
     void SetSize(float width, float height)
@@ -62,6 +85,7 @@ class StandardIcon : Icon
         size.x = width;
         size.y = height;
 
+        CalculateScale();
         DispatchEvent("resize");
     }
 
@@ -83,12 +107,16 @@ class StandardIcon : Icon
 
     Vec2f getBounds()
     {
-        return size;
+        Vec2f offset;
+        offset.x = (cropLeft + cropRight) * scale.x;
+        offset.y = (cropTop + cropBottom) * scale.y;
+
+        return size - offset;
     }
 
     bool isHovering()
     {
-        return isMouseInBounds(position, position + size);
+        return isMouseInBounds(position, position + getBounds());
     }
 
     bool canClick()
@@ -140,9 +168,10 @@ class StandardIcon : Icon
     {
         if (!canRender()) return;
 
-        float scaleX = size.x / frameDim.x * 0.5f;
-        float scaleY = size.y / frameDim.y * 0.5f;
+        Vec2f offset;
+        offset.x = cropLeft * scale.x;
+        offset.y = cropTop * scale.y;
 
-        GUI::DrawIcon(icon, frameIndex, frameDim, position, scaleX, scaleY, color_white);
+        GUI::DrawIcon(icon, frameIndex, frameDim, position - offset, scale.x, scale.y, color_white);
     }
 }
