@@ -169,7 +169,13 @@ class EasyUI
 
         CacheComponents();
 
-        if (interacting is null && clickable !is null && (controls.isKeyJustPressed(KEY_LBUTTON) || controls.isKeyJustPressed(KEY_RBUTTON)))
+        // These boolean checks are outside the if statement on purpose
+        // It fixes an obscure bug with isKeyJustPressed() for right mouse
+        // Right mouse was always just pressed when checked directly in if statement
+        bool leftPressed = controls.isKeyJustPressed(KEY_LBUTTON);
+        bool rightPressed = controls.isKeyJustPressed(KEY_RBUTTON);
+
+        if (interacting is null && clickable !is null && (leftPressed || rightPressed))
         {
             @interacting = clickable;
 
