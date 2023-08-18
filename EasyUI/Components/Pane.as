@@ -13,7 +13,7 @@ enum StandardPaneType
     Bubble
 }
 
-class StandardPane : Pane, CachedBounds
+class StandardPane : Pane
 {
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;

@@ -4,6 +4,7 @@ interface Component : EventDispatcher
     Vec2f getPosition();
 
     Vec2f getBounds();
+    void CalculateBounds();
 
     void Update();
     void Render();

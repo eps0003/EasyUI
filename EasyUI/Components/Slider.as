@@ -99,6 +99,11 @@ class StandardVerticalSlider : VerticalSlider
         return size;
     }
 
+    void CalculateBounds()
+    {
+
+    }
+
     bool isHovering()
     {
         return isMouseInBounds(position, position + size);
@@ -278,6 +283,11 @@ class StandardHorizontalSlider : HorizontalSlider
     Vec2f getBounds()
     {
         return size;
+    }
+
+    void CalculateBounds()
+    {
+
     }
 
     bool isHovering()

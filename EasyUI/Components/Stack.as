@@ -3,7 +3,7 @@ interface Stack : Container, MultiChild
 
 }
 
-class StandardStack : Stack, CachedBounds
+class StandardStack : Stack
 {
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;

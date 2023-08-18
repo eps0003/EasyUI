@@ -98,6 +98,11 @@ class StandardToggle : Toggle
         return button.getBounds();
     }
 
+    void CalculateBounds()
+    {
+        button.CalculateBounds();
+    }
+
     bool isHovering()
     {
         return button.isHovering();

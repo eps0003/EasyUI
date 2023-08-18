@@ -54,6 +54,11 @@ class StandardAvatar : Avatar
         return Vec2f_abs(getSize());
     }
 
+    void CalculateBounds()
+    {
+
+    }
+
     bool isHovering()
     {
         return isMouseInBounds(position, position + getBounds());

@@ -1,13 +1,8 @@
-interface CachedBounds
-{
-    void CalculateBounds();
-}
-
 class CachedBoundsHandler : EventHandler
 {
-    private CachedBounds@ component;
+    private Component@ component;
 
-    CachedBoundsHandler(CachedBounds@ component)
+    CachedBoundsHandler(Component@ component)
     {
         @this.component = component;
     }

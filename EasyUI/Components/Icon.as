@@ -119,6 +119,11 @@ class StandardIcon : Icon
         return Vec2f_abs(size);
     }
 
+    void CalculateBounds()
+    {
+
+    }
+
     bool isHovering()
     {
         return isMouseInBounds(position, position + getBounds());

@@ -7,7 +7,7 @@ interface Progress : Container, SingleChild
     float getProgress();
 }
 
-class StandardProgress : Progress, CachedBounds
+class StandardProgress : Progress
 {
     private float progress = 0.0f;
     private Component@ component;
@@ -45,7 +45,21 @@ class StandardProgress : Progress, CachedBounds
 
     void SetComponent(Component@ component)
     {
+        if (this.component is component) return;
+
+        if (this.component !is null)
+        {
+            this.component.RemoveEventListener("resize", componentResizeHandler);
+        }
+
         @this.component = component;
+
+        if (this.component !is null)
+        {
+            this.component.AddEventListener("resize", componentResizeHandler);
+        }
+
+        CalculateBounds();
     }
 
     Component@ getComponent()

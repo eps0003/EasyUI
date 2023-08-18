@@ -16,7 +16,7 @@ interface AreaLabel : Label
     Vec2f getSize();
 }
 
-class StandardLabel : Label, CachedBounds
+class StandardLabel : Label
 {
     private string text;
     private string font = "menu";
@@ -216,6 +216,11 @@ class StandardAreaLabel : AreaLabel
     Vec2f getBounds()
     {
         return size;
+    }
+
+    void CalculateBounds()
+    {
+
     }
 
     bool isHovering()

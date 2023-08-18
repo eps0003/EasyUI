@@ -19,7 +19,7 @@ interface List : Container, MultiChild
     uint getScrollIndex();
 }
 
-class VerticalList : List, CachedBounds
+class VerticalList : List
 {
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;

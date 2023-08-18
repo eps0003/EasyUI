@@ -6,7 +6,7 @@ interface Button : Container, SingleChild
     bool isPressed();
 }
 
-class StandardButton : Button, CachedBounds
+class StandardButton : Button
 {
     private EasyUI@ ui;
 
@@ -30,7 +30,21 @@ class StandardButton : Button, CachedBounds
 
     void SetComponent(Component@ component)
     {
+        if (this.component is component) return;
+
+        if (this.component !is null)
+        {
+            this.component.RemoveEventListener("resize", componentResizeHandler);
+        }
+
         @this.component = component;
+
+        if (this.component !is null)
+        {
+            this.component.AddEventListener("resize", componentResizeHandler);
+        }
+
+        CalculateBounds();
     }
 
     Component@ getComponent()
