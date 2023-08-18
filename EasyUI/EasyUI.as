@@ -157,7 +157,7 @@ class EasyUI
 
         if (interacting !is null && !controls.isKeyPressed(KEY_LBUTTON) && !controls.isKeyPressed(KEY_RBUTTON))
         {
-            if (ui.canClick(interacting))
+            if (canClick(interacting))
             {
                 interacting.DispatchEvent("click");
             }

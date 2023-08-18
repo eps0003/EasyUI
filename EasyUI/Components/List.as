@@ -21,6 +21,8 @@ interface List : Container, MultiChild
 
 class VerticalList : List
 {
+    private EasyUI@ ui;
+
     private Component@[] components;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
@@ -40,8 +42,9 @@ class VerticalList : List
     private float[] columnWidths;
     private float[] rowHeights;
 
-    VerticalList()
+    VerticalList(EasyUI@ ui)
     {
+        @this.ui = ui;
         @scrollbarResizeHandler = CachedBoundsHandler(this);
     }
 
