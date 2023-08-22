@@ -8,24 +8,40 @@ interface Label : Component
 
     void SetColor(SColor color);
     SColor getColor();
+
+    void SetClickable(bool clickable);
 }
 
 interface AreaLabel : Label
 {
-    void SetSize(float width, float height);
-    Vec2f getSize();
+    void SetMinSize(float width, float height);
+    Vec2f getMinSize();
+
+    void SetMaxSize(float width, float height);
+    Vec2f getMaxSize();
+
+    void SetStretchRatio(float x, float y);
+    Vec2f getStretchRatio();
 }
 
 class StandardLabel : Label
 {
+    private Component@ parent;
     private string text;
     private string font = "menu";
     private SColor color = color_black;
+    private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private bool clickable = false;
     private EventDispatcher@ events = StandardEventDispatcher();
 
-    private Vec2f bounds = Vec2f_zero;
+    private Vec2f trueBounds = Vec2f_zero;
     private bool calculateBounds = true;
+
+    void SetParent(Component@ parent)
+    {
+        @this.parent = parent;
+    }
 
     void SetText(string text)
     {
@@ -65,6 +81,24 @@ class StandardLabel : Label
         return color;
     }
 
+    void SetMargin(float x, float y)
+    {
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
+        if (margin.x == x && margin.y == y) return;
+
+        margin.x = x;
+        margin.y = y;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMargin()
+    {
+        return margin;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -76,17 +110,42 @@ class StandardLabel : Label
         return position;
     }
 
+    Vec2f getTruePosition()
+    {
+        return getPosition() + margin;
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return getTruePosition();
+    }
+
+    Vec2f getMinBounds()
+    {
+        return getBounds();
+    }
+
     Vec2f getBounds()
+    {
+        return getTrueBounds() + margin * 2.0f;
+    }
+
+    Vec2f getTrueBounds()
     {
         if (calculateBounds)
         {
             calculateBounds = false;
 
             GUI::SetFont(font);
-            GUI::GetTextDimensions(text, bounds);
+            GUI::GetTextDimensions(text, trueBounds);
         }
 
-        return bounds;
+        return trueBounds;
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return getTrueBounds();
     }
 
     void CalculateBounds()
@@ -99,12 +158,17 @@ class StandardLabel : Label
 
     bool isHovering()
     {
-        return isMouseInBounds(position, position + bounds);
+        return ::isHovering(this);
+    }
+
+    void SetClickable(bool clickable)
+    {
+        this.clickable = clickable;
     }
 
     bool canClick()
     {
-        return false;
+        return clickable;
     }
 
     bool canScroll()
@@ -143,19 +207,32 @@ class StandardLabel : Label
         if (text == "") return;
 
         // The magic values correctly align the text within the bounds
+        // May only be applicable with the default KAG font?
+        Vec2f pos = getTruePosition() - Vec2f(3, 1);
+
         GUI::SetFont(font);
-        GUI::DrawText(text, position - Vec2f(3, 1), color);
+        GUI::DrawText(text, pos, color);
     }
 }
 
 class StandardAreaLabel : AreaLabel
 {
+    private Component@ parent;
     private string text;
     private string font = "menu";
     private SColor color = color_black;
-    private Vec2f size = Vec2f_zero;
+    private Vec2f minSize = Vec2f_zero;
+    private Vec2f maxSize = Vec2f_zero;
+    private Vec2f stretch = Vec2f_zero;
+    private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private bool clickable = false;
     private EventDispatcher@ events = StandardEventDispatcher();
+
+    void SetParent(Component@ parent)
+    {
+        @this.parent = parent;
+    }
 
     void SetText(string text)
     {
@@ -187,19 +264,63 @@ class StandardAreaLabel : AreaLabel
         return color;
     }
 
-    void SetSize(float width, float height)
+    void SetMargin(float x, float y)
     {
-        if (size.x == width && size.y == height) return;
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
 
-        size.x = width;
-        size.y = height;
+        if (margin.x == x && margin.y == y) return;
 
-        DispatchEvent("resize");
+        margin.x = x;
+        margin.y = y;
+
+        CalculateBounds();
     }
 
-    Vec2f getSize()
+    Vec2f getMargin()
     {
-        return size;
+        return margin;
+    }
+
+    void SetMinSize(float width, float height)
+    {
+        if (minSize.x == width && minSize.y == height) return;
+
+        minSize.x = width;
+        minSize.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMinSize()
+    {
+        return minSize;
+    }
+
+    void SetMaxSize(float width, float height)
+    {
+        if (maxSize.x == width && maxSize.y == height) return;
+
+        maxSize.x = width;
+        maxSize.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMaxSize()
+    {
+        return maxSize;
+    }
+
+    void SetStretchRatio(float x, float y)
+    {
+        stretch.x = Maths::Clamp01(x);
+        stretch.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getStretchRatio()
+    {
+        return stretch;
     }
 
     void SetPosition(float x, float y)
@@ -213,24 +334,54 @@ class StandardAreaLabel : AreaLabel
         return position;
     }
 
+    Vec2f getTruePosition()
+    {
+        return getPosition() + margin;
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return getTruePosition();
+    }
+
+    Vec2f getMinBounds()
+    {
+        return getBounds();
+    }
+
     Vec2f getBounds()
     {
-        return size;
+        return getTrueBounds() + margin * 2.0f;
+    }
+
+    Vec2f getTrueBounds()
+    {
+        return minSize;
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return getTrueBounds();
     }
 
     void CalculateBounds()
     {
-
+        DispatchEvent("resize");
     }
 
     bool isHovering()
     {
-        return isMouseInBounds(position, position + size);
+        return ::isHovering(this);
+    }
+
+    void SetClickable(bool clickable)
+    {
+        this.clickable = clickable;
     }
 
     bool canClick()
     {
-        return false;
+        return clickable;
     }
 
     bool canScroll()
@@ -269,6 +420,6 @@ class StandardAreaLabel : AreaLabel
         if (text == "") return;
 
         GUI::SetFont(font);
-        GUI::DrawText(text, position, position + size, color, false, false);
+        GUI::DrawText(text, position, position + minSize, color, false, false);
     }
 }

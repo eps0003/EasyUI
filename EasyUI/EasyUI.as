@@ -3,15 +3,15 @@
 #include "CachedBounds.as"
 #include "Component.as"
 #include "Container.as"
-#include "Draggable.as"
-#include "DragHandle.as"
+// #include "Draggable.as"
+// #include "DragHandle.as"
 #include "EventDispatcher.as"
 #include "Icon.as"
 #include "Label.as"
-#include "List.as"
+// #include "List.as"
 #include "Pane.as"
 #include "Progress.as"
-#include "Slider.as"
+// #include "Slider.as"
 #include "Stack.as"
 #include "ToggleButton.as"
 #include "Utilities.as"
@@ -26,6 +26,8 @@ class EasyUI
     private Component@ interacting;
 
     private CControls@ controls;
+
+    private u8 debugOutlineThickness = 2;
 
     EasyUI()
     {
@@ -204,10 +206,51 @@ class EasyUI
     {
         if (!isClient()) return;
 
+        if (hovering !is null)
+        {
+            if (hovering.getBounds() != hovering.getTrueBounds())
+            {
+                Vec2f min = hovering.getPosition();
+                Vec2f max = min + hovering.getBounds();
+                GUI::DrawOutlinedRectangle(min, max, debugOutlineThickness, SColor(255, 100, 100, 100));
+            }
+
+            if (hovering.getInnerBounds() != hovering.getTrueBounds())
+            {
+                Vec2f min = hovering.getInnerPosition();
+                Vec2f max = min + hovering.getInnerBounds();
+                GUI::DrawOutlinedRectangle(min, max, debugOutlineThickness, SColor(255, 100, 100, 100));
+            }
+        }
+
         DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255), detailed);
         DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0), detailed);
         DrawDebug(hovering, "hovering", SColor(255, 255, 165, 0), detailed);
         DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0), detailed);
+
+        if (hovering !is null && detailed)
+        {
+            if (hovering.getBounds() != hovering.getTrueBounds())
+            {
+                string[] lines = {
+                    "pos: " + hovering.getPosition().toString(),
+                    "size: " + hovering.getBounds().toString()
+                };
+                Vec2f pos = hovering.getPosition() + Vec2f(0, hovering.getBounds().y - debugOutlineThickness);
+                DrawDebugLabel(lines, pos, SColor(255, 100, 100, 100));
+            }
+
+            if (hovering.getInnerBounds() != hovering.getTrueBounds())
+            {
+                string[] lines = {
+                    "pos: " + hovering.getInnerPosition().toString(),
+                    "size: " + hovering.getInnerBounds().toString()
+                };
+                Vec2f pos = hovering.getInnerPosition() + Vec2f(0, hovering.getInnerBounds().y - debugOutlineThickness);
+                DrawDebugLabel(lines, pos, SColor(255, 100, 100, 100));
+            }
+        }
+
 
         if (detailed)
         {
@@ -217,32 +260,31 @@ class EasyUI
 
     private void DrawDebug(Component@ component, string text, SColor color, bool detailed = false)
     {
+        if (component is null) return;
+
         DrawDebugOutline(component, color);
-        DrawDebugLabel(component, text, color, detailed);
+
+        {
+            string[] lines = { text };
+            if (detailed)
+            {
+                lines.push_back("pos: " + component.getTruePosition().toString());
+                lines.push_back("size: " + component.getTrueBounds().toString());
+            }
+            DrawDebugLabel(lines, component.getTruePosition(), color);
+        }
     }
 
     private void DrawDebugOutline(Component@ component, SColor color)
     {
-        if (component is null) return;
-
-        Vec2f min = component.getPosition();
-        Vec2f max = min + component.getBounds();
-        GUI::DrawOutlinedRectangle(min, max, 2, color);
+        Vec2f min = component.getTruePosition();
+        Vec2f max = min + component.getTrueBounds();
+        GUI::DrawOutlinedRectangle(min, max, debugOutlineThickness, color);
     }
 
-    private void DrawDebugLabel(Component@ component, string text, SColor color, bool detailed = false)
+    private void DrawDebugLabel(string[] lines, Vec2f position, SColor color)
     {
-        if (component is null) return;
-
         GUI::SetFont("");
-
-        string[] lines = { text };
-
-        if (detailed)
-        {
-            lines.push_back("pos: " + component.getPosition().toString());
-            lines.push_back("size: " + component.getBounds().toString());
-        }
 
         float dimX = 0.0f;
 
@@ -257,11 +299,10 @@ class EasyUI
             }
         }
 
-        Vec2f position = component.getPosition();
         Vec2f padding = Vec2f(2.0f, 0.0f);
 
-        Vec2f min = position - Vec2f(0, 12 * lines.size() + padding.y * (lines.size() + 1));
-        Vec2f max = position + Vec2f(dimX + padding.x * 2, 0);
+        Vec2f min = position - Vec2f(0, 12.0f * lines.size() + padding.y * (lines.size() + 1));
+        Vec2f max = position + Vec2f(dimX + padding.x * 2.0f, debugOutlineThickness);
 
         GUI::DrawRectangle(min, max, color);
 
@@ -273,7 +314,7 @@ class EasyUI
 
     private void DrawDebugCursor()
     {
-        Vec2f mousePos = getControls().getInterpMouseScreenPos();
+        Vec2f mousePos = controls.getInterpMouseScreenPos();
         GUI::DrawRectangle(mousePos - Vec2f(1, 1), mousePos + Vec2f(1, 1), SColor(255, 255, 0, 255));
     }
 }

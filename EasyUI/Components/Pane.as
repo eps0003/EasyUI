@@ -1,7 +1,10 @@
 interface Pane : Container, SingleChild
 {
-    void SetSize(float width, float height);
-    Vec2f getSize();
+    void SetMinSize(float width, float height);
+    Vec2f getMinSize();
+
+    void SetMaxSize(float width, float height);
+    Vec2f getMaxSize();
 }
 
 enum StandardPaneType
@@ -15,6 +18,7 @@ enum StandardPaneType
 
 class StandardPane : Pane
 {
+    private Component@ parent;
     private Component@ component;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
@@ -22,11 +26,13 @@ class StandardPane : Pane
     private StandardPaneType type = StandardPaneType::Normal;
     private SColor color;
     private bool hasColor = false;
-    private Vec2f size = Vec2f_zero;
+    private Vec2f minSize = Vec2f_zero;
+    private Vec2f maxSize = Vec2f_zero;
+    private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private EventDispatcher@ events = StandardEventDispatcher();
 
-    private Vec2f bounds = Vec2f_zero;
+    private Vec2f minBounds = Vec2f_zero;
     private bool calculateBounds = true;
     private EventHandler@ componentResizeHandler;
 
@@ -54,6 +60,7 @@ class StandardPane : Pane
 
         if (this.component !is null)
         {
+            this.component.SetParent(null);
             this.component.RemoveEventListener("resize", componentResizeHandler);
         }
 
@@ -61,6 +68,7 @@ class StandardPane : Pane
 
         if (this.component !is null)
         {
+            this.component.SetParent(this);
             this.component.AddEventListener("resize", componentResizeHandler);
         }
 
@@ -70,6 +78,15 @@ class StandardPane : Pane
     Component@ getComponent()
     {
         return component;
+    }
+
+    void SetParent(Component@ parent)
+    {
+        if (this.parent is parent) return;
+
+        @this.parent = parent;
+
+        CalculateBounds();
     }
 
     void SetAlignment(float x, float y)
@@ -85,6 +102,9 @@ class StandardPane : Pane
 
     void SetMargin(float x, float y)
     {
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
         if (margin.x == x && margin.y == y) return;
 
         margin.x = x;
@@ -100,6 +120,9 @@ class StandardPane : Pane
 
     void SetPadding(float x, float y)
     {
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
         if (padding.x == x && padding.y == y) return;
 
         padding.x = x;
@@ -113,19 +136,45 @@ class StandardPane : Pane
         return padding;
     }
 
-    void SetSize(float width, float height)
+    void SetMinSize(float width, float height)
     {
-        if (size.x == width && size.y == height) return;
+        if (minSize.x == width && minSize.y == height) return;
 
-        size.x = width;
-        size.y = height;
+        minSize.x = width;
+        minSize.y = height;
 
         CalculateBounds();
     }
 
-    Vec2f getSize()
+    Vec2f getMinSize()
     {
-        return size;
+        return minSize;
+    }
+
+    void SetMaxSize(float width, float height)
+    {
+        if (maxSize.x == width && maxSize.y == height) return;
+
+        maxSize.x = width;
+        maxSize.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMaxSize()
+    {
+        return maxSize;
+    }
+
+    void SetStretchRatio(float x, float y)
+    {
+        stretch.x = Maths::Clamp01(x);
+        stretch.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getStretchRatio()
+    {
+        return stretch;
     }
 
     void SetPosition(float x, float y)
@@ -139,31 +188,65 @@ class StandardPane : Pane
         return position;
     }
 
-    Vec2f getInnerBounds()
+    Vec2f getTruePosition()
+    {
+        return getPosition() + margin;
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return getTruePosition() + padding;
+    }
+
+    Vec2f getMinBounds()
     {
         if (calculateBounds)
         {
             calculateBounds = false;
 
-            bounds = component !is null
-                ? component.getBounds()
+            minBounds = component !is null
+                ? component.getMinBounds()
                 : Vec2f_zero;
 
-            bounds.x = Maths::Max(bounds.x, size.x);
-            bounds.y = Maths::Max(bounds.y, size.y);
+            minBounds += padding * 2.0f;
+
+            minBounds.x = Maths::Max(minBounds.x, minSize.x);
+            minBounds.y = Maths::Max(minBounds.y, minSize.y);
+
+            minBounds += margin * 2.0f;
         }
 
-        return bounds;
-    }
-
-    Vec2f getTrueBounds()
-    {
-        return padding + getInnerBounds() + padding;
+        return minBounds;
     }
 
     Vec2f getBounds()
     {
-        return margin + getTrueBounds() + margin;
+        Vec2f outerBounds = getMinBounds();
+
+        if (parent !is null)
+        {
+            Vec2f parentBounds = parent.getInnerBounds();
+            parentBounds *= getStretchRatio();
+
+            Vec2f maxBounds;
+            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(parentBounds.x, maxSize.x) : parentBounds.x;
+            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(parentBounds.y, maxSize.y) : parentBounds.y;
+
+            outerBounds.x = Maths::Max(outerBounds.x, maxBounds.x);
+            outerBounds.y = Maths::Max(outerBounds.y, maxBounds.y);
+        }
+
+        return outerBounds;
+    }
+
+    Vec2f getTrueBounds()
+    {
+        return getBounds() - margin * 2.0f;
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return getTrueBounds() - padding * 2.0f;
     }
 
     void CalculateBounds()
@@ -176,9 +259,7 @@ class StandardPane : Pane
 
     bool isHovering()
     {
-        Vec2f min = position + margin;
-        Vec2f max = min + getTrueBounds();
-        return isMouseInBounds(min, max);
+        return ::isHovering(this);
     }
 
     bool canClick()
@@ -226,9 +307,9 @@ class StandardPane : Pane
 
     void Render()
     {
+        Vec2f min = getTruePosition();
+        Vec2f max = min + getTrueBounds();
         Vec2f innerBounds = getInnerBounds();
-        Vec2f min = position + margin;
-        Vec2f max = min + padding + innerBounds + padding;
 
         switch (type)
         {
@@ -256,13 +337,14 @@ class StandardPane : Pane
 
         if (component !is null)
         {
-            Vec2f boundsDiff = innerBounds - component.getBounds();
+            Vec2f childBounds = component.getBounds();
+            Vec2f boundsDiff = innerBounds - childBounds;
 
-            Vec2f innerPos;
-            innerPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
-            innerPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
+            Vec2f childPos;
+            childPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
+            childPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
 
-            component.SetPosition(innerPos.x, innerPos.y);
+            component.SetPosition(childPos.x, childPos.y);
             component.Render();
         }
     }

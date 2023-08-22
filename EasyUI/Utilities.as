@@ -9,6 +9,13 @@ bool isMouseInBounds(Vec2f &in min, Vec2f &in max)
     );
 }
 
+bool isHovering(Component@ component)
+{
+    Vec2f min = component.getTruePosition();
+    Vec2f max = min + component.getTrueBounds();
+    return isMouseInBounds(min, max);
+}
+
 Vec2f Vec2f_abs(Vec2f &in vec)
 {
     return Vec2f(Maths::Abs(vec.x), Maths::Abs(vec.y));

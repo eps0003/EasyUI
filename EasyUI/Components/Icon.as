@@ -13,10 +13,13 @@ interface Icon : Component
 
     void SetSize(float width, float height);
     Vec2f getSize();
+
+    void SetClickable(bool clickable);
 }
 
 class StandardIcon : Icon
 {
+    private Component@ parent;
     private string icon;
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
@@ -26,8 +29,19 @@ class StandardIcon : Icon
     private float cropBottom = 0.0f;
     private float cropLeft = 0.0f;
     private Vec2f scale = Vec2f_zero;
+    private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
+    private bool clickable = true;
     private EventDispatcher@ events = StandardEventDispatcher();
+
+    void SetParent(Component@ parent)
+    {
+        if (this.parent is parent) return;
+
+        @this.parent = parent;
+
+        CalculateBounds();
+    }
 
     private void CalculateScale()
     {
@@ -103,6 +117,24 @@ class StandardIcon : Icon
         return size;
     }
 
+    void SetMargin(float x, float y)
+    {
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
+        if (margin.x == x && margin.y == y) return;
+
+        margin.x = x;
+        margin.y = y;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMargin()
+    {
+        return margin;
+    }
+
     void SetPosition(float x, float y)
     {
         position.x = x;
@@ -114,9 +146,34 @@ class StandardIcon : Icon
         return position;
     }
 
+    Vec2f getTruePosition()
+    {
+        return getPosition() + margin;
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return getTruePosition();
+    }
+
+    Vec2f getMinBounds()
+    {
+        return getBounds();
+    }
+
     Vec2f getBounds()
     {
+        return getTrueBounds() + margin * 2.0f;
+    }
+
+    Vec2f getTrueBounds()
+    {
         return Vec2f_abs(size);
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return getTrueBounds();
     }
 
     void CalculateBounds()
@@ -126,12 +183,17 @@ class StandardIcon : Icon
 
     bool isHovering()
     {
-        return isMouseInBounds(position, position + getBounds());
+        return ::isHovering(this);
+    }
+
+    void SetClickable(bool clickable)
+    {
+        this.clickable = clickable;
     }
 
     bool canClick()
     {
-        return false;
+        return clickable;
     }
 
     bool canScroll()

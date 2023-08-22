@@ -4,18 +4,43 @@ interface Toggle : Button
     bool isChecked();
 }
 
+class ToggleClickHandler : EventHandler
+{
+    private Toggle@ toggle;
+
+    ToggleClickHandler(Toggle@ toggle)
+    {
+        @this.toggle = toggle;
+    }
+
+    void Handle()
+    {
+        toggle.SetChecked(!toggle.isChecked());
+    }
+}
+
 class StandardToggle : Toggle
 {
     private EasyUI@ ui;
     private Button@ button;
 
-    private bool pressed = false;
     private bool checked = false;
+
+    StandardToggle()
+    {
+        error("Initialized StandardToggle using the default constructor. Use StandardToggle(EasyUI@ ui) instead.");
+        printTrace();
+
+        @ui = EasyUI();
+        @button = StandardButton(ui);
+        button.AddEventListener("click", ToggleClickHandler(this));
+    }
 
     StandardToggle(EasyUI@ ui)
     {
         @this.ui = ui;
         @button = StandardButton(ui);
+        button.AddEventListener("click", ToggleClickHandler(this));
     }
 
     void SetComponent(Component@ component)
@@ -28,9 +53,14 @@ class StandardToggle : Toggle
         return button.getComponent();
     }
 
+    void SetParent(Component@ parent)
+    {
+        button.SetParent(parent);
+    }
+
     bool isPressed()
     {
-        return pressed;
+        return ui.isInteractingWith(this);
     }
 
     void SetMargin(float x, float y)
@@ -63,14 +93,34 @@ class StandardToggle : Toggle
         return button.getAlignment();
     }
 
-    void SetSize(float width, float height)
+    void SetMinSize(float width, float height)
     {
-        button.SetSize(width, height);
+        button.SetMinSize(width, height);
     }
 
-    Vec2f getSize()
+    Vec2f getMinSize()
     {
-        return button.getSize();
+        return button.getMinSize();
+    }
+
+    void SetMaxSize(float width, float height)
+    {
+        button.SetMaxSize(width, height);
+    }
+
+    Vec2f getMaxSize()
+    {
+        return button.getMaxSize();
+    }
+
+    void SetStretchRatio(float x, float y)
+    {
+        button.SetStretchRatio(x, y);
+    }
+
+    Vec2f getStretchRatio()
+    {
+        return button.getStretchRatio();
     }
 
     void SetPosition(float x, float y)
@@ -83,9 +133,24 @@ class StandardToggle : Toggle
         return button.getPosition();
     }
 
-    Vec2f getInnerBounds()
+    Vec2f getTruePosition()
     {
-        return button.getInnerBounds();
+        return button.getTruePosition();
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return button.getInnerPosition();
+    }
+
+    Vec2f getMinBounds()
+    {
+        return button.getMinBounds();
+    }
+
+    Vec2f getBounds()
+    {
+        return button.getBounds();
     }
 
     Vec2f getTrueBounds()
@@ -93,9 +158,9 @@ class StandardToggle : Toggle
         return button.getTrueBounds();
     }
 
-    Vec2f getBounds()
+    Vec2f getInnerBounds()
     {
-        return button.getBounds();
+        return button.getInnerBounds();
     }
 
     void CalculateBounds()
@@ -125,13 +190,11 @@ class StandardToggle : Toggle
 
     void SetChecked(bool checked)
     {
-        bool wasChecked = this.checked;
+        if (this.checked == checked) return;
+
         this.checked = checked;
 
-        if (this.checked != wasChecked)
-        {
-            DispatchEvent("change");
-        }
+        DispatchEvent("change");
     }
 
     bool isChecked()
@@ -156,49 +219,20 @@ class StandardToggle : Toggle
 
     void Update()
     {
-        CControls@ controls = getControls();
-
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && ui.canClick(this))
-        {
-            pressed = true;
-            DispatchEvent("press");
-        }
-
-        if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
-        {
-            if (ui.canClick(this))
-            {
-                SetChecked(!checked);
-                DispatchEvent("click");
-            }
-
-            pressed = false;
-            DispatchEvent("release");
-        }
-
-        Component@ component = getComponent();
-        if (component !is null)
-        {
-            component.Update();
-        }
+        button.Update();
     }
 
     void Render()
     {
-        Vec2f position = getPosition();
-        Vec2f margin = getMargin();
-        Vec2f padding = getPadding();
-        Vec2f alignment = getAlignment();
+        Vec2f min = getTruePosition();
+        Vec2f max = min + getTrueBounds();
         Vec2f innerBounds = getInnerBounds();
-
-        Vec2f min = position + margin;
-        Vec2f max = min + padding + innerBounds + padding;
 
         if (ui.canClick(this))
         {
-            if (pressed)
+            if (isPressed())
             {
-                if (checked)
+                if (isChecked())
                 {
                     GUI::DrawButtonPressed(min, max);
                 }
@@ -209,7 +243,7 @@ class StandardToggle : Toggle
             }
             else
             {
-                if (checked)
+                if (isChecked())
                 {
                     GUI::DrawSunkenPane(min, max);
                 }
@@ -221,9 +255,9 @@ class StandardToggle : Toggle
         }
         else
         {
-            if (pressed)
+            if (isPressed())
             {
-                if (checked)
+                if (isChecked())
                 {
                     GUI::DrawSunkenPane(min, max);
                 }
@@ -234,7 +268,7 @@ class StandardToggle : Toggle
             }
             else
             {
-                if (checked)
+                if (isChecked())
                 {
                     GUI::DrawButtonPressed(min, max);
                 }
@@ -248,13 +282,17 @@ class StandardToggle : Toggle
         Component@ component = getComponent();
         if (component !is null)
         {
-            Vec2f boundsDiff = innerBounds - component.getBounds();
+            Vec2f padding = getPadding();
+            Vec2f alignment = getAlignment();
 
-            Vec2f innerPos;
-            innerPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
-            innerPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
+            Vec2f childBounds = component.getBounds();
+            Vec2f boundsDiff = innerBounds - childBounds;
 
-            component.SetPosition(innerPos.x, innerPos.y);
+            Vec2f childPos;
+            childPos.x = min.x + padding.x + boundsDiff.x * alignment.x;
+            childPos.y = min.y + padding.y + boundsDiff.y * alignment.y;
+
+            component.SetPosition(childPos.x, childPos.y);
             component.Render();
         }
     }

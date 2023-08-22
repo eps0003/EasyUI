@@ -101,6 +101,9 @@ class VerticalList : List
 
     void SetPadding(float x, float y)
     {
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
         if (padding.x == x && padding.y == y) return;
 
         padding.x = x;
