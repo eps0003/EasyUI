@@ -1,42 +1,59 @@
 interface Slider : Component
 {
+    void SetMinSize(float width, float height);
+    Vec2f getMinSize();
+
+    void SetMaxSize(float width, float height);
+    Vec2f getMaxSize();
+
+    void SetStretchRatio(float x, float y);
+    Vec2f getStretchRatio();
+
     void SetPercentage(float percentage);
     float getPercentage();
 
-    void SetSize(float width, float height);
-    Vec2f getSize();
-
-    void SetHandleSize(float size);
-    float getHandleSize();
+    void SetHandleRatio(float ratio);
+    float getHandleRatio();
 }
 
-interface VerticalSlider : Slider
-{
-
-}
-
-interface HorizontalSlider : Slider
-{
-
-}
-
-class StandardVerticalSlider : VerticalSlider
+class StandardVerticalSlider : Slider
 {
     private EasyUI@ ui;
 
+    private Component@ parent;
     private float percentage = 0.0f;
-    private Vec2f size = Vec2f_zero;
+    private Vec2f margin = Vec2f_zero;
+    private Vec2f minSize = Vec2f_zero;
+    private Vec2f maxSize = Vec2f_zero;
+    private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private float handleSize = 0.0f;
+    private float handleRatio = 0.2f;
     private bool pressed = false;
     private float clickOffsetY;
     private EventDispatcher@ events = StandardEventDispatcher();
+
+    StandardVerticalSlider()
+    {
+        error("Initialized StandardVerticalSlider using the default constructor. Use StandardVerticalSlider(EasyUI@ ui) instead.");
+        printTrace();
+
+        @ui = EasyUI();
+    }
 
     StandardVerticalSlider(EasyUI@ ui)
     {
         @this.ui = ui;
     }
 
+    void SetParent(Component@ parent)
+    {
+        if (this.parent is parent) return;
+
+        @this.parent = parent;
+
+        CalculateBounds();
+    }
+
     void SetPercentage(float percentage)
     {
         percentage = Maths::Clamp01(percentage);
@@ -53,34 +70,73 @@ class StandardVerticalSlider : VerticalSlider
         return percentage;
     }
 
-    void SetSize(float width, float height)
+    void SetHandleRatio(float ratio)
     {
-        if (size.x == width && size.y == height) return;
-
-        size.x = width;
-        size.y = height;
-
-        DispatchEvent("resize");
-
-        if (handleSize == 0.0f)
-        {
-            SetHandleSize(size.y * 0.2f);
-        }
+        handleRatio = Maths::Clamp01(ratio);
     }
 
-    Vec2f getSize()
+    float getHandleRatio()
     {
-        return size;
+        return handleRatio;
     }
 
-    void SetHandleSize(float size)
+    void SetMargin(float x, float y)
     {
-        handleSize = Maths::Max(size, 12.0f);
+        x = Maths::Max(0, x);
+        y = Maths::Max(0, y);
+
+        if (margin.x == x && margin.y == y) return;
+
+        margin.x = x;
+        margin.y = y;
+
+        CalculateBounds();
     }
 
-    float getHandleSize()
+    Vec2f getMargin()
     {
-        return handleSize;
+        return margin;
+    }
+
+    void SetMinSize(float width, float height)
+    {
+        if (minSize.x == width && minSize.y == height) return;
+
+        minSize.x = width;
+        minSize.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMinSize()
+    {
+        return minSize;
+    }
+
+    void SetMaxSize(float width, float height)
+    {
+        if (maxSize.x == width && maxSize.y == height) return;
+
+        maxSize.x = width;
+        maxSize.y = height;
+
+        CalculateBounds();
+    }
+
+    Vec2f getMaxSize()
+    {
+        return maxSize;
+    }
+
+    void SetStretchRatio(float x, float y)
+    {
+        stretch.x = Maths::Clamp01(x);
+        stretch.y = Maths::Clamp01(y);
+    }
+
+    Vec2f getStretchRatio()
+    {
+        return stretch;
     }
 
     void SetPosition(float x, float y)
@@ -94,19 +150,59 @@ class StandardVerticalSlider : VerticalSlider
         return position;
     }
 
+    Vec2f getTruePosition()
+    {
+        return getPosition() + margin;
+    }
+
+    Vec2f getInnerPosition()
+    {
+        return getTruePosition();
+    }
+
+    Vec2f getMinBounds()
+    {
+        return minSize + margin * 2.0f;
+    }
+
     Vec2f getBounds()
     {
-        return size;
+        Vec2f outerBounds = getMinBounds();
+
+        if (parent !is null)
+        {
+            Vec2f parentBounds = parent.getInnerBounds();
+            parentBounds *= getStretchRatio();
+
+            Vec2f maxBounds;
+            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(parentBounds.x, maxSize.x) : parentBounds.x;
+            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(parentBounds.y, maxSize.y) : parentBounds.y;
+
+            outerBounds.x = Maths::Max(outerBounds.x, maxBounds.x);
+            outerBounds.y = Maths::Max(outerBounds.y, maxBounds.y);
+        }
+
+        return outerBounds;
+    }
+
+    Vec2f getTrueBounds()
+    {
+        return getBounds() - margin * 2.0f;
+    }
+
+    Vec2f getInnerBounds()
+    {
+        return getTrueBounds();
     }
 
     void CalculateBounds()
     {
-
+        DispatchEvent("resize");
     }
 
     bool isHovering()
     {
-        return isMouseInBounds(position, position + size);
+        return ::isHovering(this);
     }
 
     bool canClick()
@@ -143,41 +239,53 @@ class StandardVerticalSlider : VerticalSlider
     private bool isHandleHovered()
     {
         Vec2f min = getHandlePosition();
-        Vec2f max = min + Vec2f(size.x, handleSize);
+        Vec2f max = min + getHandleSize();
         return isMouseInBounds(min, max);
     }
 
     private Vec2f getHandlePosition()
     {
-        float handleY = (size.y - handleSize) * percentage;
-        return position + Vec2f(0.0f, handleY);
+        float handleY = (getTrueBounds().y - getHandleSize().y) * percentage;
+        return getTruePosition() + Vec2f(0.0f, handleY);
+    }
+
+    private Vec2f getHandleSize()
+    {
+        Vec2f trueBounds = getTrueBounds();
+        return Vec2f(trueBounds.x, trueBounds.y * handleRatio);
     }
 
     private void MoveHandleIfDragging()
     {
         if (!pressed) return;
 
-        float mouseY = getControls().getInterpMouseScreenPos().y;
-        float handleY = mouseY - handleSize * clickOffsetY;
-        SetPercentage((handleY - position.y) / Maths::Max(size.y - handleSize, 1.0f));
+        Vec2f sliderPos = getTruePosition();
+        Vec2f sliderSize = getTrueBounds();
+        Vec2f handleSize = getHandleSize();
+        Vec2f mousePos = getControls().getInterpMouseScreenPos();
+
+        float handleY = mousePos.y - handleSize.y * clickOffsetY;
+        float percentage = (handleY - sliderPos.y) / Maths::Max(sliderSize.y - handleSize.y, 1.0f);
+
+        SetPercentage(percentage);
     }
 
     void Update()
     {
         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && isHandleHovered() && ui.canClick(this))
+        if (!pressed && ui.startedInteractingWith(this) && isHandleHovered())
         {
             // Drag handle relative to cursor if clicking on handle
             pressed = true;
-            clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(handleSize, 1.0f);
+            clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(getHandleSize().y, 1.0f);
             DispatchEvent("dragstart");
         }
 
         // Call this here to override any external code updating the percentage
         MoveHandleIfDragging();
 
-        if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
+        if (pressed && !ui.isInteractingWith(this))
         {
             pressed = false;
             DispatchEvent("dragend");
@@ -186,203 +294,204 @@ class StandardVerticalSlider : VerticalSlider
 
     void Render()
     {
-        GUI::DrawSunkenPane(position, position + size);
-
         // Call this here to make dragging look smooth
         MoveHandleIfDragging();
 
-        float handleY = (size.y - handleSize) * percentage;
-        Vec2f min = position + Vec2f(0, handleY);
-        Vec2f max = position + Vec2f(size.x, handleSize + handleY);
+        Vec2f sliderMin = getTruePosition();
+        Vec2f sliderMax = sliderMin + getTrueBounds();
+        Vec2f handleMin = getHandlePosition();
+        Vec2f handleMax = handleMin + getHandleSize();
+
+        GUI::DrawSunkenPane(sliderMin, sliderMax);
 
         if (pressed || (isHandleHovered() && ui.canClick(this)))
         {
-            GUI::DrawButtonHover(min, max);
+            GUI::DrawButtonHover(handleMin, handleMax);
         }
         else
         {
-            GUI::DrawButton(min, max);
+            GUI::DrawButton(handleMin, handleMax);
         }
     }
 }
 
-class StandardHorizontalSlider : HorizontalSlider
-{
-    private EasyUI@ ui;
+// class StandardHorizontalSlider : Slider
+// {
+//     private EasyUI@ ui;
 
-    private float percentage = 0.0f;
-    private Vec2f size = Vec2f_zero;
-    private Vec2f position = Vec2f_zero;
-    private float handleSize = 0.0f;
-    private bool pressed = false;
-    private float clickOffsetX;
-    private EventDispatcher@ events = StandardEventDispatcher();
+//     private float percentage = 0.0f;
+//     private Vec2f size = Vec2f_zero;
+//     private Vec2f position = Vec2f_zero;
+//     private float handleSize = 0.0f;
+//     private bool pressed = false;
+//     private float clickOffsetX;
+//     private EventDispatcher@ events = StandardEventDispatcher();
 
-    StandardHorizontalSlider(EasyUI@ ui)
-    {
-        @this.ui = ui;
-    }
+//     StandardHorizontalSlider(EasyUI@ ui)
+//     {
+//         @this.ui = ui;
+//     }
 
-    void SetPercentage(float percentage)
-    {
-        percentage = Maths::Clamp01(percentage);
+//     void SetPercentage(float percentage)
+//     {
+//         percentage = Maths::Clamp01(percentage);
 
-        if (this.percentage == percentage) return;
+//         if (this.percentage == percentage) return;
 
-        this.percentage = percentage;
+//         this.percentage = percentage;
 
-        DispatchEvent("change");
-    }
+//         DispatchEvent("change");
+//     }
 
-    float getPercentage()
-    {
-        return percentage;
-    }
+//     float getPercentage()
+//     {
+//         return percentage;
+//     }
 
-    void SetSize(float width, float height)
-    {
-        if (size.x == width && size.y == height) return;
+//     void SetSize(float width, float height)
+//     {
+//         if (size.x == width && size.y == height) return;
 
-        size.x = width;
-        size.y = height;
+//         size.x = width;
+//         size.y = height;
 
-        DispatchEvent("resize");
+//         DispatchEvent("resize");
 
-        if (handleSize == 0.0f)
-        {
-            SetHandleSize(size.x * 0.2f);
-        }
-    }
+//         if (handleSize == 0.0f)
+//         {
+//             SetHandleSize(size.x * 0.2f);
+//         }
+//     }
 
-    Vec2f getSize()
-    {
-        return size;
-    }
+//     Vec2f getSize()
+//     {
+//         return size;
+//     }
 
-    void SetHandleSize(float size)
-    {
-        handleSize = Maths::Max(size, 12.0f);
-    }
+//     void SetHandleSize(float size)
+//     {
+//         handleSize = Maths::Max(size, 12.0f);
+//     }
 
-    float getHandleSize()
-    {
-        return handleSize;
-    }
+//     float getHandleSize()
+//     {
+//         return handleSize;
+//     }
 
-    void SetPosition(float x, float y)
-    {
-        position.x = x;
-        position.y = y;
-    }
+//     void SetPosition(float x, float y)
+//     {
+//         position.x = x;
+//         position.y = y;
+//     }
 
-    Vec2f getPosition()
-    {
-        return position;
-    }
+//     Vec2f getPosition()
+//     {
+//         return position;
+//     }
 
-    Vec2f getBounds()
-    {
-        return size;
-    }
+//     Vec2f getBounds()
+//     {
+//         return size;
+//     }
 
-    void CalculateBounds()
-    {
+//     void CalculateBounds()
+//     {
 
-    }
+//     }
 
-    bool isHovering()
-    {
-        return isMouseInBounds(position, position + size);
-    }
+//     bool isHovering()
+//     {
+//         return isMouseInBounds(position, position + size);
+//     }
 
-    bool canClick()
-    {
-        return true;
-    }
+//     bool canClick()
+//     {
+//         return true;
+//     }
 
-    bool canScroll()
-    {
-        return false;
-    }
+//     bool canScroll()
+//     {
+//         return false;
+//     }
 
-    Component@[] getComponents()
-    {
-        Component@[] components;
-        return components;
-    }
+//     Component@[] getComponents()
+//     {
+//         Component@[] components;
+//         return components;
+//     }
 
-    void AddEventListener(string type, EventHandler@ handler)
-    {
-        events.AddEventListener(type, handler);
-    }
+//     void AddEventListener(string type, EventHandler@ handler)
+//     {
+//         events.AddEventListener(type, handler);
+//     }
 
-    void RemoveEventListener(string type, EventHandler@ handler)
-    {
-        events.RemoveEventListener(type, handler);
-    }
+//     void RemoveEventListener(string type, EventHandler@ handler)
+//     {
+//         events.RemoveEventListener(type, handler);
+//     }
 
-    void DispatchEvent(string type)
-    {
-        events.DispatchEvent(type);
-    }
+//     void DispatchEvent(string type)
+//     {
+//         events.DispatchEvent(type);
+//     }
 
-    private bool isHandleHovered()
-    {
-        Vec2f min = getHandlePosition();
-        Vec2f max = min + Vec2f(handleSize, size.y);
-        return isMouseInBounds(min, max);
-    }
+//     private bool isHandleHovered()
+//     {
+//         Vec2f min = getHandlePosition();
+//         Vec2f max = min + Vec2f(handleSize, size.y);
+//         return isMouseInBounds(min, max);
+//     }
 
-    private Vec2f getHandlePosition()
-    {
-        float handleX = (size.x - handleSize) * percentage;
-        return position + Vec2f(handleX, 0.0f);
-    }
+//     private Vec2f getHandlePosition()
+//     {
+//         float handleX = (size.x - handleSize) * percentage;
+//         return position + Vec2f(handleX, 0.0f);
+//     }
 
-    void Update()
-    {
-        CControls@ controls = getControls();
+//     void Update()
+//     {
+//         CControls@ controls = getControls();
 
-        if (controls.isKeyJustPressed(KEY_LBUTTON) && isHandleHovered() && ui.canClick(this))
-        {
-            // Drag handle relative to cursor if clicking on handle
-            pressed = true;
-            clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
-            DispatchEvent("dragstart");
-        }
+//         if (controls.isKeyJustPressed(KEY_LBUTTON) && isHandleHovered() && ui.canClick(this))
+//         {
+//             // Drag handle relative to cursor if clicking on handle
+//             pressed = true;
+//             clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(handleSize, 1.0f);
+//             DispatchEvent("dragstart");
+//         }
 
-        if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
-        {
-            pressed = false;
-            DispatchEvent("dragend");
-        }
-    }
+//         if (!controls.isKeyPressed(KEY_LBUTTON) && pressed)
+//         {
+//             pressed = false;
+//             DispatchEvent("dragend");
+//         }
+//     }
 
-    private void MoveHandleIfDragging()
-    {
-        if (!pressed) return;
+//     private void MoveHandleIfDragging()
+//     {
+//         if (!pressed) return;
 
-        float mouseX = getControls().getInterpMouseScreenPos().x;
-        float handleX = mouseX - handleSize * clickOffsetX;
-        SetPercentage((handleX - position.x) / Maths::Max(size.x - handleSize, 1.0f));
-    }
+//         float mouseX = getControls().getInterpMouseScreenPos().x;
+//         float handleX = mouseX - handleSize * clickOffsetX;
+//         SetPercentage((handleX - position.x) / Maths::Max(size.x - handleSize, 1.0f));
+//     }
 
-    void Render()
-    {
-        float handleX = (size.x - handleSize) * percentage;
+//     void Render()
+//     {
+//         float handleX = (size.x - handleSize) * percentage;
 
-        GUI::DrawSunkenPane(position, position + size);
+//         GUI::DrawSunkenPane(position, position + size);
 
-        Vec2f min = position + Vec2f(handleX, 0);
-        Vec2f max = position + Vec2f(handleSize + handleX, size.y);
+//         Vec2f min = position + Vec2f(handleX, 0);
+//         Vec2f max = position + Vec2f(handleSize + handleX, size.y);
 
-        if (pressed || (isHandleHovered() && ui.canClick(this)))
-        {
-            GUI::DrawButtonHover(min, max);
-        }
-        else
-        {
-            GUI::DrawButton(min, max);
-        }
-    }
-}
+//         if (pressed || (isHandleHovered() && ui.canClick(this)))
+//         {
+//             GUI::DrawButtonHover(min, max);
+//         }
+//         else
+//         {
+//             GUI::DrawButton(min, max);
+//         }
+//     }
+// }

@@ -11,7 +11,7 @@
 // #include "List.as"
 #include "Pane.as"
 #include "Progress.as"
-// #include "Slider.as"
+#include "Slider.as"
 #include "Stack.as"
 #include "ToggleButton.as"
 #include "Utilities.as"
@@ -24,6 +24,7 @@ class EasyUI
     private Component@ clickable;
     private Component@ scrollable;
     private Component@ interacting;
+    private Component@ prevInteracting;
 
     private CControls@ controls;
 
@@ -100,6 +101,11 @@ class EasyUI
         return component !is null && component is interacting;
     }
 
+    bool startedInteractingWith(Component@ component)
+    {
+        return component !is null && component is interacting && component !is prevInteracting;
+    }
+
     private void CacheComponents()
     {
         @hovering = null;
@@ -156,6 +162,8 @@ class EasyUI
     void Update()
     {
         if (!isClient()) return;
+
+        @prevInteracting = interacting;
 
         if (interacting !is null && !controls.isKeyPressed(KEY_LBUTTON) && !controls.isKeyPressed(KEY_RBUTTON))
         {
