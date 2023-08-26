@@ -17,6 +17,7 @@ class StandardProgress : Progress
 {
     private Component@ parent;
     private Component@ component;
+
     private float progress = 0.0f;
     private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
@@ -25,10 +26,11 @@ class StandardProgress : Progress
     private Vec2f maxSize = Vec2f_zero;
     private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f minBounds = Vec2f_zero;
     private bool calculateBounds = true;
+
+    private EventDispatcher@ events = StandardEventDispatcher();
     private EventHandler@ componentResizeHandler;
 
     StandardProgress()
@@ -250,6 +252,7 @@ class StandardProgress : Progress
         if (calculateBounds) return;
 
         calculateBounds = true;
+
         DispatchEvent("resize");
     }
 

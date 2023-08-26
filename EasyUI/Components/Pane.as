@@ -20,6 +20,7 @@ class StandardPane : Pane
 {
     private Component@ parent;
     private Component@ component;
+
     private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
@@ -30,10 +31,11 @@ class StandardPane : Pane
     private Vec2f maxSize = Vec2f_zero;
     private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f minBounds = Vec2f_zero;
     private bool calculateBounds = true;
+
+    private EventDispatcher@ events = StandardEventDispatcher();
     private EventHandler@ componentResizeHandler;
 
     StandardPane()
@@ -254,6 +256,7 @@ class StandardPane : Pane
         if (calculateBounds) return;
 
         calculateBounds = true;
+
         DispatchEvent("resize");
     }
 

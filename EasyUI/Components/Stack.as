@@ -7,6 +7,7 @@ class StandardStack : Stack
 {
     private Component@ parent;
     private Component@[] components;
+
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
@@ -14,10 +15,11 @@ class StandardStack : Stack
     private Vec2f maxSize = Vec2f_zero;
     private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f minBounds = Vec2f_zero;
     private bool calculateBounds = true;
+
+    private EventDispatcher@ events = StandardEventDispatcher();
 
     void AddComponent(Component@ component)
     {
@@ -214,6 +216,7 @@ class StandardStack : Stack
         if (calculateBounds) return;
 
         calculateBounds = true;
+
         DispatchEvent("resize");
     }
 

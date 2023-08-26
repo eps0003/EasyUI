@@ -12,16 +12,22 @@ interface Avatar : Component
 class StandardAvatar : Avatar
 {
     private Component@ parent;
+
     private CPlayer@ player;
     private float size = 0.0f;
     private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool clickable = true;
+
     private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetParent(Component@ parent)
     {
+        if (this.parent is parent) return;
+
         @this.parent = parent;
+
+        CalculateBounds();
     }
 
     void SetPlayer(CPlayer@ player)
@@ -40,7 +46,7 @@ class StandardAvatar : Avatar
 
         this.size = size;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getSize()
@@ -109,7 +115,7 @@ class StandardAvatar : Avatar
 
     void CalculateBounds()
     {
-
+        DispatchEvent("resize");
     }
 
     bool isHovering()

@@ -15,6 +15,7 @@ class StandardButton : Button
 
     private Component@ parent;
     private Component@ component;
+
     private Vec2f alignment = Vec2f_zero;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
@@ -22,10 +23,11 @@ class StandardButton : Button
     private Vec2f maxSize = Vec2f_zero;
     private Vec2f stretch = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f minBounds = Vec2f_zero;
     private bool calculateBounds = true;
+
+    private EventDispatcher@ events = StandardEventDispatcher();
     private EventHandler@ componentResizeHandler;
 
     StandardButton()
@@ -90,7 +92,7 @@ class StandardButton : Button
         margin.x = x;
         margin.y = y;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getMargin()
@@ -108,7 +110,7 @@ class StandardButton : Button
         padding.x = x;
         padding.y = y;
 
-        DispatchEvent("resize");
+        CalculateBounds();
     }
 
     Vec2f getPadding()
@@ -245,6 +247,7 @@ class StandardButton : Button
         if (calculateBounds) return;
 
         calculateBounds = true;
+
         DispatchEvent("resize");
     }
 

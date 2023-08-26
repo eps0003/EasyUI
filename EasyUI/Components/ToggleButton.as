@@ -22,6 +22,7 @@ class ToggleClickHandler : EventHandler
 class StandardToggle : Toggle
 {
     private EasyUI@ ui;
+
     private Button@ button;
 
     private bool checked = false;

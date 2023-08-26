@@ -27,20 +27,26 @@ interface AreaLabel : Label
 class StandardLabel : Label
 {
     private Component@ parent;
-    private string text;
+
+    private string text = "";
     private string font = "menu";
     private SColor color = color_black;
     private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool clickable = false;
-    private EventDispatcher@ events = StandardEventDispatcher();
 
     private Vec2f trueBounds = Vec2f_zero;
     private bool calculateBounds = true;
 
+    private EventDispatcher@ events = StandardEventDispatcher();
+
     void SetParent(Component@ parent)
     {
+        if (this.parent is parent) return;
+
         @this.parent = parent;
+
+        CalculateBounds();
     }
 
     void SetText(string text)
@@ -153,6 +159,7 @@ class StandardLabel : Label
         if (calculateBounds) return;
 
         calculateBounds = true;
+
         DispatchEvent("resize");
     }
 
@@ -218,7 +225,8 @@ class StandardLabel : Label
 class StandardAreaLabel : AreaLabel
 {
     private Component@ parent;
-    private string text;
+
+    private string text = "";
     private string font = "menu";
     private SColor color = color_black;
     private Vec2f minSize = Vec2f_zero;
@@ -227,11 +235,16 @@ class StandardAreaLabel : AreaLabel
     private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool clickable = false;
+
     private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetParent(Component@ parent)
     {
+        if (this.parent is parent) return;
+
         @this.parent = parent;
+
+        CalculateBounds();
     }
 
     void SetText(string text)
@@ -273,8 +286,6 @@ class StandardAreaLabel : AreaLabel
 
         margin.x = x;
         margin.y = y;
-
-        CalculateBounds();
     }
 
     Vec2f getMargin()

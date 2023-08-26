@@ -21,6 +21,7 @@ class StandardVerticalSlider : Slider
     private EasyUI@ ui;
 
     private Component@ parent;
+
     private float percentage = 0.0f;
     private Vec2f margin = Vec2f_zero;
     private Vec2f minSize = Vec2f_zero;
@@ -30,6 +31,7 @@ class StandardVerticalSlider : Slider
     private float handleRatio = 0.2f;
     private bool pressed = false;
     private float clickOffsetY;
+
     private EventDispatcher@ events = StandardEventDispatcher();
 
     StandardVerticalSlider()

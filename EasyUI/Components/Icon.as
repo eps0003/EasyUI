@@ -20,7 +20,8 @@ interface Icon : Component
 class StandardIcon : Icon
 {
     private Component@ parent;
-    private string icon;
+
+    private string icon = "";
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
     private Vec2f size = Vec2f_zero;
@@ -32,6 +33,9 @@ class StandardIcon : Icon
     private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
     private bool clickable = true;
+
+    private bool calculateBounds = true;
+
     private EventDispatcher@ events = StandardEventDispatcher();
 
     void SetParent(Component@ parent)
@@ -109,7 +113,6 @@ class StandardIcon : Icon
         size.y = height;
 
         CalculateScale();
-        DispatchEvent("resize");
     }
 
     Vec2f getSize()
@@ -178,7 +181,7 @@ class StandardIcon : Icon
 
     void CalculateBounds()
     {
-
+        DispatchEvent("resize");
     }
 
     bool isHovering()
