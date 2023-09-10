@@ -36,6 +36,7 @@ class StandardButton : Button
         printTrace();
 
         @ui = EasyUI();
+        @componentResizeHandler = CachedBoundsHandler(this);
     }
 
     StandardButton(EasyUI@ ui)

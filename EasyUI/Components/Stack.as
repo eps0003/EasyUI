@@ -1,6 +1,10 @@
 interface Stack : Container, MultiChild
 {
+    void SetMinSize(float width, float height);
+    Vec2f getMinSize();
 
+    void SetMaxSize(float width, float height);
+    Vec2f getMaxSize();
 }
 
 class StandardStack : Stack
@@ -266,7 +270,7 @@ class StandardStack : Stack
     void Render()
     {
         Vec2f innerPos = getInnerPosition();
-        Vec2f innerBounds = getInnerBounds();;
+        Vec2f innerBounds = getInnerBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {
