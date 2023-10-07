@@ -173,46 +173,6 @@ class StandardVerticalList : VerticalList
         return Maths::Min(components.size(), columns);
     }
 
-    private float getColumnMinWidth(float column)
-    {
-        float width = 0.0f;
-
-        uint startIndex = column;
-        uint endIndex = components.size();
-
-        for (uint i = startIndex; i < endIndex; i += columns)
-        {
-            Component@ component = components[i];
-
-            float childWidth = component.getMinBounds().x;
-            if (childWidth <= width) continue;
-
-            width = childWidth;
-        }
-
-        return width;
-    }
-
-    private float getRowMinHeight(float row)
-    {
-        float height = 0.0f;
-
-        uint startIndex = row * columns;
-        uint endIndex = Maths::Min(startIndex + columns, components.size());
-
-        for (uint i = startIndex; i < endIndex; i++)
-        {
-            Component@ component = components[i];
-
-            float childHeight = component.getMinBounds().y;
-            if (childHeight <= height) continue;
-
-            height = childHeight;
-        }
-
-        return height;
-    }
-
     Vec2f getMinBounds()
     {
         if (calculateBounds)
@@ -220,37 +180,50 @@ class StandardVerticalList : VerticalList
             calculateBounds = false;
             minBounds.SetZero();
 
-            rowHeights.clear();
-            columnWidths.clear();
-
             uint visibleRows = getVisibleRows();
             uint visibleColumns = getVisibleColumns();
+
+            rowHeights = array<float>(visibleRows, 0.0f);
+            columnWidths = array<float>(visibleColumns, 0.0f);
+
+            // Calculate largest column widths and row heights
+            for (uint y = 0; y < visibleRows; y++)
+            for (uint x = 0; x < visibleColumns; x++)
+            {
+                uint index = y * visibleColumns + x;
+                if (index >= components.size()) break;
+
+                Component@ component = components[index];
+                Vec2f childBounds = component.getMinBounds();
+
+                if (childBounds.x > columnWidths[x])
+                {
+                    columnWidths[x] = childBounds.x;
+                }
+                if (childBounds.y > rowHeights[y])
+                {
+                    rowHeights[y] = childBounds.y;
+                }
+            }
+
+            // Sum column widths and row heights
+            for (uint i = 0; i < visibleColumns; i++)
+            {
+                minBounds.x += columnWidths[i];
+            }
+            for (uint i = 0; i < visibleRows; i++)
+            {
+                minBounds.y += rowHeights[i];
+            }
 
             // Spacing between components
             if (visibleColumns > 1)
             {
                 minBounds.x += (visibleColumns - 1) * spacing.x;
             }
-
             if (visibleRows > 1)
             {
                 minBounds.y += (visibleRows - 1) * spacing.y;
-            }
-
-            // Component widths
-            for (uint i = 0; i < visibleColumns; i++)
-            {
-                float width = getColumnMinWidth(i);
-                columnWidths.push_back(width);
-                minBounds.x += width;
-            }
-
-            // Component heights
-            for (uint i = 0; i < visibleRows; i++)
-            {
-                float height = getRowMinHeight(i);
-                rowHeights.push_back(height);
-                minBounds.y += height;
             }
 
             minBounds += (margin + padding) * 2.0f;
