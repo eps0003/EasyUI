@@ -1,4 +1,4 @@
-interface Stack : Container, MultiChild
+interface Stack : Container, Parent
 {
     void SetMinSize(float width, float height);
     Vec2f getMinSize();

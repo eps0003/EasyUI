@@ -10,14 +10,7 @@ interface Container : Component
     Vec2f getAlignment();
 }
 
-interface SingleChild
-{
-    void SetComponent(Component@ component);
-    Component@ getComponent();
-}
-
-interface MultiChild
+interface Parent
 {
     void AddComponent(Component@ component);
-    Component@[] getComponents();
 }
