@@ -1,7 +1,6 @@
 interface Container : Component
 {
-    void SetStretchRatio(float x, float y);
-    Vec2f getStretchRatio();
+    void AddComponent(Component@ component);
 
     void SetPadding(float x, float y);
     Vec2f getPadding();
@@ -10,7 +9,8 @@ interface Container : Component
     Vec2f getAlignment();
 }
 
-interface Parent
+interface Stretch
 {
-    void AddComponent(Component@ component);
+    void SetStretchRatio(float x, float y);
+    Vec2f getStretchRatio();
 }

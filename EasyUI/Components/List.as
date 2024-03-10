@@ -1,4 +1,4 @@
-interface List : Container, Parent
+interface List : Container
 {
     void SetSpacing(float x, float y);
     Vec2f getSpacing();

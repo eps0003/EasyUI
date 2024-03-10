@@ -1,4 +1,4 @@
-interface Stack : Container, Parent
+interface Stack : Container, Stretch
 {
     void SetMinSize(float width, float height);
     Vec2f getMinSize();

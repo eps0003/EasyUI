@@ -1,27 +1,27 @@
 interface Progress : Stack
 {
-    void SetProgress(float progress);
-    float getProgress();
+    void SetPercentage(float percentage);
+    float getPercentage();
 }
 
 class StandardProgress : Progress, StandardStack
 {
-    private float progress = 0.0f;
+    private float percentage = 0.0f;
 
-    void SetProgress(float progress)
+    void SetPercentage(float percentage)
     {
-        progress = Maths::Clamp01(progress);
+        percentage = Maths::Clamp01(percentage);
 
-        if (this.progress == progress) return;
+        if (this.percentage == percentage) return;
 
-        this.progress = progress;
+        this.percentage = percentage;
 
         DispatchEvent("change");
     }
 
-    float getProgress()
+    float getPercentage()
     {
-        return progress;
+        return percentage;
     }
 
     bool canClick()
@@ -35,7 +35,7 @@ class StandardProgress : Progress, StandardStack
         Vec2f max = min + getTrueBounds();
         Vec2f innerBounds = getInnerBounds();
 
-        GUI::DrawProgressBar(min, max, progress);
+        GUI::DrawProgressBar(min, max, percentage);
 
         StandardStack::Render();
     }
