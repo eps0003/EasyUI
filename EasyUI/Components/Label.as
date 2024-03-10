@@ -8,20 +8,11 @@ interface Label : Component
 
     void SetColor(SColor color);
     SColor getColor();
-
-    void SetClickable(bool clickable);
 }
 
-interface AreaLabel : Label
+interface AreaLabel : Label, Stack
 {
-    void SetMinSize(float width, float height);
-    Vec2f getMinSize();
 
-    void SetMaxSize(float width, float height);
-    Vec2f getMaxSize();
-
-    void SetStretchRatio(float x, float y);
-    Vec2f getStretchRatio();
 }
 
 class StandardLabel : Label
@@ -33,7 +24,6 @@ class StandardLabel : Label
     private SColor color = color_black;
     private Vec2f margin = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
-    private bool clickable = false;
 
     private Vec2f trueBounds = Vec2f_zero;
     private bool calculateBounds = true;
@@ -168,14 +158,9 @@ class StandardLabel : Label
         return ::isHovering(this);
     }
 
-    void SetClickable(bool clickable)
-    {
-        this.clickable = clickable;
-    }
-
     bool canClick()
     {
-        return clickable;
+        return false;
     }
 
     bool canScroll()
@@ -222,30 +207,11 @@ class StandardLabel : Label
     }
 }
 
-class StandardAreaLabel : AreaLabel
+class StandardAreaLabel : AreaLabel, StandardStack
 {
-    private Component@ parent;
-
     private string text = "";
     private string font = "menu";
     private SColor color = color_black;
-    private Vec2f minSize = Vec2f_zero;
-    private Vec2f maxSize = Vec2f_zero;
-    private Vec2f stretch = Vec2f_zero;
-    private Vec2f margin = Vec2f_zero;
-    private Vec2f position = Vec2f_zero;
-    private bool clickable = false;
-
-    private EventDispatcher@ events = StandardEventDispatcher();
-
-    void SetParent(Component@ parent)
-    {
-        if (this.parent is parent) return;
-
-        @this.parent = parent;
-
-        CalculateBounds();
-    }
 
     void SetText(string text)
     {
@@ -277,160 +243,17 @@ class StandardAreaLabel : AreaLabel
         return color;
     }
 
-    void SetMargin(float x, float y)
-    {
-        x = Maths::Max(0, x);
-        y = Maths::Max(0, y);
-
-        if (margin.x == x && margin.y == y) return;
-
-        margin.x = x;
-        margin.y = y;
-    }
-
-    Vec2f getMargin()
-    {
-        return margin;
-    }
-
-    void SetMinSize(float width, float height)
-    {
-        if (minSize.x == width && minSize.y == height) return;
-
-        minSize.x = width;
-        minSize.y = height;
-
-        CalculateBounds();
-    }
-
-    Vec2f getMinSize()
-    {
-        return minSize;
-    }
-
-    void SetMaxSize(float width, float height)
-    {
-        if (maxSize.x == width && maxSize.y == height) return;
-
-        maxSize.x = width;
-        maxSize.y = height;
-
-        CalculateBounds();
-    }
-
-    Vec2f getMaxSize()
-    {
-        return maxSize;
-    }
-
-    void SetStretchRatio(float x, float y)
-    {
-        stretch.x = Maths::Clamp01(x);
-        stretch.y = Maths::Clamp01(y);
-    }
-
-    Vec2f getStretchRatio()
-    {
-        return stretch;
-    }
-
-    void SetPosition(float x, float y)
-    {
-        position.x = x;
-        position.y = y;
-    }
-
-    Vec2f getPosition()
-    {
-        return position;
-    }
-
-    Vec2f getTruePosition()
-    {
-        return getPosition() + margin;
-    }
-
-    Vec2f getInnerPosition()
-    {
-        return getTruePosition();
-    }
-
-    Vec2f getMinBounds()
-    {
-        return getBounds();
-    }
-
-    Vec2f getBounds()
-    {
-        return getTrueBounds() + margin * 2.0f;
-    }
-
-    Vec2f getTrueBounds()
-    {
-        return minSize;
-    }
-
-    Vec2f getInnerBounds()
-    {
-        return getTrueBounds();
-    }
-
-    void CalculateBounds()
-    {
-        DispatchEvent("resize");
-    }
-
-    bool isHovering()
-    {
-        return ::isHovering(this);
-    }
-
-    void SetClickable(bool clickable)
-    {
-        this.clickable = clickable;
-    }
-
-    bool canClick()
-    {
-        return clickable;
-    }
-
-    bool canScroll()
-    {
-        return false;
-    }
-
-    Component@[] getComponents()
-    {
-        Component@[] components;
-        return components;
-    }
-
-    void AddEventListener(string type, EventHandler@ handler)
-    {
-        events.AddEventListener(type, handler);
-    }
-
-    void RemoveEventListener(string type, EventHandler@ handler)
-    {
-        events.RemoveEventListener(type, handler);
-    }
-
-    void DispatchEvent(string type)
-    {
-        events.DispatchEvent(type);
-    }
-
-    void Update()
-    {
-
-    }
-
     void Render()
     {
-        if (text == "") return;
+        if (text != "")
+        {
+            Vec2f position = getTruePosition();
+            Vec2f bounds = getTrueBounds();
 
-        GUI::SetFont(font);
-        GUI::DrawText(text, position, position + minSize, color, false, false);
+            GUI::SetFont(font);
+            GUI::DrawText(text, position, position + bounds, color, false, false);
+        }
+
+        StandardStack::Render();
     }
 }
