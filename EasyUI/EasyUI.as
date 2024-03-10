@@ -259,7 +259,6 @@ class EasyUI
             }
         }
 
-
         if (detailed)
         {
             DrawDebugCursor();

@@ -343,7 +343,6 @@ class StandardVerticalList : VerticalList
     }
 }
 
-
 class StandardHorizontalList : HorizontalList
 {
     private Component@ parent;
