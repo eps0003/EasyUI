@@ -39,31 +39,3 @@ void onRender(CRules@ this)
 1. Put the EasyUI folder in your `Mods` folder.
 2. Add `EasyUI` to a new line in `mods.cfg` above any mod that will use it.
 3. Build, update, and render your UI in a new or existing client-only script.
-
-## Components
-
-| Category       | Components                                                                  |
-| -------------- | --------------------------------------------------------------------------- |
-| Input Controls | [Button](#button) • [Slider](#slider) • [Toggle](#toggle)                   |
-| Informational  | [Avatar](#avatar) • [Icon](#icon) • [Label](#label) • [Progress](#progress) |
-| Containers     | [List](#list) • [Pane](#pane) • [Stack](#stack)                             |
-
-### Avatar
-
-### Button
-
-### Icon
-
-### Label
-
-### List
-
-### Pane
-
-### Progress
-
-### Slider
-
-### Stack
-
-### Toggle

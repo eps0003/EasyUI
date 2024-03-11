@@ -1,4 +1,4 @@
-interface List : Container
+interface List : Component
 {
     void SetSpacing(float x, float y);
     Vec2f getSpacing();
@@ -251,6 +251,11 @@ class StandardVerticalList : VerticalList
     Vec2f getInnerBounds()
     {
         return getTrueBounds() - padding * 2.0f;
+    }
+
+    Vec2f getStretchBounds(Component@ child)
+    {
+        return getInnerBounds();
     }
 
     void CalculateBounds()
@@ -577,6 +582,11 @@ class StandardHorizontalList : HorizontalList
     Vec2f getInnerBounds()
     {
         return getTrueBounds() - padding * 2.0f;
+    }
+
+    Vec2f getStretchBounds(Component@ child)
+    {
+        return getInnerBounds();
     }
 
     void CalculateBounds()

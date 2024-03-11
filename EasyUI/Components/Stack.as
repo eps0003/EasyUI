@@ -1,4 +1,4 @@
-interface Stack : Container, Stretch
+interface Stack : Component, Stretch
 {
     void SetMinSize(float width, float height);
     Vec2f getMinSize();
@@ -196,7 +196,7 @@ class StandardStack : Stack
         Vec2f outerBounds = getMinBounds();
 
         Vec2f parentBounds = parent !is null
-            ? parent.getInnerBounds()
+            ? parent.getStretchBounds(this)
             : getDriver().getScreenDimensions() - position;
         parentBounds *= getStretchRatio();
 
@@ -218,6 +218,11 @@ class StandardStack : Stack
     Vec2f getInnerBounds()
     {
         return getTrueBounds() - padding * 2.0f;
+    }
+
+    Vec2f getStretchBounds(Component@ child)
+    {
+        return getInnerBounds();
     }
 
     void CalculateBounds()

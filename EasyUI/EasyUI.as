@@ -2,7 +2,6 @@
 #include "Button.as"
 #include "CachedBounds.as"
 #include "Component.as"
-#include "Container.as"
 // #include "Draggable.as"
 // #include "DragHandle.as"
 #include "EventDispatcher.as"
