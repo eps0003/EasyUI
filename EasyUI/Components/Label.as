@@ -98,7 +98,7 @@ class StandardLabel : Label, StandardStack
         {
             // The magic values correctly align the text within the bounds
             // May only be applicable with the default KAG font?
-            Vec2f position = getTruePosition() - Vec2f(2, 1);
+            Vec2f position = getTruePosition() - Vec2f(2, 2);
             Vec2f bounds = getTrueBounds();
 
             GUI::SetFont(font);
