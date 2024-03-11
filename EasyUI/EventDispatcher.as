@@ -79,7 +79,7 @@ enum Event
     FrameIndex,
     FrameDim,
     Crop,
-    Scale,
+    FixedAspectRatio,
     Clickable,
     Text,
     Font,

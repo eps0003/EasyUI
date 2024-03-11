@@ -11,11 +11,8 @@ interface Icon : Stack
 
     void SetCrop(float top, float right, float bottom, float left);
 
-    void SetScale(float x, float y);
-    Vec2f getScale();
-
-    // void SetMaintainAspectRatio(bool maintain);
-    // bool isMaintainingAspectRatio();
+    void SetFixedAspectRatio(bool fixed);
+    bool isFixedAspectRatio();
 
     void SetClickable(bool clickable);
 }
@@ -29,8 +26,8 @@ class StandardIcon : Icon, StandardStack
     private float cropRight = 0.0f;
     private float cropBottom = 0.0f;
     private float cropLeft = 0.0f;
-    private Vec2f scale = Vec2f(1, 1);
-    private bool clickable = true;
+    private bool fixedAspectRatio = true;
+    private bool clickable = false;
 
     void SetIcon(string icon)
     {
@@ -87,19 +84,18 @@ class StandardIcon : Icon, StandardStack
         DispatchEvent(Event::Crop);
     }
 
-    void SetScale(float x, float y)
+    void SetFixedAspectRatio(bool fixed)
     {
-        if (scale.x == x && scale.y == y) return;
+        if (fixedAspectRatio == fixed) return;
 
-        scale.x = x;
-        scale.y = y;
+        fixedAspectRatio = fixed;
 
-        DispatchEvent(Event::Scale);
+        DispatchEvent(Event::FixedAspectRatio);
     }
 
-    Vec2f getScale()
+    bool isFixedAspectRatio()
     {
-        return scale;
+        return fixedAspectRatio;
     }
 
     void SetClickable(bool clickable)
@@ -121,12 +117,57 @@ class StandardIcon : Icon, StandardStack
         return false;
     }
 
+    private Vec2f getCroppedFrameDim()
+    {
+        return Vec2f(
+            frameDim.x - cropLeft - cropRight,
+            frameDim.y - cropTop - cropBottom
+        );
+    }
+
+    private Vec2f getScale()
+    {
+        Vec2f croppedFrameDim = getCroppedFrameDim();
+        Vec2f trueBounds = getTrueBounds();
+
+        Vec2f scale;
+        scale.x = croppedFrameDim.x != 0.0f
+            ? trueBounds.x / croppedFrameDim.x
+            : 0.0f;
+        scale.y = croppedFrameDim.y != 0.0f
+            ? trueBounds.y / croppedFrameDim.y
+            : 0.0f;
+
+        if (fixedAspectRatio)
+        {
+            float minScale = Maths::Min(scale.x, scale.y);
+            scale.Set(minScale, minScale);
+        }
+
+        return scale;
+    }
+
+    private Vec2f getOffset()
+    {
+        Vec2f trueBounds = getTrueBounds();
+        Vec2f croppedFrameDim = getCroppedFrameDim();
+        Vec2f scale = getScale();
+        Vec2f scaledFrameDim = Vec2f(
+            croppedFrameDim.x * scale.x,
+            croppedFrameDim.y * scale.y
+        );
+        Vec2f scaledCropOffset = Vec2f(
+            cropLeft * scale.x,
+            cropTop * scale.y
+        );
+
+        return (trueBounds - scaledFrameDim) * 0.5f - scaledCropOffset;
+    }
+
     private bool canRender()
     {
         return (
             icon != "" &&
-            scale.x != 0.0f &&
-            scale.y != 0.0f &&
             frameDim.x != 0.0f &&
             frameDim.y != 0.0f
         );
@@ -136,24 +177,8 @@ class StandardIcon : Icon, StandardStack
     {
         if (canRender())
         {
-            Vec2f size = getTrueBounds();
-
-            Vec2f croppedDim;
-            croppedDim.x = frameDim.x - cropLeft - cropRight;
-            croppedDim.y = frameDim.y - cropTop - cropBottom;
-
-            Vec2f scale;
-            scale.x = croppedDim.x != 0.0f
-                ? size.x / croppedDim.x * 0.5f
-                : 0.0f;
-            scale.y = croppedDim.y != 0.0f
-                ? size.y / croppedDim.y * 0.5f
-                : 0.0f;
-
-            Vec2f offset = Vec2f_zero;
-            offset.x = scale.x > 0.0f ? -cropLeft : frameDim.x - cropRight;
-            offset.y = scale.y > 0.0f ? -cropTop : frameDim.y - cropBottom;
-            offset *= Vec2f_abs(scale) * 2.0f;
+            Vec2f scale = getScale() * 0.5f;
+            Vec2f offset = getOffset();
 
             GUI::DrawIcon(icon, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
         }
