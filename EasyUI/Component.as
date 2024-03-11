@@ -1,7 +1,8 @@
 interface Component : EventDispatcher
 {
     void SetPosition(float x, float y);
-    // The position before margin or padding is applied
+
+    // The position before margin or padding are applied
     Vec2f getPosition();
     // The true position after margin is applied
     Vec2f getTruePosition();
@@ -11,15 +12,20 @@ interface Component : EventDispatcher
     // The minimum bounds the component can be
     // Takes into account margin, padding, and the minimum bounds of child components
     Vec2f getMinBounds();
-    // The bounds with margin and padding applied
+    // The stretched bounds with margin and padding applied
     Vec2f getBounds();
-    // The bounds with padding applied
+    // The stretched bounds with padding applied
     Vec2f getTrueBounds();
-    // The bounds before margin and padding are applied
+    // The stretched bounds before margin and padding are applied
     Vec2f getInnerBounds();
     // The bounds the child component can stretch to
-    // Usually the inner bounds except for complex layout components like lists
+    // Usually is the inner bounds except for complex layout components like lists
     Vec2f getStretchBounds(Component@ child);
+
+    // Schedules bounds recalculation when bounds are next retrieved
+    // True and inner bounds can easily be derived so don't need caching
+    // These methods are called when the parent or child components are resized, or when this component is updated
+    void CalculateMinBounds();
     void CalculateBounds();
 
     void SetMargin(float x, float y);

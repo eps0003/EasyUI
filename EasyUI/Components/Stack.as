@@ -7,107 +7,6 @@ interface Stack : Component, Stretch
     Vec2f getMaxSize();
 }
 
-class StackCachedMinBounds : CachedBounds, EventHandler
-{
-    private Stack@ stack;
-    private bool recalculate = true;
-    private Vec2f minBounds = Vec2f_zero;
-
-    StackCachedMinBounds(Stack@ stack)
-    {
-        @this.stack = stack;
-    }
-
-    void Handle()
-    {
-        if (recalculate) return;
-
-        recalculate = true;
-        stack.DispatchEvent(Event::MinBounds);
-    }
-
-    Vec2f getBounds()
-    {
-        if (recalculate)
-        {
-            recalculate = false;
-
-            minBounds.SetZero();
-
-            Component@[] components = stack.getComponents();
-            for (uint i = 0; i < components.size(); i++)
-            {
-                Vec2f childBounds = components[i].getMinBounds();
-                if (childBounds.x > minBounds.x)
-                {
-                    minBounds.x = childBounds.x;
-                }
-                if (childBounds.y > minBounds.y)
-                {
-                    minBounds.y = childBounds.y;
-                }
-            }
-
-            minBounds += stack.getPadding() * 2.0f;
-
-            Vec2f minSize = stack.getMinSize();
-            minBounds.x = Maths::Max(minBounds.x, minSize.x);
-            minBounds.y = Maths::Max(minBounds.y, minSize.y);
-
-            minBounds += stack.getMargin() * 2.0f;
-        }
-
-        return minBounds;
-    }
-}
-
-class StackCachedBounds : CachedBounds, EventHandler
-{
-    private Stack@ stack;
-    private bool recalculate = true;
-    private Vec2f bounds = Vec2f_zero;
-
-    StackCachedBounds(Stack@ stack)
-    {
-        @this.stack = stack;
-    }
-
-    void Handle()
-    {
-        if (recalculate) return;
-
-        recalculate = true;
-        stack.DispatchEvent(Event::Bounds);
-    }
-
-    Vec2f getBounds()
-    {
-        if (recalculate)
-        {
-            recalculate = false;
-
-            bounds = stack.getMinBounds();
-
-            Component@ parent = stack.getParent();
-            Vec2f maxSize = stack.getMaxSize();
-
-            Vec2f parentBounds = parent !is null
-                ? parent.getStretchBounds(stack)
-                : getDriver().getScreenDimensions() - stack.getPosition();
-            parentBounds *= stack.getStretchRatio();
-
-            Vec2f maxBounds;
-            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(parentBounds.x, maxSize.x) : parentBounds.x;
-            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(parentBounds.y, maxSize.y) : parentBounds.y;
-
-            bounds.x = Maths::Max(bounds.x, maxBounds.x);
-            bounds.y = Maths::Max(bounds.y, maxBounds.y);
-        }
-
-        return bounds;
-    }
-}
-
 class StandardStack : Stack
 {
     private Component@ parent;
@@ -118,29 +17,24 @@ class StandardStack : Stack
     private Vec2f alignment = Vec2f_zero;
     private Vec2f minSize = Vec2f_zero;
     private Vec2f maxSize = Vec2f_zero;
-    private Vec2f stretch = Vec2f_zero;
+    private Vec2f stretchRatio = Vec2f_zero;
     private Vec2f position = Vec2f_zero;
 
-    private StackCachedMinBounds@ minBounds;
-    private StackCachedBounds@ bounds;
+    private Vec2f minBounds = Vec2f_zero;
+    private Vec2f bounds = Vec2f_zero;
+
+    private bool calculateMinBounds = true;
     private bool calculateBounds = true;
+
+    private CachedMinBoundsHandler@ minBoundsHandler;
+    private CachedBoundsHandler@ boundsHandler;
 
     private EventDispatcher@ events = StandardEventDispatcher();
 
     StandardStack()
     {
-        @minBounds = StackCachedMinBounds(this);
-        AddEventListener(Event::Components, minBounds);
-        AddEventListener(Event::Padding, minBounds);
-        AddEventListener(Event::Margin, minBounds);
-        AddEventListener(Event::MinSize, minBounds);
-
-        @bounds = StackCachedBounds(this);
-        AddEventListener(Event::Parent, bounds);
-        AddEventListener(Event::MaxSize, bounds);
-        AddEventListener(Event::Position, bounds);
-        AddEventListener(Event::StretchRatio, bounds);
-        AddEventListener(Event::MinBounds, bounds);
+        @minBoundsHandler = CachedMinBoundsHandler(this);
+        @boundsHandler = CachedBoundsHandler(this);
     }
 
     void AddComponent(Component@ component)
@@ -150,7 +44,11 @@ class StandardStack : Stack
         components.push_back(component);
         component.SetParent(this);
 
+        // If child minimum bounds changes, update my minimum bounds
+        component.AddEventListener(Event::MinBounds, minBoundsHandler);
+
         DispatchEvent(Event::Components);
+        CalculateMinBounds();
     }
 
     void SetParent(Component@ parent)
@@ -159,17 +57,19 @@ class StandardStack : Stack
 
         if (this.parent !is null)
         {
-            parent.RemoveEventListener(Event::Bounds, bounds);
+            parent.RemoveEventListener(Event::Bounds, boundsHandler);
         }
 
         @this.parent = parent;
 
         if (this.parent !is null)
         {
-            parent.AddEventListener(Event::Bounds, bounds);
+            // If parent bounds changes, update my bounds
+            parent.AddEventListener(Event::Bounds, boundsHandler);
         }
 
         DispatchEvent(Event::Parent);
+        CalculateBounds();
     }
 
     Component@ getParent()
@@ -188,6 +88,7 @@ class StandardStack : Stack
         margin.y = y;
 
         DispatchEvent(Event::Margin);
+        CalculateMinBounds();
     }
 
     Vec2f getMargin()
@@ -206,6 +107,7 @@ class StandardStack : Stack
         padding.y = y;
 
         DispatchEvent(Event::Padding);
+        CalculateMinBounds();
     }
 
     Vec2f getPadding()
@@ -242,6 +144,7 @@ class StandardStack : Stack
         minSize.y = height;
 
         DispatchEvent(Event::MinSize);
+        CalculateMinBounds();
     }
 
     Vec2f getMinSize()
@@ -260,6 +163,7 @@ class StandardStack : Stack
         maxSize.y = height;
 
         DispatchEvent(Event::MaxSize);
+        CalculateBounds();
     }
 
     Vec2f getMaxSize()
@@ -272,17 +176,18 @@ class StandardStack : Stack
         x = Maths::Clamp01(x);
         y = Maths::Clamp01(y);
 
-        if (stretch.x == x && stretch.y == y) return;
+        if (stretchRatio.x == x && stretchRatio.y == y) return;
 
-        stretch.x = x;
-        stretch.y = y;
+        stretchRatio.x = x;
+        stretchRatio.y = y;
 
         DispatchEvent(Event::StretchRatio);
+        CalculateBounds();
     }
 
     Vec2f getStretchRatio()
     {
-        return stretch;
+        return stretchRatio;
     }
 
     void SetPosition(float x, float y)
@@ -293,6 +198,12 @@ class StandardStack : Stack
         position.y = y;
 
         DispatchEvent(Event::Position);
+
+        // Position is only used when stretching to fill the screen
+        if (parent is null)
+        {
+            CalculateBounds();
+        }
     }
 
     Vec2f getPosition()
@@ -312,12 +223,58 @@ class StandardStack : Stack
 
     Vec2f getMinBounds()
     {
-        return minBounds.getBounds();
+        if (calculateMinBounds)
+        {
+            calculateMinBounds = false;
+
+            Vec2f maxChildBounds = Vec2f_zero;
+            for (uint i = 0; i < components.size(); i++)
+            {
+                Vec2f childBounds = components[i].getMinBounds();
+                if (childBounds.x > maxChildBounds.x)
+                {
+                    maxChildBounds.x = childBounds.x;
+                }
+                if (childBounds.y > maxChildBounds.y)
+                {
+                    maxChildBounds.y = childBounds.y;
+                }
+            }
+
+            minBounds.x = Maths::Max(maxChildBounds.x + padding.x * 2.0f, minSize.x) + margin.x * 2.0f;
+            minBounds.y = Maths::Max(maxChildBounds.y + padding.y * 2.0f, minSize.y) + margin.y * 2.0f;
+        }
+
+        return minBounds;
     }
 
     Vec2f getBounds()
     {
-        return bounds.getBounds();
+        if (calculateBounds)
+        {
+            calculateBounds = false;
+
+            // Use method to get mininmum bounds in case it needs to be recalculated
+            Vec2f minBounds = getMinBounds();
+
+            // Stretch to fill the parent or the screen
+            Vec2f stretchBounds = parent !is null
+                ? parent.getStretchBounds(this)
+                : getDriver().getScreenDimensions() - position;
+            stretchBounds *= stretchRatio;
+
+            // Constrain the stretch bounds within the maximum size if configured
+            // This bounds ranges from (0,0) to the maximum possible bounds
+            Vec2f maxBounds;
+            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(stretchBounds.x, maxSize.x) : stretchBounds.x;
+            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(stretchBounds.y, maxSize.y) : stretchBounds.y;
+
+            // Pick the larger bounds
+            bounds.x = Maths::Max(minBounds.x, maxBounds.x);
+            bounds.y = Maths::Max(minBounds.y, maxBounds.y);
+        }
+
+        return bounds;
     }
 
     Vec2f getTrueBounds()
@@ -335,9 +292,23 @@ class StandardStack : Stack
         return getInnerBounds();
     }
 
+    void CalculateMinBounds()
+    {
+        if (calculateMinBounds) return;
+
+        calculateMinBounds = true;
+
+        DispatchEvent(Event::MinBounds);
+        CalculateBounds();
+    }
+
     void CalculateBounds()
     {
+        if (calculateBounds) return;
 
+        calculateBounds = true;
+
+        DispatchEvent(Event::Bounds);
     }
 
     bool isHovering()

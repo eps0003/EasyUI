@@ -23,7 +23,7 @@ class StandardLabel : Label, StandardStack
         this.text = text;
 
         DispatchEvent(Event::Text);
-        CalculateBounds();
+        CalculateMinBounds();
     }
 
     string getText()
@@ -38,7 +38,7 @@ class StandardLabel : Label, StandardStack
         this.font = font;
 
         DispatchEvent(Event::Font);
-        CalculateBounds();
+        CalculateMinBounds();
     }
 
     string getFont()
@@ -62,31 +62,31 @@ class StandardLabel : Label, StandardStack
 
     Vec2f getMinBounds()
     {
-        if (calculateBounds)
+        if (calculateMinBounds)
         {
-            // Get dimensions for the line of text
-            Vec2f dim;
-            GUI::SetFont(font);
-            GUI::GetTextDimensions(text, dim);
+            // This will set calculateMinBounds back to false
+            Vec2f stackMinBounds = StandardStack::getMinBounds();
 
-            // If a minSize is configured, it is an area label
+            // Get dimensions for the line of text
+            Vec2f labelMinBounds;
+            GUI::SetFont(font);
+            GUI::GetTextDimensions(text, labelMinBounds);
+
+            // If a minimum size is configured, it is an area label
             // x is the area label width; y is at least one line tall
             if (minSize.x != 0.0f || minSize.y != 0.0f)
             {
-                dim.x = minSize.x;
-                dim.y = Maths::Max(dim.y, minSize.y);
+                labelMinBounds.x = minSize.x;
+                labelMinBounds.y = Maths::Max(labelMinBounds.y, minSize.y);
             }
 
-            // Get minBounds without padding or margin
-            // This will set calculateBounds back to false
-            Vec2f trueMinBounds = StandardStack::getMinBounds() - (padding + margin) * 2.0f;
+            // Take into account padding and margin
+            labelMinBounds.x = Maths::Max(labelMinBounds.x, padding.x * 2.0f) + margin.x * 2.0f;
+            labelMinBounds.y = Maths::Max(labelMinBounds.y, padding.y * 2.0f) + margin.y * 2.0f;
 
-            // Determine the larger of the two bounds
-            trueMinBounds.x = Maths::Max(trueMinBounds.x, dim.x);
-            trueMinBounds.y = Maths::Max(trueMinBounds.y, dim.y);
-
-            // Add back padding and margin
-            minBounds = trueMinBounds + (padding + margin) * 2.0f;
+            // Pick the larger bounds
+            minBounds.x = Maths::Max(stackMinBounds.x, labelMinBounds.x);
+            minBounds.y = Maths::Max(stackMinBounds.y, labelMinBounds.y);
         }
 
         return minBounds;

@@ -13,7 +13,17 @@ class CachedBoundsHandler : EventHandler
     }
 }
 
-interface CachedBounds
+class CachedMinBoundsHandler : EventHandler
 {
-    Vec2f getBounds();
+    private Component@ component;
+
+    CachedMinBoundsHandler(Component@ component)
+    {
+        @this.component = component;
+    }
+
+    void Handle()
+    {
+        component.CalculateMinBounds();
+    }
 }

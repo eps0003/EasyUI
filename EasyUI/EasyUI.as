@@ -6,7 +6,7 @@
 // #include "DragHandle.as"
 #include "EventDispatcher.as"
 #include "Icon.as"
-// #include "Label.as"
+#include "Label.as"
 // #include "List.as"
 #include "Pane.as"
 #include "Progress.as"
