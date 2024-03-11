@@ -12,3 +12,8 @@ class CachedBoundsHandler : EventHandler
         component.CalculateBounds();
     }
 }
+
+interface CachedBounds
+{
+    Vec2f getBounds();
+}

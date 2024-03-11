@@ -16,7 +16,7 @@ class StandardProgress : Progress, StandardStack
 
         this.percentage = percentage;
 
-        DispatchEvent("change");
+        DispatchEvent(Event::Percentage);
     }
 
     float getPercentage()

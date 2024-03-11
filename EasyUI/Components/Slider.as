@@ -37,7 +37,7 @@ class StandardVerticalSlider : Slider, StandardStack
 
         this.percentage = percentage;
 
-        DispatchEvent("change");
+        DispatchEvent(Event::Percentage);
     }
 
     float getPercentage()
@@ -47,7 +47,13 @@ class StandardVerticalSlider : Slider, StandardStack
 
     void SetHandleRatio(float ratio)
     {
-        handleRatio = Maths::Clamp01(ratio);
+        ratio = Maths::Clamp01(ratio);
+
+        if (handleRatio == ratio) return;
+
+        handleRatio = ratio;
+
+        DispatchEvent(Event::HandleRatio);
     }
 
     float getHandleRatio()
@@ -105,7 +111,7 @@ class StandardVerticalSlider : Slider, StandardStack
             // Drag handle relative to cursor if clicking on handle
             pressed = true;
             clickOffsetY = (controls.getInterpMouseScreenPos().y - getHandlePosition().y) / Maths::Max(getHandleSize().y, 1.0f);
-            DispatchEvent("dragstart");
+            DispatchEvent(Event::StartDrag);
         }
 
         // Call this here to override any external code updating the percentage
@@ -114,7 +120,7 @@ class StandardVerticalSlider : Slider, StandardStack
         if (pressed && !ui.isInteractingWith(this))
         {
             pressed = false;
-            DispatchEvent("dragend");
+            DispatchEvent(Event::EndDrag);
         }
     }
 
@@ -173,7 +179,7 @@ class StandardHorizontalSlider : Slider, StandardStack
 
         this.percentage = percentage;
 
-        DispatchEvent("change");
+        DispatchEvent(Event::Percentage);
     }
 
     float getPercentage()
@@ -241,7 +247,7 @@ class StandardHorizontalSlider : Slider, StandardStack
             // Drag handle relative to cursor if clicking on handle
             pressed = true;
             clickOffsetX = (controls.getInterpMouseScreenPos().x - getHandlePosition().x) / Maths::Max(getHandleSize().x, 1.0f);
-            DispatchEvent("dragstart");
+            DispatchEvent(Event::StartDrag);
         }
 
         // Call this here to override any external code updating the percentage
@@ -250,7 +256,7 @@ class StandardHorizontalSlider : Slider, StandardStack
         if (pressed && !ui.isInteractingWith(this))
         {
             pressed = false;
-            DispatchEvent("dragend");
+            DispatchEvent(Event::EndDrag);
         }
     }
 

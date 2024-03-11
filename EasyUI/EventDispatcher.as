@@ -1,8 +1,8 @@
 interface EventDispatcher
 {
-    void AddEventListener(string type, EventHandler@ handler);
-    void RemoveEventListener(string type, EventHandler@ handler);
-    void DispatchEvent(string type);
+    void AddEventListener(Event type, EventHandler@ handler);
+    void RemoveEventListener(Event type, EventHandler@ handler);
+    void DispatchEvent(Event type);
 }
 
 interface EventHandler
@@ -12,10 +12,10 @@ interface EventHandler
 
 class StandardEventDispatcher : EventDispatcher
 {
-    private string[] eventTypes;
+    private Event[] eventTypes;
     private EventHandler@[] eventHandlers;
 
-    void AddEventListener(string type, EventHandler@ handler)
+    void AddEventListener(Event type, EventHandler@ handler)
     {
         if (handler is null) return;
 
@@ -23,7 +23,7 @@ class StandardEventDispatcher : EventDispatcher
         eventHandlers.push_back(handler);
     }
 
-    void RemoveEventListener(string type, EventHandler@ handler)
+    void RemoveEventListener(Event type, EventHandler@ handler)
     {
         if (handler is null) return;
 
@@ -39,7 +39,7 @@ class StandardEventDispatcher : EventDispatcher
         }
     }
 
-    void DispatchEvent(string type)
+    void DispatchEvent(Event type)
     {
         for (uint i = 0; i < eventHandlers.size(); i++)
         {
@@ -49,4 +49,49 @@ class StandardEventDispatcher : EventDispatcher
             }
         }
     }
+}
+
+enum Event
+{
+    // Bounds
+    Bounds,
+    MinBounds,
+
+    // Size
+    Padding,
+    Margin,
+    MinSize,
+    MaxSize,
+    StretchRatio,
+
+    // Position
+    Position,
+    Alignment,
+
+    // Components
+    Components,
+    Parent,
+
+    // Miscellaneous
+    Percentage,
+    Player,
+    Icon,
+    FrameIndex,
+    FrameDim,
+    Crop,
+    Scale,
+    Clickable,
+    Text,
+    Font,
+    Color,
+    HandleRatio,
+    Checked,
+
+    // Interaction
+    Press,
+    Release,
+    Click,
+    StartDrag,
+    EndDrag,
+    Scroll,
 }

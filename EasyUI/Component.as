@@ -40,6 +40,7 @@ interface Component : EventDispatcher
     bool canScroll();
 
     void SetParent(Component@ parent);
+    Component@ getParent();
 
     void AddComponent(Component@ component);
     Component@[] getComponents();

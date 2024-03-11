@@ -1,4 +1,4 @@
-interface Icon : Component
+interface Icon : Stack
 {
     void SetIcon(string icon);
     string getIcon();
@@ -6,65 +6,39 @@ interface Icon : Component
     void SetFrameIndex(uint index);
     uint getFrameIndex();
 
-    void SetFrameDimension(uint width, uint height);
-    Vec2f getFrameDimension();
+    void SetFrameDim(uint width, uint height);
+    Vec2f getFrameDim();
 
     void SetCrop(float top, float right, float bottom, float left);
 
-    void SetSize(float width, float height);
-    Vec2f getSize();
+    void SetScale(float x, float y);
+    Vec2f getScale();
+
+    // void SetMaintainAspectRatio(bool maintain);
+    // bool isMaintainingAspectRatio();
 
     void SetClickable(bool clickable);
 }
 
-class StandardIcon : Icon
+class StandardIcon : Icon, StandardStack
 {
-    private Component@ parent;
-
     private string icon = "";
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
-    private Vec2f size = Vec2f_zero;
     private float cropTop = 0.0f;
     private float cropRight = 0.0f;
     private float cropBottom = 0.0f;
     private float cropLeft = 0.0f;
-    private Vec2f scale = Vec2f_zero;
-    private Vec2f margin = Vec2f_zero;
-    private Vec2f position = Vec2f_zero;
+    private Vec2f scale = Vec2f(1, 1);
     private bool clickable = true;
-
-    private bool calculateBounds = true;
-
-    private EventDispatcher@ events = StandardEventDispatcher();
-
-    void SetParent(Component@ parent)
-    {
-        if (this.parent is parent) return;
-
-        @this.parent = parent;
-
-        CalculateBounds();
-    }
-
-    private void CalculateScale()
-    {
-        Vec2f croppedDim;
-        croppedDim.x = frameDim.x - cropLeft - cropRight;
-        croppedDim.y = frameDim.y - cropTop - cropBottom;
-
-        scale.x = croppedDim.x != 0.0f
-            ? size.x / croppedDim.x * 0.5f
-            : 0.0f;
-
-        scale.y = croppedDim.y != 0.0f
-            ? size.y / croppedDim.y * 0.5f
-            : 0.0f;
-    }
 
     void SetIcon(string icon)
     {
+        if (this.icon == icon) return;
+
         this.icon = icon;
+
+        DispatchEvent(Event::Icon);
     }
 
     string getIcon()
@@ -74,7 +48,11 @@ class StandardIcon : Icon
 
     void SetFrameIndex(uint index)
     {
+        if (frameIndex == index) return;
+
         frameIndex = index;
+
+        DispatchEvent(Event::FrameIndex);
     }
 
     uint getFrameIndex()
@@ -82,116 +60,55 @@ class StandardIcon : Icon
         return frameIndex;
     }
 
-    void SetFrameDimension(uint width, uint height)
+    void SetFrameDim(uint width, uint height)
     {
         if (frameDim.x == width && frameDim.y == height) return;
 
         frameDim.x = width;
         frameDim.y = height;
 
-        CalculateScale();
+        DispatchEvent(Event::FrameDim);
     }
 
-    Vec2f getFrameDimension()
+    Vec2f getFrameDim()
     {
         return frameDim;
     }
 
     void SetCrop(float top, float right, float bottom, float left)
     {
+        if (cropTop == top && cropRight == right && cropBottom == bottom && cropLeft == left) return;
+
         cropTop = top;
         cropRight = right;
         cropBottom = bottom;
         cropLeft = left;
+
+        DispatchEvent(Event::Crop);
     }
 
-    void SetSize(float width, float height)
+    void SetScale(float x, float y)
     {
-        if (size.x == width && size.y == height) return;
+        if (scale.x == x && scale.y == y) return;
 
-        size.x = width;
-        size.y = height;
+        scale.x = x;
+        scale.y = y;
 
-        CalculateScale();
+        DispatchEvent(Event::Scale);
     }
 
-    Vec2f getSize()
+    Vec2f getScale()
     {
-        return size;
-    }
-
-    void SetMargin(float x, float y)
-    {
-        x = Maths::Max(0, x);
-        y = Maths::Max(0, y);
-
-        if (margin.x == x && margin.y == y) return;
-
-        margin.x = x;
-        margin.y = y;
-
-        CalculateBounds();
-    }
-
-    Vec2f getMargin()
-    {
-        return margin;
-    }
-
-    void SetPosition(float x, float y)
-    {
-        position.x = x;
-        position.y = y;
-    }
-
-    Vec2f getPosition()
-    {
-        return position;
-    }
-
-    Vec2f getTruePosition()
-    {
-        return getPosition() + margin;
-    }
-
-    Vec2f getInnerPosition()
-    {
-        return getTruePosition();
-    }
-
-    Vec2f getMinBounds()
-    {
-        return getBounds();
-    }
-
-    Vec2f getBounds()
-    {
-        return getTrueBounds() + margin * 2.0f;
-    }
-
-    Vec2f getTrueBounds()
-    {
-        return Vec2f_abs(size);
-    }
-
-    Vec2f getInnerBounds()
-    {
-        return getTrueBounds();
-    }
-
-    void CalculateBounds()
-    {
-        DispatchEvent("resize");
-    }
-
-    bool isHovering()
-    {
-        return ::isHovering(this);
+        return scale;
     }
 
     void SetClickable(bool clickable)
     {
+        if (this.clickable == clickable) return;
+
         this.clickable = clickable;
+
+        DispatchEvent(Event::Clickable);
     }
 
     bool canClick()
@@ -204,38 +121,12 @@ class StandardIcon : Icon
         return false;
     }
 
-    Component@[] getComponents()
-    {
-        Component@[] components;
-        return components;
-    }
-
-    void AddEventListener(string type, EventHandler@ handler)
-    {
-        events.AddEventListener(type, handler);
-    }
-
-    void RemoveEventListener(string type, EventHandler@ handler)
-    {
-        events.RemoveEventListener(type, handler);
-    }
-
-    void DispatchEvent(string type)
-    {
-        events.DispatchEvent(type);
-    }
-
-    void Update()
-    {
-
-    }
-
     private bool canRender()
     {
         return (
             icon != "" &&
-            size.x != 0.0f &&
-            size.y != 0.0f &&
+            scale.x != 0.0f &&
+            scale.y != 0.0f &&
             frameDim.x != 0.0f &&
             frameDim.y != 0.0f
         );
@@ -243,13 +134,30 @@ class StandardIcon : Icon
 
     void Render()
     {
-        if (!canRender()) return;
+        if (canRender())
+        {
+            Vec2f size = getTrueBounds();
 
-        Vec2f offset = Vec2f_zero;
-        offset.x = size.x > 0.0f ? -cropLeft : frameDim.x - cropRight;
-        offset.y = size.y > 0.0f ? -cropTop : frameDim.y - cropBottom;
-        offset *= Vec2f_abs(scale) * 2.0f;
+            Vec2f croppedDim;
+            croppedDim.x = frameDim.x - cropLeft - cropRight;
+            croppedDim.y = frameDim.y - cropTop - cropBottom;
 
-        GUI::DrawIcon(icon, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
+            Vec2f scale;
+            scale.x = croppedDim.x != 0.0f
+                ? size.x / croppedDim.x * 0.5f
+                : 0.0f;
+            scale.y = croppedDim.y != 0.0f
+                ? size.y / croppedDim.y * 0.5f
+                : 0.0f;
+
+            Vec2f offset = Vec2f_zero;
+            offset.x = scale.x > 0.0f ? -cropLeft : frameDim.x - cropRight;
+            offset.y = scale.y > 0.0f ? -cropTop : frameDim.y - cropBottom;
+            offset *= Vec2f_abs(scale) * 2.0f;
+
+            GUI::DrawIcon(icon, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
+        }
+
+        StandardStack::Render();
     }
 }

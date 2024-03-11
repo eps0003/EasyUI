@@ -44,7 +44,7 @@ class StandardVerticalList : VerticalList
         component.SetParent(this);
 
         CalculateBounds();
-        component.AddEventListener("resize", CachedBoundsHandler(this));
+        component.AddEventListener(Event::MinSize, CachedBoundsHandler(this));
     }
 
     void SetParent(Component@ parent)
@@ -54,6 +54,11 @@ class StandardVerticalList : VerticalList
         @this.parent = parent;
 
         CalculateBounds();
+    }
+
+    Component@ getParent()
+    {
+        return parent;
     }
 
     void SetMargin(float x, float y)
@@ -267,17 +272,17 @@ class StandardVerticalList : VerticalList
         DispatchEvent("resize");
     }
 
-    void AddEventListener(string type, EventHandler@ handler)
+    void AddEventListener(Event type, EventHandler@ handler)
     {
         events.AddEventListener(type, handler);
     }
 
-    void RemoveEventListener(string type, EventHandler@ handler)
+    void RemoveEventListener(Event type, EventHandler@ handler)
     {
         events.RemoveEventListener(type, handler);
     }
 
-    void DispatchEvent(string type)
+    void DispatchEvent(Event type)
     {
         events.DispatchEvent(type);
     }
@@ -375,7 +380,7 @@ class StandardHorizontalList : HorizontalList
         component.SetParent(this);
 
         CalculateBounds();
-        component.AddEventListener("resize", CachedBoundsHandler(this));
+        component.AddEventListener(Event::MinSize, CachedBoundsHandler(this));
     }
 
     void SetParent(Component@ parent)
@@ -385,6 +390,11 @@ class StandardHorizontalList : HorizontalList
         @this.parent = parent;
 
         CalculateBounds();
+    }
+
+    Component@ getParent()
+    {
+        return parent;
     }
 
     void SetMargin(float x, float y)
@@ -598,17 +608,17 @@ class StandardHorizontalList : HorizontalList
         DispatchEvent("resize");
     }
 
-    void AddEventListener(string type, EventHandler@ handler)
+    void AddEventListener(Event type, EventHandler@ handler)
     {
         events.AddEventListener(type, handler);
     }
 
-    void RemoveEventListener(string type, EventHandler@ handler)
+    void RemoveEventListener(Event type, EventHandler@ handler)
     {
         events.RemoveEventListener(type, handler);
     }
 
-    void DispatchEvent(string type)
+    void DispatchEvent(Event type)
     {
         events.DispatchEvent(type);
     }

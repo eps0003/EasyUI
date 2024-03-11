@@ -6,8 +6,8 @@
 // #include "DragHandle.as"
 #include "EventDispatcher.as"
 #include "Icon.as"
-#include "Label.as"
-#include "List.as"
+// #include "Label.as"
+// #include "List.as"
 #include "Pane.as"
 #include "Progress.as"
 #include "Slider.as"
@@ -168,10 +168,10 @@ class EasyUI
         {
             if (canClick(interacting))
             {
-                interacting.DispatchEvent("click");
+                interacting.DispatchEvent(Event::Click);
             }
 
-            interacting.DispatchEvent("release");
+            interacting.DispatchEvent(Event::Release);
 
             @interacting = null;
         }
@@ -188,7 +188,7 @@ class EasyUI
         {
             @interacting = clickable;
 
-            interacting.DispatchEvent("press");
+            interacting.DispatchEvent(Event::Press);
         }
 
         for (int i = components.size() - 1; i >= 0; i--)

@@ -30,14 +30,14 @@ class StandardToggle : Toggle, StandardButton
 
         super(EasyUI());
 
-        AddEventListener("click", ToggleClickHandler(this));
+        AddEventListener(Event::Click, ToggleClickHandler(this));
     }
 
     StandardToggle(EasyUI@ ui)
     {
         super(ui);
 
-        AddEventListener("click", ToggleClickHandler(this));
+        AddEventListener(Event::Click, ToggleClickHandler(this));
     }
 
     bool isPressed()
@@ -51,7 +51,7 @@ class StandardToggle : Toggle, StandardButton
 
         this.checked = checked;
 
-        DispatchEvent("change");
+        DispatchEvent(Event::Checked);
     }
 
     bool isChecked()

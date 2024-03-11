@@ -22,6 +22,7 @@ class StandardLabel : Label, StandardStack
 
         this.text = text;
 
+        DispatchEvent(Event::Text);
         CalculateBounds();
     }
 
@@ -36,6 +37,7 @@ class StandardLabel : Label, StandardStack
 
         this.font = font;
 
+        DispatchEvent(Event::Font);
         CalculateBounds();
     }
 
@@ -46,7 +48,11 @@ class StandardLabel : Label, StandardStack
 
     void SetColor(SColor color)
     {
+        if (this.color == color) return;
+
         this.color = color;
+
+        DispatchEvent(Event::Color);
     }
 
     SColor getColor()

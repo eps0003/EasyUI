@@ -10,7 +10,11 @@ class StandardAvatar : Avatar, StandardStack
 
     void SetPlayer(CPlayer@ player)
     {
+        if (this.player is player) return;
+
         @this.player = player;
+
+        DispatchEvent(Event::Player);
     }
 
     CPlayer@ getPlayer()
