@@ -94,6 +94,9 @@ class StandardStack : Stack
 
     void SetMinSize(float width, float height)
     {
+        width = Maths::Max(0, width);
+        height = Maths::Max(0, height);
+
         if (minSize.x == width && minSize.y == height) return;
 
         minSize.x = width;
@@ -109,6 +112,9 @@ class StandardStack : Stack
 
     void SetMaxSize(float width, float height)
     {
+        width = Maths::Max(0, width);
+        height = Maths::Max(0, height);
+
         if (maxSize.x == width && maxSize.y == height) return;
 
         maxSize.x = width;

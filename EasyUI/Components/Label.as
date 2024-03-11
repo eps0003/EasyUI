@@ -18,6 +18,8 @@ class StandardLabel : Label, StandardStack
 
     void SetText(string text)
     {
+        if (this.text == text) return;
+
         this.text = text;
 
         CalculateBounds();
@@ -30,6 +32,8 @@ class StandardLabel : Label, StandardStack
 
     void SetFont(string font)
     {
+        if (this.font == font) return;
+
         this.font = font;
 
         CalculateBounds();
