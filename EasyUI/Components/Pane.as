@@ -38,7 +38,6 @@ class StandardPane : Pane, StandardStack
     {
         Vec2f min = getTruePosition();
         Vec2f max = min + getTrueBounds();
-        Vec2f innerBounds = getInnerBounds();
 
         switch (type)
         {

@@ -33,7 +33,6 @@ class StandardProgress : Progress, StandardStack
     {
         Vec2f min = getTruePosition();
         Vec2f max = min + getTrueBounds();
-        Vec2f innerBounds = getInnerBounds();
 
         GUI::DrawProgressBar(min, max, percentage);
 

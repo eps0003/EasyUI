@@ -309,7 +309,6 @@ class StandardVerticalList : VerticalList
     {
         Vec2f offset = Vec2f_zero;
         Vec2f innerPos = getInnerPosition();
-        Vec2f innerBounds = getInnerBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {
@@ -636,7 +635,6 @@ class StandardHorizontalList : HorizontalList
     {
         Vec2f offset = Vec2f_zero;
         Vec2f innerPos = getInnerPosition();
-        Vec2f innerBounds = getInnerBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {

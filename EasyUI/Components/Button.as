@@ -34,7 +34,6 @@ class StandardButton : Button, StandardStack
     {
         Vec2f min = getTruePosition();
         Vec2f max = min + getTrueBounds();
-        Vec2f innerBounds = getInnerBounds();
 
         if (ui.canClick(this))
         {
