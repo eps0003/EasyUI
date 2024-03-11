@@ -189,18 +189,17 @@ class StandardStack : Stack
     {
         Vec2f outerBounds = getMinBounds();
 
-        if (parent !is null)
-        {
-            Vec2f parentBounds = parent.getInnerBounds();
-            parentBounds *= getStretchRatio();
+        Vec2f parentBounds = parent !is null
+            ? parent.getInnerBounds()
+            : getDriver().getScreenDimensions() - position;
+        parentBounds *= getStretchRatio();
 
-            Vec2f maxBounds;
-            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(parentBounds.x, maxSize.x) : parentBounds.x;
-            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(parentBounds.y, maxSize.y) : parentBounds.y;
+        Vec2f maxBounds;
+        maxBounds.x = maxSize.x != 0.0f ? Maths::Min(parentBounds.x, maxSize.x) : parentBounds.x;
+        maxBounds.y = maxSize.y != 0.0f ? Maths::Min(parentBounds.y, maxSize.y) : parentBounds.y;
 
-            outerBounds.x = Maths::Max(outerBounds.x, maxBounds.x);
-            outerBounds.y = Maths::Max(outerBounds.y, maxBounds.y);
-        }
+        outerBounds.x = Maths::Max(outerBounds.x, maxBounds.x);
+        outerBounds.y = Maths::Max(outerBounds.y, maxBounds.y);
 
         return outerBounds;
     }
