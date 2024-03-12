@@ -264,10 +264,13 @@ class StandardStack : Stack
             stretchBounds *= stretchRatio;
 
             // Constrain the stretch bounds within the maximum size if configured
-            // This bounds ranges from (0,0) to the maximum possible bounds
             Vec2f maxBounds;
-            maxBounds.x = maxSize.x != 0.0f ? Maths::Min(stretchBounds.x, maxSize.x) : stretchBounds.x;
-            maxBounds.y = maxSize.y != 0.0f ? Maths::Min(stretchBounds.y, maxSize.y) : stretchBounds.y;
+            maxBounds.x = maxSize.x != 0.0f
+                ? Maths::Min(stretchBounds.x, maxSize.x + margin.x * 2.0f)
+                : stretchBounds.x;
+            maxBounds.y = maxSize.y != 0.0f
+                ? Maths::Min(stretchBounds.y, maxSize.y + margin.y * 2.0f)
+                : stretchBounds.y;
 
             // Pick the larger bounds
             bounds.x = Maths::Max(minBounds.x, maxBounds.x);
@@ -362,12 +365,14 @@ class StandardStack : Stack
         for (uint i = 0; i < components.size(); i++)
         {
             Component@ component = components[i];
+
             Vec2f childBounds = component.getBounds();
+            Vec2f childAlignment = component.getAlignment();
             Vec2f boundsDiff = innerBounds - childBounds;
 
             Vec2f childPos;
-            childPos.x = innerPos.x + boundsDiff.x * alignment.x;
-            childPos.y = innerPos.y + boundsDiff.y * alignment.y;
+            childPos.x = innerPos.x + boundsDiff.x * childAlignment.x;
+            childPos.y = innerPos.y + boundsDiff.y * childAlignment.y;
 
             component.SetPosition(childPos.x, childPos.y);
             component.Render();

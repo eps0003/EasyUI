@@ -34,25 +34,19 @@ void onRestart(CRules@ this)
 {
     @ui = EasyUI();
 
-    // Displays a single-line label
     Label@ label = StandardLabel();
     label.SetText("This pane is centered on the screen and stretches horizontally!");
     label.SetColor(color_white);
 
-    // Stretches to fill the width of the canvas
     Pane@ pane = StandardPane();
+    pane.SetMargin(200, 0);
     pane.SetPadding(20, 20);
+    pane.SetAlignment(0.5f, 0.5f);
     pane.SetStretchRatio(1.0f, 0.0f);
+    pane.SetMaxSize(600, 0);
     pane.AddComponent(label);
 
-    // Covers the entire screen so the pane can be center-aligned
-    Stack@ canvas = StandardStack();
-    canvas.SetStretchRatio(1.0f, 1.0f);
-    canvas.SetAlignment(0.5f, 0.5f);
-    canvas.SetMargin(200, 200);
-    canvas.AddComponent(pane);
-
-    ui.AddComponent(canvas);
+    ui.AddComponent(pane);
 }
 
 void onTick(CRules@ this)

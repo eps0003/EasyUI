@@ -16,11 +16,6 @@ bool isHovering(Component@ component)
     return isMouseInBounds(min, max);
 }
 
-Vec2f Vec2f_abs(Vec2f &in vec)
-{
-    return Vec2f(Maths::Abs(vec.x), Maths::Abs(vec.y));
-}
-
 namespace GUI
 {
     void DrawOutlinedRectangle(Vec2f min, Vec2f max, float thickness, SColor color)

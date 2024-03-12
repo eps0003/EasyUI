@@ -203,9 +203,22 @@ class EasyUI
 
         CacheComponents();
 
+        Vec2f screenDim = getDriver().getScreenDimensions();
+
         for (uint i = 0; i < components.size(); i++)
         {
-            components[i].Render();
+            Component@ component = components[i];
+
+            Vec2f bounds = component.getBounds();
+            Vec2f alignment = component.getAlignment();
+            Vec2f boundsDiff = screenDim - bounds;
+
+            Vec2f position;
+            position.x = boundsDiff.x * alignment.x;
+            position.y = boundsDiff.y * alignment.y;
+
+            component.SetPosition(position.x, position.y);
+            component.Render();
         }
     }
 
