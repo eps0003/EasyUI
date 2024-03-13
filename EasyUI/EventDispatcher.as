@@ -87,8 +87,8 @@ enum Event
     HandleRatio,
     Checked,
     Spacing,
-    Columns,
-    Rows,
+    CellWrap,
+    FlowDirection,
 
     // Interaction
     Press,
