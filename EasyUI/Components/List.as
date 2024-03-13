@@ -72,27 +72,110 @@ class StandardVerticalList : VerticalList, StandardStack
         return Maths::Min(components.size(), columns);
     }
 
+    private Vec2f getTotalStretchBounds()
+    {
+        Vec2f stretchBounds = parent !is null
+            ? parent.getStretchBounds(this)
+            : getDriver().getScreenDimensions() - position;
+        stretchBounds *= stretchRatio;
+        return stretchBounds;
+    }
+
+    private Vec2f getDesiredCellStretchBounds()
+    {
+        uint visibleRows = getVisibleRows();
+        uint visibleColumns = getVisibleColumns();
+
+        // Stretch to fill the parent or the screen
+        Vec2f stretchBounds = parent !is null
+            ? parent.getStretchBounds(this)
+            : getDriver().getScreenDimensions() - position;
+        stretchBounds *= stretchRatio;
+
+        // Remove spacing
+        stretchBounds.x -= (visibleColumns - 1) * spacing.x;
+        stretchBounds.y -= (visibleRows - 1) * spacing.y;
+
+        // Divide equally
+        stretchBounds.x /= visibleColumns;
+        stretchBounds.y /= visibleRows;
+
+        return stretchBounds;
+    }
+
+    private float[] distributeExcess(float[] sizes, float[] minSizes)
+    {
+        uint count = sizes.size();
+
+        // Accumulate excess size that needs redistributing
+        float excess = 0.0f;
+        uint excessCount = 0;
+        uint oversizeCount = 0;
+
+        for (uint i = 0; i < count; i++)
+        {
+            float size = sizes[i];
+            float minSize = minSizes[i];
+
+            if (minSize > size)
+            {
+                excess += minSize - size;
+                excessCount++;
+            }
+
+            if (size >= minSize)
+            {
+                oversizeCount++;
+            }
+        }
+
+        // All excess has been distributed or all sizes are oversized
+        if (excessCount == 0 || oversizeCount == count)
+        {
+            return sizes;
+        }
+
+        // Redistribute excess size
+        float dividedExcess = excess / (count - excessCount);
+
+        for (uint i = 0; i < count; i++)
+        {
+            float size = sizes[i];
+            float minSize = minSizes[i];
+
+            if (minSize > size)
+            {
+                sizes[i] = minSize;
+            }
+            else
+            {
+                sizes[i] -= dividedExcess;
+            }
+        }
+
+        // Recurse
+        return distributeExcess(sizes, minSizes);
+    }
+
     Vec2f getMinBounds()
     {
         if (calculateMinBounds)
         {
             calculateMinBounds = false;
 
-            minBounds.SetZero();
-
             uint visibleRows = getVisibleRows();
             uint visibleColumns = getVisibleColumns();
-            uint totalComponents = components.size();
+            Vec2f desiredCellStretchBounds = getDesiredCellStretchBounds();
 
-            minHeights = array<float>(visibleRows, 0.0f);
+            // Calculate min widths of columns and heights of rows
             minWidths = array<float>(visibleColumns, 0.0f);
+            minHeights = array<float>(visibleRows, 0.0f);
 
-            // Calculate largest column widths and row heights
             for (uint y = 0; y < visibleRows; y++)
             for (uint x = 0; x < visibleColumns; x++)
             {
                 uint index = y * visibleColumns + x;
-                if (index >= totalComponents) break;
+                if (index >= components.size()) break;
 
                 Vec2f childBounds = components[index].getMinBounds();
                 if (childBounds.x > minWidths[x])
@@ -104,6 +187,16 @@ class StandardVerticalList : VerticalList, StandardStack
                     minHeights[y] = childBounds.y;
                 }
             }
+
+            // Calculate stretch widths of columns and heights of rows
+            stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
+            stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
+
+            stretchWidths = distributeExcess(stretchWidths, minWidths);
+            stretchHeights = distributeExcess(stretchHeights, minHeights);
+
+            // Calculate min bounds
+            minBounds.SetZero();
 
             // Sum column widths and row heights
             for (uint i = 0; i < visibleColumns; i++)
@@ -126,106 +219,10 @@ class StandardVerticalList : VerticalList, StandardStack
         return minBounds;
     }
 
-    Vec2f getBounds()
-    {
-        if (calculateBounds)
-        {
-            Vec2f minBounds = getMinBounds();
-            uint visibleRows = getVisibleRows();
-            uint visibleColumns = getVisibleColumns();
-
-            Vec2f stretchBounds = parent !is null
-                ? parent.getStretchBounds(this)
-                : getDriver().getScreenDimensions() - position;
-            stretchBounds *= stretchRatio;
-
-            // Pick the larger bounds
-            bounds.x = Maths::Max(minBounds.x, stretchBounds.x);
-            bounds.y = Maths::Max(minBounds.y, stretchBounds.y);
-        }
-
-        return bounds;
-    }
-
-    private float[] distributeExcess(float[] sizes, float[] minSizes)
-    {
-        uint count = sizes.size();
-
-        // Accumulate excess size that needs redistributing
-        float excess = 0.0f;
-        uint excessCount = 0;
-        uint oversizeCount = 0;
-
-        for (uint i = 0; i < count; i++)
-        {
-            float size = sizes[i];
-            float minSize = minSizes[i];
-
-            if (size < minSize)
-            {
-                excess += minSize - size;
-                excessCount++;
-            }
-
-            if (size <= minSize)
-            {
-                oversizeCount++;
-            }
-        }
-
-        // All excess has been distributed or all sizes are oversized
-        if (excessCount == 0 || oversizeCount == count)
-        {
-            return sizes;
-        }
-
-        // Redistribute excess size
-        float dividedExcess = excess / (count - excessCount);
-
-        for (uint i = 0; i < count; i++)
-        {
-            float size = sizes[i];
-            float minSize = minSizes[i];
-
-            if (size < minSize)
-            {
-                sizes[i] = minSize;
-            }
-            else
-            {
-                sizes[i] -= dividedExcess;
-            }
-        }
-
-        // Recurse
-        return distributeExcess(sizes, minSizes);
-    }
-
     Vec2f getStretchBounds(Component@ child)
     {
-        getMinBounds(); // FIXME: this isn't needed but will cause crash if removed
-
-        uint visibleRows = getVisibleRows();
-        uint visibleColumns = getVisibleColumns();
-
-        Vec2f stretchBounds = parent !is null
-            ? parent.getStretchBounds(this)
-            : getDriver().getScreenDimensions() - position;
-        stretchBounds *= stretchRatio;
-
-        Vec2f equalCellBounds = stretchBounds;
-        // Remove spacing
-        equalCellBounds.x -= (visibleColumns - 1) * spacing.x;
-        equalCellBounds.y -= (visibleRows - 1) * spacing.y;
-        // Divide equally
-        equalCellBounds.x /= visibleColumns;
-        equalCellBounds.y /= visibleRows;
-
-        stretchHeights = array<float>(visibleRows, equalCellBounds.y);
-        stretchWidths = array<float>(visibleColumns, equalCellBounds.x);
-
-        stretchHeights = distributeExcess(stretchHeights, minHeights);
-        stretchWidths = distributeExcess(stretchWidths, minWidths);
+        // Ensure stretchWidths and stretchHeights are calculated
+        getMinBounds();
 
         for (uint i = 0; i < components.size(); i++)
         {
