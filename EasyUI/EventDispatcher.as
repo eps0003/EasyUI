@@ -86,6 +86,9 @@ enum Event
     Color,
     HandleRatio,
     Checked,
+    Spacing,
+    Columns,
+    Rows,
 
     // Interaction
     Press,

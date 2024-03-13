@@ -1,10 +1,6 @@
-interface Stack : Component, Stretch
+interface Stack : Component
 {
-    void SetMinSize(float width, float height);
-    Vec2f getMinSize();
 
-    void SetMaxSize(float width, float height);
-    Vec2f getMaxSize();
 }
 
 class StandardStack : Stack

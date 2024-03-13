@@ -37,6 +37,15 @@ interface Component : EventDispatcher
     void SetAlignment(float x, float y);
     Vec2f getAlignment();
 
+    void SetStretchRatio(float x, float y);
+    Vec2f getStretchRatio();
+
+    void SetMinSize(float width, float height);
+    Vec2f getMinSize();
+
+    void SetMaxSize(float width, float height);
+    Vec2f getMaxSize();
+
     void Update();
     void Render();
 
@@ -50,10 +59,4 @@ interface Component : EventDispatcher
 
     void AddComponent(Component@ component);
     Component@[] getComponents();
-}
-
-interface Stretch
-{
-    void SetStretchRatio(float x, float y);
-    Vec2f getStretchRatio();
 }

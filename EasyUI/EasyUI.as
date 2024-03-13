@@ -7,7 +7,7 @@
 #include "EventDispatcher.as"
 #include "Icon.as"
 #include "Label.as"
-// #include "List.as"
+#include "List.as"
 #include "Pane.as"
 #include "Progress.as"
 #include "Slider.as"
