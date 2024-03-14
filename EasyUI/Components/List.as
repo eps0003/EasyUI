@@ -6,21 +6,33 @@ interface List : Stack
     void SetCellWrap(uint cells);
     uint getCellWrap();
 
+    void SetFlowAxis(FlowAxis axis);
+    FlowAxis getFlowAxis();
+
     void SetFlowDirection(FlowDirection direction);
     FlowDirection getFlowDirection();
 }
 
+enum FlowAxis
+{
+    Horizontal,
+    Vertical
+}
+
 enum FlowDirection
 {
-    Vertical,
-    Horizontal
+    DownRight,
+    DownLeft,
+    UpRight,
+    UpLeft
 }
 
 class StandardList : List, StandardStack
 {
     private Vec2f spacing = Vec2f_zero;
     private uint cellWrap = 1;
-    private FlowDirection flowDirection = FlowDirection::Horizontal;
+    private FlowAxis flowAxis = FlowAxis::Horizontal;
+    private FlowDirection flowDirection = FlowDirection::DownRight;
 
     private float[] minWidths;
     private float[] minHeights;
@@ -63,6 +75,21 @@ class StandardList : List, StandardStack
         return cellWrap;
     }
 
+    void SetFlowAxis(FlowAxis axis)
+    {
+        if (flowAxis == axis) return;
+
+        flowAxis = axis;
+
+        DispatchEvent(Event::FlowAxis);
+        CalculateMinBounds();
+    }
+
+    FlowAxis getFlowAxis()
+    {
+        return flowAxis;
+    }
+
     void SetFlowDirection(FlowDirection direction)
     {
         if (flowDirection == direction) return;
@@ -80,28 +107,74 @@ class StandardList : List, StandardStack
 
     uint getCellX(uint index)
     {
-        return flowDirection == FlowDirection::Horizontal
-            ? index % cellWrap
-            : index / cellWrap;
+        if (flowAxis == FlowAxis::Horizontal)
+        {
+            switch (flowDirection)
+            {
+                case FlowDirection::DownRight:
+                case FlowDirection::UpRight:
+                    return index % cellWrap;
+                case FlowDirection::DownLeft:
+                case FlowDirection::UpLeft:
+                    return cellWrap - 1 - index % cellWrap;
+            }
+        }
+        else
+        {
+            switch (flowDirection)
+            {
+                case FlowDirection::DownRight:
+                case FlowDirection::UpRight:
+                    return index / cellWrap;
+                case FlowDirection::DownLeft:
+                case FlowDirection::UpLeft:
+                    return getVisibleColumns() - 1 - index / cellWrap;
+            }
+        }
+
+        return 0;
     }
 
     uint getCellY(uint index)
     {
-        return flowDirection == FlowDirection::Vertical
-            ? index % cellWrap
-            : index / cellWrap;
+        if (flowAxis == FlowAxis::Horizontal)
+        {
+            switch (flowDirection)
+            {
+                case FlowDirection::DownRight:
+                case FlowDirection::DownLeft:
+                    return index / cellWrap;
+                case FlowDirection::UpRight:
+                case FlowDirection::UpLeft:
+                    return getVisibleRows() - 1 - index / cellWrap;
+            }
+        }
+        else
+        {
+            switch (flowDirection)
+            {
+                case FlowDirection::DownRight:
+                case FlowDirection::DownLeft:
+                    return index % cellWrap;
+                case FlowDirection::UpRight:
+                case FlowDirection::UpLeft:
+                    return cellWrap - 1 - index % cellWrap;
+            }
+        }
+
+        return 0;
     }
 
     private uint getVisibleRows()
     {
-        return flowDirection == FlowDirection::Horizontal
+        return flowAxis == FlowAxis::Horizontal
             ? Maths::Ceil(components.size() / float(cellWrap))
             : Maths::Min(components.size(), cellWrap);
     }
 
     private uint getVisibleColumns()
     {
-        return flowDirection == FlowDirection::Vertical
+        return flowAxis == FlowAxis::Vertical
             ? Maths::Ceil(components.size() / float(cellWrap))
             : Maths::Min(components.size(), cellWrap);
     }
@@ -119,15 +192,12 @@ class StandardList : List, StandardStack
             minWidths = array<float>(visibleColumns, 0.0f);
             minHeights = array<float>(visibleRows, 0.0f);
 
-            for (uint x = 0; x < visibleColumns; x++)
-            for (uint y = 0; y < visibleRows; y++)
+            for (uint i = 0; i < components.size(); i++)
             {
-                uint index = flowDirection == FlowDirection::Horizontal
-                    ? y * visibleColumns + x
-                    : x * visibleRows + y;
-                if (index >= components.size()) continue;
+                Vec2f childBounds = components[i].getMinBounds();
+                uint x = getCellX(i);
+                uint y = getCellY(i);
 
-                Vec2f childBounds = components[index].getMinBounds();
                 if (childBounds.x > minWidths[x])
                 {
                     minWidths[x] = childBounds.x;
@@ -200,7 +270,6 @@ class StandardList : List, StandardStack
 
     void Render()
     {
-        Vec2f offset = Vec2f_zero;
         Vec2f innerPos = getInnerPosition();
 
         for (uint i = 0; i < components.size(); i++)
@@ -215,37 +284,30 @@ class StandardList : List, StandardStack
             Vec2f cellBounds(stretchWidths[x], stretchHeights[y]);
             Vec2f boundsDiff = cellBounds - childBounds;
 
-            Vec2f childPos = offset;
-            childPos.x += innerPos.x + boundsDiff.x * childAlignment.x;
-            childPos.y += innerPos.y + boundsDiff.y * childAlignment.y;
+            Vec2f offset;
+
+            // Add spacing
+            offset.x = spacing.x * x;
+            offset.y = spacing.y * y;
+
+            // Add cell widths
+            for (uint xx = 0; xx < x; xx++)
+            {
+                offset.x += stretchWidths[xx];
+            }
+
+            // Add cell heights
+            for (uint yy = 0; yy < y; yy++)
+            {
+                offset.y += stretchHeights[yy];
+            }
+
+            Vec2f childPos;
+            childPos.x = innerPos.x + offset.x + boundsDiff.x * childAlignment.x;
+            childPos.y = innerPos.y + offset.y + boundsDiff.y * childAlignment.y;
 
             component.SetPosition(childPos.x, childPos.y);
             component.Render();
-
-            if (flowDirection == FlowDirection::Horizontal)
-            {
-                if (x < cellWrap - 1)
-                {
-                    offset.x += cellBounds.x + spacing.x;
-                }
-                else
-                {
-                    offset.x = 0.0f;
-                    offset.y += cellBounds.y + spacing.y;
-                }
-            }
-            else
-            {
-                if (y < cellWrap - 1)
-                {
-                    offset.y += cellBounds.y + spacing.y;
-                }
-                else
-                {
-                    offset.y = 0.0f;
-                    offset.x += cellBounds.x + spacing.x;
-                }
-            }
         }
     }
 }
