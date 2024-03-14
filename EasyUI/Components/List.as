@@ -30,7 +30,7 @@ class StandardList : List, StandardStack
 {
     private Vec2f spacing = Vec2f_zero;
     private uint cellWrap = 1;
-    private FlowDirection flowDirection = FlowDirection::DownRight;
+    private FlowDirection flowDirection = FlowDirection::RightDown;
 
     private float[] minWidths;
     private float[] minHeights;
@@ -217,23 +217,6 @@ class StandardList : List, StandardStack
                 }
             }
 
-            // Calculate stretch widths of columns and heights of rows
-            Vec2f desiredCellStretchBounds = getInnerBounds();
-
-            // Remove spacing
-            desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
-            desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
-
-            // Divide equally among columns and rows
-            desiredCellStretchBounds.x /= visibleColumns;
-            desiredCellStretchBounds.y /= visibleRows;
-
-            stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
-            stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
-
-            stretchWidths = distributeExcess(stretchWidths, minWidths);
-            stretchHeights = distributeExcess(stretchHeights, minHeights);
-
             // Calculate min bounds
             minBounds.SetZero();
 
@@ -253,6 +236,23 @@ class StandardList : List, StandardStack
 
             // Margin and padding
             minBounds += (margin + padding) * 2.0f;
+
+            // Calculate stretch widths of columns and heights of rows
+            Vec2f desiredCellStretchBounds = getInnerBounds();
+
+            // Remove spacing
+            desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
+            desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
+
+            // Divide equally among columns and rows
+            desiredCellStretchBounds.x /= visibleColumns;
+            desiredCellStretchBounds.y /= visibleRows;
+
+            stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
+            stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
+
+            stretchWidths = distributeExcess(stretchWidths, minWidths);
+            stretchHeights = distributeExcess(stretchHeights, minHeights);
         }
 
         return minBounds;

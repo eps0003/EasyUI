@@ -40,7 +40,7 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
             excessCount++;
         }
 
-        if (size >= minSize)
+        if (minSize >= size)
         {
             oversizeCount++;
         }
