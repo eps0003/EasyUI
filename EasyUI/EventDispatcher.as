@@ -88,7 +88,6 @@ enum Event
     Checked,
     Spacing,
     CellWrap,
-    FlowAxis,
     FlowDirection,
 
     // Interaction
