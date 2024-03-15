@@ -38,6 +38,7 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
         {
             excess += minSize - size;
             excessCount++;
+            sizes[i] = minSize;
         }
 
         if (minSize >= size)
@@ -60,11 +61,7 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
         float size = sizes[i];
         float minSize = minSizes[i];
 
-        if (minSize > size)
-        {
-            sizes[i] = minSize;
-        }
-        else
+        if (minSize < size)
         {
             sizes[i] -= dividedExcess;
         }
