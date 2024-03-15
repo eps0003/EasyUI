@@ -100,7 +100,7 @@ class StandardToggle : Toggle, StandardButton
             }
         }
 
-        bool hovering = isHovering();
+        bool hovering = ui.isHovering() && isHovering();
         bool pressed = isPressed();
 
         if (!wasHovering && hovering && !pressed)

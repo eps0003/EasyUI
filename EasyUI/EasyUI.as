@@ -111,6 +111,8 @@ class EasyUI
         @clickable = null;
         @scrollable = null;
 
+        if (Menu::getMainMenu() !is null) return;
+
         for (int i = components.size() - 1; i >= 0; i--)
         {
             TraverseComponentTree(components[i]);
