@@ -119,8 +119,8 @@ class EasyUI
 
     private void TraverseComponentTree(Component@ component)
     {
-        // Component is nonexistent
-        if (component is null) return;
+        // Component is nonexistent or not being hovered
+        if (component is null || !component.isHovering()) return;
 
         // Remember scrollable component and if hovering
         Component@ scroll = scrollable;
@@ -139,22 +139,19 @@ class EasyUI
             @scrollable = scroll;
         }
 
-        if (component.isHovering())
+        if (hovering is null)
         {
-            if (hovering is null)
-            {
-                @hovering = component;
-            }
+            @hovering = component;
+        }
 
-            if (clickable is null && component.canClick())
-            {
-                @clickable = component;
-            }
+        if (clickable is null && component.canClick())
+        {
+            @clickable = component;
+        }
 
-            if (scrollable is null && component.canScroll())
-            {
-                @scrollable = component;
-            }
+        if (scrollable is null && component.canScroll())
+        {
+            @scrollable = component;
         }
     }
 
@@ -283,15 +280,13 @@ class EasyUI
 
         DrawDebugOutline(component, color);
 
+        string[] lines = { text };
+        if (detailed)
         {
-            string[] lines = { text };
-            if (detailed)
-            {
-                lines.push_back("pos: " + component.getTruePosition().toString());
-                lines.push_back("size: " + component.getTrueBounds().toString());
-            }
-            DrawDebugLabel(lines, component.getTruePosition(), color);
+            lines.push_back("pos: " + component.getTruePosition().toString());
+            lines.push_back("size: " + component.getTrueBounds().toString());
         }
+        DrawDebugLabel(lines, component.getTruePosition(), color);
     }
 
     private void DrawDebugOutline(Component@ component, SColor color)
