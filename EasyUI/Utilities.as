@@ -23,39 +23,36 @@ bool isHovering(Component@ component)
 float[] distributeExcess(float[] sizes, float[] minSizes)
 {
     uint count = sizes.size();
+    float sizesSum = 0.0f;
 
     // Accumulate excess size that needs redistributing
     float excess = 0.0f;
     uint excessCount = 0;
-    uint oversizeCount = 0;
 
     for (uint i = 0; i < count; i++)
     {
         float size = sizes[i];
         float minSize = minSizes[i];
 
-        if (minSize > size)
+        if (minSize >= size)
         {
             excess += minSize - size;
             excessCount++;
             sizes[i] = minSize;
         }
-
-        if (minSize >= size)
+        else
         {
-            oversizeCount++;
+            sizesSum += size;
         }
     }
 
-    // All excess has been distributed or all sizes are oversized
-    if (excessCount == 0 || oversizeCount == count)
+    // All excess has been distributed or all sizes have excess
+    if (excess == 0.0f || excessCount == count)
     {
         return sizes;
     }
 
     // Redistribute excess size
-    float dividedExcess = excess / (count - excessCount);
-
     for (uint i = 0; i < count; i++)
     {
         float size = sizes[i];
@@ -63,7 +60,7 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
 
         if (minSize < size)
         {
-            sizes[i] -= dividedExcess;
+            sizes[i] -= excess * size / sizesSum;
         }
     }
 
