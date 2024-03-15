@@ -239,14 +239,16 @@ class StandardList : List, StandardStack
 
             // Calculate stretch widths of columns and heights of rows
             Vec2f desiredCellStretchBounds = getInnerBounds();
+            if (components.size() > 1)
+            {
+                // Remove spacing
+                desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
+                desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
 
-            // Remove spacing
-            desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
-            desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
-
-            // Divide equally among columns and rows
-            desiredCellStretchBounds.x /= visibleColumns;
-            desiredCellStretchBounds.y /= visibleRows;
+                // Divide equally among columns and rows
+                desiredCellStretchBounds.x /= visibleColumns;
+                desiredCellStretchBounds.y /= visibleRows;
+            }
 
             stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
             stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
