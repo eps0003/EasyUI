@@ -258,7 +258,7 @@ class StandardStack : Stack
             // Stretch to fill the parent or the screen
             Vec2f stretchBounds = parent !is null
                 ? parent.getStretchBounds(this)
-                : getDriver().getScreenDimensions() - position;
+                : getDriver().getScreenDimensions();
             stretchBounds *= stretchRatio;
 
             // Constrain the stretch bounds within the maximum size if configured

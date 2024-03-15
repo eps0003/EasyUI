@@ -237,26 +237,6 @@ class StandardList : List, StandardStack
             // Add padding and margin while enforcing minimum size
             minBounds.x = Maths::Max(minBounds.x + padding.x * 2.0f, minSize.x) + margin.x * 2.0f;
             minBounds.y = Maths::Max(minBounds.y + padding.y * 2.0f, minSize.y) + margin.y * 2.0f;
-
-            // Calculate stretch widths of columns and heights of rows
-            // The inner bounds must be retrieved after the minimum bounds is calculated
-            Vec2f desiredCellStretchBounds = getInnerBounds();
-            if (components.size() > 1)
-            {
-                // Remove spacing
-                desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
-                desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
-
-                // Divide equally among columns and rows
-                desiredCellStretchBounds.x /= visibleColumns;
-                desiredCellStretchBounds.y /= visibleRows;
-            }
-
-            stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
-            stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
-
-            stretchWidths = distributeExcess(stretchWidths, minWidths);
-            stretchHeights = distributeExcess(stretchHeights, minHeights);
         }
 
         return minBounds;
@@ -264,15 +244,28 @@ class StandardList : List, StandardStack
 
     Vec2f getStretchBounds(Component@ child)
     {
-        // Ensure stretchWidths and stretchHeights are calculated
-        getMinBounds();
+        uint visibleRows = getVisibleRows();
+        uint visibleColumns = getVisibleColumns();
 
-        // I can't figure out why it takes several attempts before stretch sizes are calculated
-        // It seems to work out in the end which is all that really matters, right?
-        if (stretchWidths.empty() && stretchHeights.empty())
+        // Calculate stretch widths of columns and heights of rows
+        // The inner bounds must be retrieved after the minimum bounds is calculated
+        Vec2f desiredCellStretchBounds = getInnerBounds();
+        if (components.size() > 1)
         {
-            return Vec2f_zero;
+            // Remove spacing
+            desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
+            desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
+
+            // Divide equally among columns and rows
+            desiredCellStretchBounds.x /= visibleColumns;
+            desiredCellStretchBounds.y /= visibleRows;
         }
+
+        stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
+        stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
+
+        stretchWidths = distributeExcess(stretchWidths, minWidths);
+        stretchHeights = distributeExcess(stretchHeights, minHeights);
 
         for (uint i = 0; i < components.size(); i++)
         {
