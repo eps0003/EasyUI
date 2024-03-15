@@ -231,13 +231,15 @@ class StandardList : List, StandardStack
             }
 
             // Spacing between components
-            minBounds.x += (visibleColumns - 1) * spacing.x;
-            minBounds.y += (visibleRows - 1) * spacing.y;
+            minBounds.x += Maths::Max(visibleColumns - 1, 0) * spacing.x;
+            minBounds.y += Maths::Max(visibleRows - 1, 0) * spacing.y;
 
-            // Margin and padding
-            minBounds += (margin + padding) * 2.0f;
+            // Add padding and margin while enforcing minimum size
+            minBounds.x = Maths::Max(minBounds.x + padding.x * 2.0f, minSize.x) + margin.x * 2.0f;
+            minBounds.y = Maths::Max(minBounds.y + padding.y * 2.0f, minSize.y) + margin.y * 2.0f;
 
             // Calculate stretch widths of columns and heights of rows
+            // The inner bounds must be retrieved after the minimum bounds is calculated
             Vec2f desiredCellStretchBounds = getInnerBounds();
             if (components.size() > 1)
             {
@@ -264,6 +266,13 @@ class StandardList : List, StandardStack
     {
         // Ensure stretchWidths and stretchHeights are calculated
         getMinBounds();
+
+        // I can't figure out why it takes several attempts before stretch sizes are calculated
+        // It seems to work out in the end which is all that really matters, right?
+        if (stretchWidths.empty() && stretchHeights.empty())
+        {
+            return Vec2f_zero;
+        }
 
         for (uint i = 0; i < components.size(); i++)
         {
