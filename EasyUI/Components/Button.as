@@ -6,6 +6,7 @@ interface Button : Stack
 class StandardButton : Button, StandardStack
 {
     private EasyUI@ ui;
+    private bool wasHovering = false;
 
     StandardButton()
     {
@@ -18,6 +19,8 @@ class StandardButton : Button, StandardStack
     StandardButton(EasyUI@ ui)
     {
         @this.ui = ui;
+
+        AddEventListener(Event::Click, PlaySoundHandler("menuclick.ogg"));
     }
 
     bool isPressed()
@@ -57,6 +60,16 @@ class StandardButton : Button, StandardStack
                 GUI::DrawButton(min, max);
             }
         }
+
+        bool hovering = isHovering();
+        bool pressed = isPressed();
+
+        if (!wasHovering && hovering && !pressed)
+        {
+            Sound::Play("select.ogg");
+        }
+
+        wasHovering = hovering;
 
         StandardStack::Render();
     }

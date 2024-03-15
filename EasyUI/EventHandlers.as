@@ -27,3 +27,18 @@ class CachedMinBoundsHandler : EventHandler
         component.CalculateMinBounds();
     }
 }
+
+class PlaySoundHandler : EventHandler
+{
+    private string sound = "";
+
+    PlaySoundHandler(string sound)
+    {
+        this.sound = sound;
+    }
+
+    void Handle()
+    {
+        Sound::Play(sound);
+    }
+}
