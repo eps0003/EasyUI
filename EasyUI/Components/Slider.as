@@ -1,4 +1,4 @@
-interface Slider : Stack
+interface Slider : List
 {
     void SetPercentage(float percentage);
     float getPercentage();
@@ -7,7 +7,7 @@ interface Slider : Stack
     float getHandleRatio();
 }
 
-class StandardVerticalSlider : Slider, StandardStack
+class StandardVerticalSlider : Slider, StandardList
 {
     private EasyUI@ ui;
 
@@ -21,11 +21,15 @@ class StandardVerticalSlider : Slider, StandardStack
         error("Initialized StandardVerticalSlider using the default constructor. Use StandardVerticalSlider(EasyUI@ ui) instead.");
         printTrace();
 
+        super();
+
         @ui = EasyUI();
     }
 
     StandardVerticalSlider(EasyUI@ ui)
     {
+        super();
+
         @this.ui = ui;
     }
 
@@ -102,7 +106,7 @@ class StandardVerticalSlider : Slider, StandardStack
 
     void Update()
     {
-        StandardStack::Update();
+        StandardList::Update();
 
         CControls@ controls = getControls();
 
@@ -145,11 +149,11 @@ class StandardVerticalSlider : Slider, StandardStack
             GUI::DrawButton(handleMin, handleMax);
         }
 
-        StandardStack::Render();
+        StandardList::Render();
     }
 }
 
-class StandardHorizontalSlider : Slider, StandardStack
+class StandardHorizontalSlider : Slider, StandardList
 {
     private EasyUI@ ui;
 
@@ -238,7 +242,7 @@ class StandardHorizontalSlider : Slider, StandardStack
 
     void Update()
     {
-        StandardStack::Update();
+        StandardList::Update();
 
         CControls@ controls = getControls();
 
@@ -281,6 +285,6 @@ class StandardHorizontalSlider : Slider, StandardStack
             GUI::DrawButton(handleMin, handleMax);
         }
 
-        StandardStack::Render();
+        StandardList::Render();
     }
 }

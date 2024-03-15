@@ -223,6 +223,7 @@ class StandardStack : Stack
         {
             calculateMinBounds = false;
 
+            // Get largest child bounds for each axis
             Vec2f maxChildBounds = Vec2f_zero;
             for (uint i = 0; i < components.size(); i++)
             {
@@ -237,6 +238,7 @@ class StandardStack : Stack
                 }
             }
 
+            // Add padding and margin while enforcing minimum size
             minBounds.x = Maths::Max(maxChildBounds.x + padding.x * 2.0f, minSize.x) + margin.x * 2.0f;
             minBounds.y = Maths::Max(maxChildBounds.y + padding.y * 2.0f, minSize.y) + margin.y * 2.0f;
         }

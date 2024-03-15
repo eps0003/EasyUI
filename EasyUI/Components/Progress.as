@@ -1,10 +1,10 @@
-interface Progress : Stack
+interface Progress : List
 {
     void SetPercentage(float percentage);
     float getPercentage();
 }
 
-class StandardProgress : Progress, StandardStack
+class StandardProgress : Progress, StandardList
 {
     private float percentage = 0.0f;
 
@@ -36,6 +36,6 @@ class StandardProgress : Progress, StandardStack
 
         GUI::DrawProgressBar(min, max, percentage);
 
-        StandardStack::Render();
+        StandardList::Render();
     }
 }

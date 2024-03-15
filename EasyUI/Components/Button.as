@@ -1,9 +1,9 @@
-interface Button : Stack
+interface Button : List
 {
     bool isPressed();
 }
 
-class StandardButton : Button, StandardStack
+class StandardButton : Button, StandardList
 {
     private EasyUI@ ui;
     private bool wasHovering = false;
@@ -13,11 +13,15 @@ class StandardButton : Button, StandardStack
         error("Initialized StandardButton using the default constructor. Use StandardButton(EasyUI@ ui) instead.");
         printTrace();
 
+        super();
+
         @ui = EasyUI();
     }
 
     StandardButton(EasyUI@ ui)
     {
+        super();
+
         @this.ui = ui;
 
         AddEventListener(Event::Click, PlaySoundHandler("menuclick.ogg"));
@@ -71,6 +75,6 @@ class StandardButton : Button, StandardStack
 
         wasHovering = hovering;
 
-        StandardStack::Render();
+        StandardList::Render();
     }
 }

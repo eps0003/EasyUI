@@ -14,7 +14,7 @@ class StandardLabel : Label, StandardStack
 {
     private string text = "";
     private string font = "menu";
-    private SColor color = color_black;
+    private SColor color = color_white;
 
     void SetText(string text)
     {

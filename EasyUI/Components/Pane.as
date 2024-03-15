@@ -1,4 +1,4 @@
-interface Pane : Stack
+interface Pane : List
 {
 
 }
@@ -12,7 +12,7 @@ enum StandardPaneType
     Bubble
 }
 
-class StandardPane : Pane, StandardStack
+class StandardPane : Pane, StandardList
 {
     private StandardPaneType type = StandardPaneType::Normal;
     private SColor color;
@@ -20,11 +20,15 @@ class StandardPane : Pane, StandardStack
 
     StandardPane(StandardPaneType type)
     {
+        super();
+
         this.type = type;
     }
 
     StandardPane(SColor color)
     {
+        super();
+
         this.color = color;
         hasColor = true;
     }
@@ -63,6 +67,6 @@ class StandardPane : Pane, StandardStack
                 break;
         }
 
-        StandardStack::Render();
+        StandardList::Render();
     }
 }

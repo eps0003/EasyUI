@@ -4,21 +4,6 @@ interface Toggle : Button
     bool isChecked();
 }
 
-class ToggleClickHandler : EventHandler
-{
-    private Toggle@ toggle;
-
-    ToggleClickHandler(Toggle@ toggle)
-    {
-        @this.toggle = toggle;
-    }
-
-    void Handle()
-    {
-        toggle.SetChecked(!toggle.isChecked());
-    }
-}
-
 class StandardToggle : Toggle, StandardButton
 {
     private bool checked = false;

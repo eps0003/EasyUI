@@ -1,4 +1,4 @@
-interface List : Stack
+interface List : Component
 {
     void SetSpacing(float x, float y);
     Vec2f getSpacing();
