@@ -60,6 +60,34 @@ class StandardLabel : Label, StandardStack
         return color;
     }
 
+    void SetMaxSize(float width, float height)
+    {
+        width = Maths::Max(0, width);
+        height = Maths::Max(0, height);
+
+        if (maxSize.x == width && maxSize.y == height) return;
+
+        maxSize.x = width;
+        maxSize.y = height;
+
+        DispatchEvent(Event::MaxSize);
+        CalculateMinBounds();
+    }
+
+    void SetStretchRatio(float x, float y)
+    {
+        x = Maths::Clamp01(x);
+        y = Maths::Clamp01(y);
+
+        if (stretchRatio.x == x && stretchRatio.y == y) return;
+
+        stretchRatio.x = x;
+        stretchRatio.y = y;
+
+        DispatchEvent(Event::StretchRatio);
+        CalculateMinBounds();
+    }
+
     Vec2f getMinBounds()
     {
         if (calculateMinBounds)
@@ -68,25 +96,40 @@ class StandardLabel : Label, StandardStack
             Vec2f stackMinBounds = StandardStack::getMinBounds();
 
             // Get dimensions for the line of text
-            Vec2f labelMinBounds;
+            Vec2f labelBounds;
             GUI::SetFont(font);
-            GUI::GetTextDimensions(text, labelMinBounds);
+            GUI::GetTextDimensions(text, labelBounds);
 
-            // If a minimum size is configured, it is an area label
-            // x is the area label width; y is at least one line tall
-            if (minSize.x != 0.0f || minSize.y != 0.0f)
+            if (maxSize.x != 0.0f && labelBounds.x > maxSize.x)
             {
-                labelMinBounds.x = minSize.x;
-                labelMinBounds.y = Maths::Max(labelMinBounds.y, minSize.y);
+                labelBounds.x = maxSize.x;
+                labelBounds.y = calculateTextHeight(text, font, labelBounds.x);
+            }
+            else if (stretchRatio.x != 0.0f)
+            {
+                parent.CalculateMinBounds();
+
+                // Stretch to fill the parent or the screen
+                Vec2f stretchBounds = parent !is null
+                    ? parent.getStretchBounds(this)
+                    : getDriver().getScreenDimensions();
+                stretchBounds *= stretchRatio;
+
+                // Constrain the stretch bounds within the maximum size if configured
+                float maxBoundsX = maxSize.x != 0.0f
+                    ? Maths::Min(stretchBounds.x, maxSize.x + margin.x * 2.0f)
+                    : stretchBounds.x;
+                maxBoundsX -= margin.x * 2.0f;
+
+                labelBounds.x = maxBoundsX;
+                labelBounds.y = calculateTextHeight(text, font, labelBounds.x);
             }
 
-            // Take into account padding and margin
-            labelMinBounds.x = Maths::Max(labelMinBounds.x, padding.x * 2.0f) + margin.x * 2.0f;
-            labelMinBounds.y = Maths::Max(labelMinBounds.y, padding.y * 2.0f) + margin.y * 2.0f;
+            labelBounds += margin * 2.0f;
 
             // Pick the larger bounds
-            minBounds.x = Maths::Max(stackMinBounds.x, labelMinBounds.x);
-            minBounds.y = Maths::Max(stackMinBounds.y, labelMinBounds.y);
+            minBounds.x = Maths::Max(stackMinBounds.x, labelBounds.x);
+            minBounds.y = Maths::Max(stackMinBounds.y, labelBounds.y);
         }
 
         return minBounds;

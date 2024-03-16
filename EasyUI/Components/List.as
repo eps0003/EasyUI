@@ -248,7 +248,6 @@ class StandardList : List, StandardStack
         uint visibleColumns = getVisibleColumns();
 
         // Calculate stretch widths of columns and heights of rows
-        // The inner bounds must be retrieved after the minimum bounds is calculated
         Vec2f desiredCellStretchBounds = getInnerBounds();
         if (components.size() > 1)
         {

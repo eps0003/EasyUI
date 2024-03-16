@@ -68,6 +68,59 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
     return distributeExcess(sizes, minSizes);
 }
 
+// Calculate the height of text that wraps at the specified width
+// Implemented using my best assumption rather than using Irrlicht code as reference
+float calculateTextHeight(string text, string font, float width)
+{
+    uint index = 0;
+
+    // Skip spaces before the first word
+    while (text.substr(index, 1) == " ")
+    {
+        index++;
+    }
+
+    GUI::SetFont(font);
+
+    while (true) // o_O
+    {
+        // Get a substring with an increasing number of words
+        uint nextIndex = text.find(" ", index + 1);
+        string substr = text.substr(0, nextIndex);
+
+        // Get substring dimensions
+        Vec2f dim;
+        GUI::GetTextDimensions(substr, dim);
+
+        // Substring exceeds width so it must wrap
+        if (dim.x > width)
+        {
+            // Skip spaces after the last word
+            while (text.substr(index, 1) == " ")
+            {
+                index++;
+            }
+
+            // Recursively wrap text following the substring
+            string rest = text.substr(index);
+            return rest != ""
+                ? dim.y + calculateTextHeight(rest, font, width)
+                : dim.y;
+        }
+        // Reached the end of the text without exceeding the width
+        else if (nextIndex == -1)
+        {
+            return dim.y;
+        }
+
+        // Substring is yet to exceed width, so remember index and continue
+        index = nextIndex;
+    }
+
+    // Impossible path
+    return 0.0f;
+}
+
 namespace GUI
 {
     void DrawOutlinedRectangle(Vec2f min, Vec2f max, float thickness, SColor color)
