@@ -100,16 +100,6 @@ class StandardToggle : Toggle, StandardButton
             }
         }
 
-        bool hovering = ui.isHovering() && isHovering();
-        bool pressed = isPressed();
-
-        if (!wasHovering && hovering && !pressed)
-        {
-            Sound::Play("select.ogg");
-        }
-
-        wasHovering = hovering;
-
         StandardStack::Render();
     }
 }

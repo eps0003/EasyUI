@@ -6,7 +6,6 @@ interface Button : List
 class StandardButton : Button, StandardList
 {
     private EasyUI@ ui;
-    private bool wasHovering = false;
 
     StandardButton()
     {
@@ -64,16 +63,6 @@ class StandardButton : Button, StandardList
                 GUI::DrawButton(min, max);
             }
         }
-
-        bool hovering = ui.isHovering() && isHovering();
-        bool pressed = isPressed();
-
-        if (!wasHovering && hovering && !pressed)
-        {
-            Sound::Play("select.ogg");
-        }
-
-        wasHovering = hovering;
 
         StandardList::Render();
     }
