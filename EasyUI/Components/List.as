@@ -8,6 +8,12 @@ interface List : Component
 
     void SetFlowDirection(FlowDirection direction);
     FlowDirection getFlowDirection();
+
+    void SetColumnSizes(float[] sizes);
+    float[] getColumnSizes();
+
+    void SetRowSizes(float[] sizes);
+    float[] getRowSizes();
 }
 
 enum FlowDirection
@@ -31,6 +37,8 @@ class StandardList : List, StandardStack
     private Vec2f spacing = Vec2f_zero;
     private uint cellWrap = 1;
     private FlowDirection flowDirection = FlowDirection::RightDown;
+    private float[] columnSizes;
+    private float[] rowSizes;
 
     private float[] minWidths;
     private float[] minHeights;
@@ -86,6 +94,26 @@ class StandardList : List, StandardStack
     FlowDirection getFlowDirection()
     {
         return flowDirection;
+    }
+
+    void SetColumnSizes(float[] sizes)
+    {
+        columnSizes = sizes;
+    }
+
+    float[] getColumnSizes()
+    {
+        return columnSizes;
+    }
+
+    void SetRowSizes(float[] sizes)
+    {
+        rowSizes = sizes;
+    }
+
+    float[] getRowSizes()
+    {
+        return rowSizes;
     }
 
     private uint getCellX(uint index)
@@ -247,21 +275,43 @@ class StandardList : List, StandardStack
         uint visibleRows = getVisibleRows();
         uint visibleColumns = getVisibleColumns();
 
-        // Calculate stretch widths of columns and heights of rows
-        Vec2f desiredCellStretchBounds = getInnerBounds();
-        if (components.size() > 1)
+        stretchWidths = array<float>(visibleColumns, 0.0f);
+        stretchHeights = array<float>(visibleRows, 0.0f);
+
+        if (components.size() > 0)
         {
-            // Remove spacing
-            desiredCellStretchBounds.x -= (visibleColumns - 1) * spacing.x;
-            desiredCellStretchBounds.y -= (visibleRows - 1) * spacing.y;
+            Vec2f availableStretchBounds = getInnerBounds();
+            availableStretchBounds.x -= (visibleColumns - 1) * spacing.x;
+            availableStretchBounds.y -= (visibleRows - 1) * spacing.y;
 
-            // Divide equally among columns and rows
-            desiredCellStretchBounds.x /= visibleColumns;
-            desiredCellStretchBounds.y /= visibleRows;
+            float columnSizesSum = 0.0f;
+            for (uint i = 0; i < columnSizes.size() && i < visibleColumns; i++)
+            {
+                columnSizesSum += columnSizes[i];
+            }
+
+            float rowSizesSum = 0.0f;
+            for (uint i = 0; i < rowSizes.size() && i < visibleRows; i++)
+            {
+                rowSizesSum += rowSizes[i];
+            }
+
+            for (uint i = 0; i < visibleColumns; i++)
+            {
+                float size = i < columnSizes.size() ? columnSizes[i] : 0;
+                stretchWidths[i] = columnSizesSum > 0.0f
+                    ? availableStretchBounds.x * size / columnSizesSum
+                    : availableStretchBounds.x / visibleColumns;
+            }
+
+            for (uint i = 0; i < visibleRows; i++)
+            {
+                float size = i < rowSizes.size() ? rowSizes[i] : 0;
+                stretchHeights[i] = rowSizesSum > 0.0f
+                    ? availableStretchBounds.y * size / rowSizesSum
+                    : availableStretchBounds.y / visibleRows;
+            }
         }
-
-        stretchWidths = array<float>(visibleColumns, desiredCellStretchBounds.x);
-        stretchHeights = array<float>(visibleRows, desiredCellStretchBounds.y);
 
         stretchWidths = distributeExcess(stretchWidths, minWidths);
         stretchHeights = distributeExcess(stretchHeights, minHeights);
