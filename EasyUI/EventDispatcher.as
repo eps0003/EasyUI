@@ -85,6 +85,7 @@ enum Event
     Font,
     Color,
     Wrap,
+    MaxLines,
     HandleRatio,
     Checked,
     Spacing,
