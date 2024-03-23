@@ -70,9 +70,12 @@ float[] distributeExcess(float[] sizes, float[] minSizes)
 
 // Calculate the height of text that wraps at the specified width
 // Implemented using my best assumption rather than using Irrlicht code as reference
-float calculateTextHeight(string text, string font, float width)
+float calculateTextHeight(string text, string font, float width, string[] &inout lines)
 {
+    // print("Width: " + width);
+
     uint index = 0;
+    bool firstWord = true;
 
     // Skip spaces before the first word
     while (text.substr(index, 1) == " ")
@@ -95,6 +98,13 @@ float calculateTextHeight(string text, string font, float width)
         // Substring exceeds width so it must wrap
         if (dim.x > width)
         {
+            // print("Substring '" + substr + "' is too long");
+
+            if (firstWord)
+            {
+                index = nextIndex;
+            }
+
             // Skip spaces after the last word
             while (text.substr(index, 1) == " ")
             {
@@ -103,18 +113,35 @@ float calculateTextHeight(string text, string font, float width)
 
             // Recursively wrap text following the substring
             string rest = text.substr(index);
-            return rest != ""
-                ? dim.y + calculateTextHeight(rest, font, width)
-                : dim.y;
+            if (rest != "")
+            {
+                string prev = text.substr(0, index);
+                lines.push_back(prev);
+                // print("Added '" + prev + "' to lines array");
+
+                // print("Recursing '" + rest + "'");
+                return dim.y + calculateTextHeight(rest, font, width, lines);
+            }
+            else
+            {
+                return dim.y;
+            }
         }
         // Reached the end of the text without exceeding the width
         else if (nextIndex == -1)
         {
+            lines.push_back(substr);
+            // print("Added '" + substr + "' to lines array");
+
+            // print("Substring '" + substr + "' is the entire text");
             return dim.y;
         }
 
+        // print("Substring '" + substr + "' is too short");
+
         // Substring is yet to exceed width, so remember index and continue
         index = nextIndex;
+        firstWord = false;
     }
 
     // Impossible path

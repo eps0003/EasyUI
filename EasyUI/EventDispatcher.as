@@ -84,6 +84,7 @@ enum Event
     Text,
     Font,
     Color,
+    Wrap,
     HandleRatio,
     Checked,
     Spacing,
