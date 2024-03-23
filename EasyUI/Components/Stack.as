@@ -43,8 +43,8 @@ class StandardStack : Stack
         // If child minimum bounds changes, update my minimum bounds
         component.AddEventListener(Event::MinBounds, minBoundsHandler);
 
-        DispatchEvent(Event::Components);
         CalculateMinBounds();
+        DispatchEvent(Event::Components);
     }
 
     void SetParent(Component@ parent)
@@ -64,8 +64,8 @@ class StandardStack : Stack
             parent.AddEventListener(Event::Bounds, boundsHandler);
         }
 
-        DispatchEvent(Event::Parent);
         CalculateBounds();
+        DispatchEvent(Event::Parent);
     }
 
     Component@ getParent()
@@ -83,8 +83,8 @@ class StandardStack : Stack
         margin.x = x;
         margin.y = y;
 
-        DispatchEvent(Event::Margin);
         CalculateMinBounds();
+        DispatchEvent(Event::Margin);
     }
 
     Vec2f getMargin()
@@ -102,8 +102,8 @@ class StandardStack : Stack
         padding.x = x;
         padding.y = y;
 
-        DispatchEvent(Event::Padding);
         CalculateMinBounds();
+        DispatchEvent(Event::Padding);
     }
 
     Vec2f getPadding()
@@ -139,8 +139,8 @@ class StandardStack : Stack
         minSize.x = width;
         minSize.y = height;
 
-        DispatchEvent(Event::MinSize);
         CalculateMinBounds();
+        DispatchEvent(Event::MinSize);
     }
 
     Vec2f getMinSize()
@@ -158,8 +158,8 @@ class StandardStack : Stack
         maxSize.x = width;
         maxSize.y = height;
 
-        DispatchEvent(Event::MaxSize);
         CalculateBounds();
+        DispatchEvent(Event::MaxSize);
     }
 
     Vec2f getMaxSize()
@@ -177,8 +177,8 @@ class StandardStack : Stack
         stretchRatio.x = x;
         stretchRatio.y = y;
 
-        DispatchEvent(Event::StretchRatio);
         CalculateBounds();
+        DispatchEvent(Event::StretchRatio);
     }
 
     Vec2f getStretchRatio()
@@ -193,13 +193,13 @@ class StandardStack : Stack
         position.x = x;
         position.y = y;
 
-        DispatchEvent(Event::Position);
-
         // Position is only used when stretching to fill the screen
         if (parent is null)
         {
             CalculateBounds();
         }
+
+        DispatchEvent(Event::Position);
     }
 
     Vec2f getPosition()
@@ -299,8 +299,8 @@ class StandardStack : Stack
 
         calculateMinBounds = true;
 
-        DispatchEvent(Event::MinBounds);
         CalculateBounds();
+        DispatchEvent(Event::MinBounds);
     }
 
     void CalculateBounds()

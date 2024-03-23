@@ -55,8 +55,8 @@ class StandardList : List, StandardStack
         spacing.x = x;
         spacing.y = y;
 
-        DispatchEvent(Event::Spacing);
         CalculateMinBounds();
+        DispatchEvent(Event::Spacing);
     }
 
     Vec2f getSpacing()
@@ -72,8 +72,8 @@ class StandardList : List, StandardStack
 
         this.cellWrap = cellWrap;
 
-        DispatchEvent(Event::CellWrap);
         CalculateMinBounds();
+        DispatchEvent(Event::CellWrap);
     }
 
     uint getCellWrap()
@@ -87,8 +87,8 @@ class StandardList : List, StandardStack
 
         flowDirection = direction;
 
-        DispatchEvent(Event::FlowDirection);
         CalculateMinBounds();
+        DispatchEvent(Event::FlowDirection);
     }
 
     FlowDirection getFlowDirection()

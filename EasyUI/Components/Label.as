@@ -25,23 +25,7 @@ class StandardLabel : Label, StandardStack
     private uint maxLines = 0;
 
     private string[] lines;
-    private float fontHeight = 0.0f;
     private Vec2f textDim = Vec2f_zero;
-
-    StandardLabel()
-    {
-        super();
-
-        UpdateFontHeight();
-    }
-
-    private void UpdateFontHeight()
-    {
-        Vec2f dim;
-        GUI::SetFont(font);
-        GUI::GetTextDimensions("", dim);
-        fontHeight = dim.y;
-    }
 
     void SetText(string text)
     {
@@ -49,8 +33,8 @@ class StandardLabel : Label, StandardStack
 
         this.text = text;
 
-        DispatchEvent(Event::Text);
         CalculateMinBounds();
+        DispatchEvent(Event::Text);
     }
 
     string getText()
@@ -64,9 +48,8 @@ class StandardLabel : Label, StandardStack
 
         this.font = font;
 
-        DispatchEvent(Event::Font);
-        UpdateFontHeight();
         CalculateMinBounds();
+        DispatchEvent(Event::Font);
     }
 
     string getFont()
@@ -108,6 +91,7 @@ class StandardLabel : Label, StandardStack
 
         this.maxLines = maxLines;
 
+        CalculateMinBounds();
         DispatchEvent(Event::MaxLines);
     }
 
