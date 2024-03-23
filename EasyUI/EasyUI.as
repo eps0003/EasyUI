@@ -111,7 +111,7 @@ class EasyUI
         @clickable = null;
         @scrollable = null;
 
-        if (Menu::getMainMenu() !is null) return;
+        if (Menu::getMainMenu() !is null || g_videorecording) return;
 
         for (int i = components.size() - 1; i >= 0; i--)
         {
@@ -202,6 +202,8 @@ class EasyUI
 
         CacheComponents();
 
+        if (g_videorecording) return;
+
         Vec2f screenDim = getDriver().getScreenDimensions();
 
         for (uint i = 0; i < components.size(); i++)
@@ -223,7 +225,7 @@ class EasyUI
 
     void Debug(bool detailed = false)
     {
-        if (!isClient()) return;
+        if (!isClient() || g_videorecording) return;
 
         if (hovering !is null)
         {
