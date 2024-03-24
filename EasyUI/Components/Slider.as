@@ -106,6 +106,8 @@ class StandardVerticalSlider : Slider, StandardList
 
     void Update()
     {
+        if (!isVisible()) return;
+
         StandardList::Update();
 
         CControls@ controls = getControls();
@@ -130,6 +132,8 @@ class StandardVerticalSlider : Slider, StandardList
 
     void Render()
     {
+        if (!isVisible()) return;
+
         // Call this here to make dragging look smooth
         MoveHandleIfDragging();
 
@@ -242,6 +246,8 @@ class StandardHorizontalSlider : Slider, StandardList
 
     void Update()
     {
+        if (!isVisible()) return;
+
         StandardList::Update();
 
         CControls@ controls = getControls();
@@ -266,6 +272,8 @@ class StandardHorizontalSlider : Slider, StandardList
 
     void Render()
     {
+        if (!isVisible()) return;
+
         // Call this here to make dragging look smooth
         MoveHandleIfDragging();
 

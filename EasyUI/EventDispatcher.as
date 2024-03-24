@@ -73,6 +73,7 @@ enum Event
     Parent,
 
     // Miscellaneous
+    Visibility,
     Percentage,
     Player,
     Icon,

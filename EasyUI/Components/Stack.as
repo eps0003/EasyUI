@@ -8,6 +8,7 @@ class StandardStack : Stack
     private Component@ parent;
     private Component@[] components;
 
+    private bool visible = true;
     private Vec2f margin = Vec2f_zero;
     private Vec2f padding = Vec2f_zero;
     private Vec2f alignment = Vec2f_zero;
@@ -67,6 +68,20 @@ class StandardStack : Stack
 
         CalculateMinBounds();
         DispatchEvent(Event::Components);
+    }
+
+    void SetVisible(bool visible)
+    {
+        if (this.visible == visible) return;
+
+        this.visible = visible;
+
+        DispatchEvent(Event::Visibility);
+    }
+
+    bool isVisible()
+    {
+        return visible;
     }
 
     void SetParent(Component@ parent)
@@ -371,6 +386,8 @@ class StandardStack : Stack
 
     void Update()
     {
+        if (!isVisible()) return;
+
         for (int i = components.size() - 1; i >= 0; i--)
         {
             components[i].Update();
@@ -379,6 +396,8 @@ class StandardStack : Stack
 
     void Render()
     {
+        if (!isVisible()) return;
+
         Vec2f innerPos = getInnerPosition();
         Vec2f innerBounds = getInnerBounds();
 

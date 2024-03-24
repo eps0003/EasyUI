@@ -122,7 +122,10 @@ class EasyUI
     private void TraverseComponentTree(Component@ component)
     {
         // Component is nonexistent or not being hovered
-        if (component is null || !component.isHovering()) return;
+        if (component is null || !component.isVisible() || !component.isHovering())
+        {
+            return;
+        }
 
         // Remember scrollable component and if hovering
         Component@ scroll = scrollable;

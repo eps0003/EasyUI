@@ -60,4 +60,7 @@ interface Component : EventDispatcher
     void AddComponent(Component@ component);
     void SetComponents(Component@[] components);
     Component@[] getComponents();
+
+    void SetVisible(bool visible);
+    bool isVisible();
 }

@@ -343,6 +343,8 @@ class StandardList : List, StandardStack
 
     void Render()
     {
+        if (!isVisible()) return;
+
         Vec2f innerPos = getInnerPosition();
 
         for (uint i = 0; i < components.size(); i++)

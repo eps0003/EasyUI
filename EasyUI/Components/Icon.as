@@ -167,6 +167,7 @@ class StandardIcon : Icon, StandardStack
     private bool canRender()
     {
         return (
+            isVisible() &&
             icon != "" &&
             frameDim.x != 0.0f &&
             frameDim.y != 0.0f

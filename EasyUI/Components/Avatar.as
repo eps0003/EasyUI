@@ -29,6 +29,8 @@ class StandardAvatar : Avatar, StandardStack
 
     void Render()
     {
+        if (!isVisible()) return;
+
         Vec2f position = getTruePosition();
         Vec2f bounds = getTrueBounds();
 

@@ -46,6 +46,8 @@ class StandardToggle : Toggle, StandardButton
 
     void Render()
     {
+        if (!isVisible()) return;
+
         Vec2f min = getTruePosition();
         Vec2f max = min + getTrueBounds();
 

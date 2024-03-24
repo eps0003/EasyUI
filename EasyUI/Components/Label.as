@@ -254,7 +254,11 @@ class StandardLabel : Label, StandardStack
 
     private bool canRender()
     {
-        return text != "" && (!wrap || minSize.x > 0.0f);
+        return (
+            isVisible() &&
+            text != "" &&
+            (!wrap || minSize.x > 0.0f)
+        );
     }
 
     void Render()
