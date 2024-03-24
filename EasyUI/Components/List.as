@@ -118,40 +118,48 @@ class StandardList : List, StandardStack
 
     private uint getCellX(uint index)
     {
-        switch (flowDirection)
+        uint visibleColumns = getVisibleColumns();
+        if (visibleColumns > 0)
         {
-            case FlowDirection::RightDown:
-            case FlowDirection::RightUp:
-                return index % cellWrap;
-            case FlowDirection::LeftDown:
-            case FlowDirection::LeftUp:
-                return cellWrap - 1 - index % cellWrap;
-            case FlowDirection::DownRight:
-            case FlowDirection::UpRight:
-                return index / cellWrap;
-            case FlowDirection::DownLeft:
-            case FlowDirection::UpLeft:
-                return getVisibleColumns() - 1 - index / cellWrap;
+            switch (flowDirection)
+            {
+                case FlowDirection::RightDown:
+                case FlowDirection::RightUp:
+                    return index % cellWrap;
+                case FlowDirection::LeftDown:
+                case FlowDirection::LeftUp:
+                    return cellWrap - 1 - index % cellWrap;
+                case FlowDirection::DownRight:
+                case FlowDirection::UpRight:
+                    return index / cellWrap;
+                case FlowDirection::DownLeft:
+                case FlowDirection::UpLeft:
+                    return visibleColumns - 1 - index / cellWrap;
+            }
         }
         return 0;
     }
 
     private uint getCellY(uint index)
     {
-        switch (flowDirection)
+        uint visibleRows = getVisibleRows();
+        if (visibleRows > 0)
         {
-            case FlowDirection::DownRight:
-            case FlowDirection::DownLeft:
-                return index % cellWrap;
-            case FlowDirection::UpRight:
-            case FlowDirection::UpLeft:
-                return cellWrap - 1 - index % cellWrap;
-            case FlowDirection::RightDown:
-            case FlowDirection::LeftDown:
-                return index / cellWrap;
-            case FlowDirection::RightUp:
-            case FlowDirection::LeftUp:
-                return getVisibleRows() - 1 - index / cellWrap;
+            switch (flowDirection)
+            {
+                case FlowDirection::DownRight:
+                case FlowDirection::DownLeft:
+                    return index % cellWrap;
+                case FlowDirection::UpRight:
+                case FlowDirection::UpLeft:
+                    return cellWrap - 1 - index % cellWrap;
+                case FlowDirection::RightDown:
+                case FlowDirection::LeftDown:
+                    return index / cellWrap;
+                case FlowDirection::RightUp:
+                case FlowDirection::LeftUp:
+                    return visibleRows - 1 - index / cellWrap;
+            }
         }
         return 0;
     }
@@ -259,8 +267,11 @@ class StandardList : List, StandardStack
             }
 
             // Spacing between components
-            minBounds.x += Maths::Max(visibleColumns - 1, 0) * spacing.x;
-            minBounds.y += Maths::Max(visibleRows - 1, 0) * spacing.y;
+            if (components.size() > 0)
+            {
+                minBounds.x += (visibleColumns - 1) * spacing.x;
+                minBounds.y += (visibleRows - 1) * spacing.y;
+            }
 
             // Add padding and margin while enforcing minimum size
             minBounds.x = Maths::Max(minBounds.x + padding.x * 2.0f, minSize.x) + margin.x * 2.0f;
