@@ -100,14 +100,20 @@ class StandardLabel : Label, StandardStack
         return maxLines;
     }
 
-    // Calculate the height of text that wraps at the specified width
-    // Implemented using my best assumption rather than using Irrlicht code as reference
+    // Recursively determine the lines and dimensions of text that wraps at the specified width
     private Vec2f calculateWrappedTextDimensions(string text, float wrapWidth, string[] &inout lines)
     {
-        // print("Wrap width: " + wrapWidth);
+        // No text to process
+        if (text == "")
+        {
+            return Vec2f_zero;
+        }
 
         uint index = 0;
         bool firstWord = true;
+
+        string[] allFitText;
+        Vec2f[] allFitDim;
 
         // Skip spaces before the first word
         while (text.substr(index, 1) == " ")
@@ -119,36 +125,58 @@ class StandardLabel : Label, StandardStack
         {
             // Get a substring with an increasing number of words
             uint nextIndex = text.find(" ", index + 1);
-            string substr = text.substr(0, nextIndex);
+            string testText = text.substr(0, nextIndex);
+
             bool lastLine = maxLines > 0 && lines.size() == maxLines - 1;
 
-            if (lastLine)
-            {
-                substr += " ...";
-            }
-
             // Get substring dimensions
-            Vec2f dim;
-            GUI::GetTextDimensions(substr, dim);
+            Vec2f testDim;
+            GUI::GetTextDimensions(testText, testDim);
 
-            // Substring exceeds wrap width so it must wrap
-            if (dim.x > wrapWidth)
+            // Substring doesn't exceed the wrap width
+            if (testDim.x <= wrapWidth || firstWord)
             {
-                // print("Substring '" + substr + "' is too long");
-
-                if (firstWord)
+                // Reached the end of the text without exceeding the wrap width
+                if (nextIndex == -1)
                 {
+                    lines.push_back(testText);
+                    return testDim;
+                }
+                else // Substring is yet to exceed wrap width, so remember index and keep iterating
+                {
+                    allFitText.push_back(testText);
+                    allFitDim.push_back(testDim);
+
                     index = nextIndex;
+                    firstWord = false;
                 }
+            }
+            // Last line needs to be truncated by iteratively backtracking until the ellipsis fits
+            else if (lastLine)
+            {
+                string fitText;
+                Vec2f fitDim;
 
-                string prev = text.substr(0, index);
-                if (lastLine)
+                for (int i = allFitText.size() - 1; i >= 0; i--)
                 {
-                    prev += " ...";
+                    fitText = allFitText[i] + " ...";
+                    GUI::GetTextDimensions(fitText, fitDim);
+
+                    if (fitDim.x <= wrapWidth)
+                    {
+                        break;
+                    }
                 }
 
-                Vec2f prevDim;
-                GUI::GetTextDimensions(prev, prevDim);
+                lines.push_back(fitText);
+                return fitDim;
+            }
+            else // Substring exceeds wrap width so it must wrap
+            {
+                string fitText = allFitText[allFitText.size() - 1];
+                Vec2f fitDim = allFitDim[allFitDim.size() - 1];
+
+                lines.push_back(fitText);
 
                 // Skip spaces after the last word
                 while (text.substr(index, 1) == " ")
@@ -156,42 +184,12 @@ class StandardLabel : Label, StandardStack
                     index++;
                 }
 
-                // Recursively wrap text following the substring
                 string rest = text.substr(index);
-                if (rest != "")
-                {
-                    lines.push_back(prev);
-                    // print("Added '" + prev + "' to lines array");
 
-                    if (lastLine)
-                    {
-                        return prevDim;
-                    }
-
-                    // print("Recursing '" + rest + "'");
-                    Vec2f restDim = calculateWrappedTextDimensions(rest, wrapWidth, lines);
-                    return Vec2f(Maths::Max(prevDim.x, restDim.x), prevDim.y + restDim.y);
-                }
-                else
-                {
-                    return dim;
-                }
+                // Width is the longest line and height is the sum of all lines
+                Vec2f restDim = calculateWrappedTextDimensions(rest, wrapWidth, lines);
+                return Vec2f(Maths::Max(fitDim.x, restDim.x), fitDim.y + restDim.y);
             }
-            // Reached the end of the text without exceeding the wrap width
-            else if (nextIndex == -1)
-            {
-                lines.push_back(substr);
-                // print("Added '" + substr + "' to lines array");
-
-                // print("Substring '" + substr + "' is the entire text");
-                return dim;
-            }
-
-            // print("Substring '" + substr + "' is too short");
-
-            // Substring is yet to exceed wrap width, so remember index and continue
-            index = nextIndex;
-            firstWord = false;
         }
 
         // Impossible path
