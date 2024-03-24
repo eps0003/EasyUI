@@ -47,6 +47,28 @@ class StandardStack : Stack
         DispatchEvent(Event::Components);
     }
 
+    void SetComponents(Component@[] components)
+    {
+        for (uint i = 0; i < components.size(); i++)
+        {
+            Component@ component = components[i];
+            component.SetParent(null);
+            component.RemoveEventListener(Event::MinBounds, minBoundsHandler);
+        }
+
+        this.components = components;
+
+        for (uint i = 0; i < components.size(); i++)
+        {
+            Component@ component = components[i];
+            component.SetParent(this);
+            component.AddEventListener(Event::MinBounds, minBoundsHandler);
+        }
+
+        CalculateMinBounds();
+        DispatchEvent(Event::Components);
+    }
+
     void SetParent(Component@ parent)
     {
         if (this.parent is parent) return;

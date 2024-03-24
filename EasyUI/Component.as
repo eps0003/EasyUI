@@ -58,5 +58,6 @@ interface Component : EventDispatcher
     Component@ getParent();
 
     void AddComponent(Component@ component);
+    void SetComponents(Component@[] components);
     Component@[] getComponents();
 }
