@@ -76,7 +76,7 @@ enum Event
     Visibility,
     Percentage,
     Player,
-    Icon,
+    Texture,
     FrameIndex,
     FrameDim,
     Crop,

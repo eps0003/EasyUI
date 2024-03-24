@@ -1,7 +1,7 @@
 interface Icon : Stack
 {
-    void SetIcon(string icon);
-    string getIcon();
+    void SetTexture(string texture);
+    string getTexture();
 
     void SetFrameIndex(uint index);
     uint getFrameIndex();
@@ -19,7 +19,7 @@ interface Icon : Stack
 
 class StandardIcon : Icon, StandardStack
 {
-    private string icon = "";
+    private string texture = "";
     private uint frameIndex = 0;
     private Vec2f frameDim = Vec2f_zero;
     private float cropTop = 0.0f;
@@ -29,18 +29,18 @@ class StandardIcon : Icon, StandardStack
     private bool fixedAspectRatio = true;
     private bool clickable = false;
 
-    void SetIcon(string icon)
+    void SetTexture(string texture)
     {
-        if (this.icon == icon) return;
+        if (this.texture == texture) return;
 
-        this.icon = icon;
+        this.texture = texture;
 
-        DispatchEvent(Event::Icon);
+        DispatchEvent(Event::Texture);
     }
 
-    string getIcon()
+    string getTexture()
     {
-        return icon;
+        return texture;
     }
 
     void SetFrameIndex(uint index)
@@ -168,7 +168,7 @@ class StandardIcon : Icon, StandardStack
     {
         return (
             isVisible() &&
-            icon != "" &&
+            texture != "" &&
             frameDim.x != 0.0f &&
             frameDim.y != 0.0f
         );
@@ -181,7 +181,7 @@ class StandardIcon : Icon, StandardStack
             Vec2f scale = getScale() * 0.5f;
             Vec2f offset = getOffset();
 
-            GUI::DrawIcon(icon, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
+            GUI::DrawIcon(texture, frameIndex, frameDim, position + offset, scale.x, scale.y, color_white);
         }
 
         StandardStack::Render();
