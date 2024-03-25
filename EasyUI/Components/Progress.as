@@ -4,7 +4,7 @@ interface Progress : List
     float getPercentage();
 }
 
-class StandardProgress : Progress, StandardList
+class StandardHorizontalProgress : Progress, StandardList
 {
     private float percentage = 0.0f;
 
