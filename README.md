@@ -202,8 +202,8 @@ Vec2f getStretchRatio();
 
 Examples:
 
-- `0.0f` on the x-axis means the component will stretch to 0% of its parent's width.
-- `0.5f` on the x-axis means the component will stretch to 0% of its parent's width.
+- `0.0f` on the x-axis means the component will stretch to 0% of its parent's width which the minimum size will always exceed.
+- `0.5f` on the x-axis means the component will stretch to 50% of its parent's width unless the minimum size exceeds this.
 - `1.0f` on the x-axis means the component will stretch to 100% of its parent's width.
 
 #### Minimum size
@@ -609,7 +609,7 @@ Source code: [Progress.as](/EasyUI/Components/Progress.as)
 
 The progress percentage.
 
-Range: `0.0f` – `1.0f`
+Range: `0.0f` – `1.0f`  
 Default: `0.0f`
 
 ```angelscript
@@ -628,7 +628,7 @@ Source code: [Slider.as](/EasyUI/Components/Slider.as)
 
 The percentage of the handle.
 
-Range: `0.0f` – `1.0f`
+Range: `0.0f` – `1.0f`  
 Default: `0.0f`
 
 ```angelscript
