@@ -9,6 +9,12 @@ interface List : Component
     void SetFlowDirection(FlowDirection direction);
     FlowDirection getFlowDirection();
 
+    void SetMaxLines(uint lines);
+    uint getMaxLines();
+
+    void SetScrollIndex(uint index);
+    uint getScrollIndex();
+
     void SetColumnSizes(float[] sizes);
     float[] getColumnSizes();
 
@@ -34,9 +40,13 @@ enum FlowDirection
 
 class StandardList : List, StandardStack
 {
+    private EasyUI@ ui;
+
     private Vec2f spacing = Vec2f_zero;
     private uint cellWrap = 1;
     private FlowDirection flowDirection = FlowDirection::RightDown;
+    private uint maxLines = 0;
+    private uint scrollIndex = 0;
     private float[] columnSizes;
     private float[] rowSizes;
 
@@ -44,6 +54,25 @@ class StandardList : List, StandardStack
     private float[] minHeights;
     private float[] stretchWidths;
     private float[] stretchHeights;
+
+    StandardList(EasyUI@ ui)
+    {
+        super();
+
+        @this.ui = ui;
+    }
+
+    void AddComponent(Component@ component)
+    {
+        StandardStack::AddComponent(component);
+        SetScrollIndex(scrollIndex);
+    }
+
+    void SetComponents(Component@[] components)
+    {
+        StandardStack::SetComponents(components);
+        SetScrollIndex(scrollIndex);
+    }
 
     void SetSpacing(float x, float y)
     {
@@ -73,6 +102,7 @@ class StandardList : List, StandardStack
         this.cellWrap = cellWrap;
 
         CalculateMinBounds();
+        SetScrollIndex(scrollIndex);
         DispatchEvent(Event::CellWrap);
     }
 
@@ -96,6 +126,49 @@ class StandardList : List, StandardStack
         return flowDirection;
     }
 
+    void SetMaxLines(uint maxLines)
+    {
+        if (this.maxLines == maxLines) return;
+
+        this.maxLines = maxLines;
+
+        CalculateMinBounds();
+        SetScrollIndex(scrollIndex);
+        DispatchEvent(Event::MaxLines);
+    }
+
+    uint getMaxLines()
+    {
+        return maxLines;
+    }
+
+    void SetScrollIndex(uint index)
+    {
+        if (maxLines > 0 && cellWrap > 0)
+        {
+            int totalLines = Maths::Ceil(components.size() / float(cellWrap));
+            uint hiddenLines = Maths::Max(totalLines - maxLines, 0);
+
+            index = Maths::Min(index, hiddenLines);
+        }
+        else
+        {
+            index = 0;
+        }
+
+        if (scrollIndex == index) return;
+
+        scrollIndex = index;
+
+        CalculateMinBounds();
+        DispatchEvent(Event::ScrollIndex);
+    }
+
+    uint getScrollIndex()
+    {
+        return scrollIndex;
+    }
+
     void SetColumnSizes(float[] sizes)
     {
         columnSizes = sizes;
@@ -116,49 +189,28 @@ class StandardList : List, StandardStack
         return rowSizes;
     }
 
-    private uint getCellX(uint index)
+    private uint getCellIndex(uint x, uint y)
     {
-        uint visibleColumns = getVisibleColumns();
-        if (visibleColumns > 0)
+        if (components.size() > 0)
         {
             switch (flowDirection)
             {
                 case FlowDirection::RightDown:
+                    return (scrollIndex + y) * cellWrap + x;
                 case FlowDirection::RightUp:
-                    return index % cellWrap;
+                    return (scrollIndex + getVisibleRows() - 1 - y) * cellWrap + x;
                 case FlowDirection::LeftDown:
+                    return (scrollIndex + y) * cellWrap + (cellWrap - 1 - x);
                 case FlowDirection::LeftUp:
-                    return cellWrap - 1 - index % cellWrap;
+                    return (scrollIndex + getVisibleRows() - 1 - y) * cellWrap + (cellWrap - 1 - x);
                 case FlowDirection::DownRight:
+                    return (scrollIndex + x) * cellWrap + y;
                 case FlowDirection::UpRight:
-                    return index / cellWrap;
+                    return (scrollIndex + getVisibleColumns() - 1 - x) * cellWrap + y;
                 case FlowDirection::DownLeft:
+                    return (scrollIndex + x) * cellWrap + (cellWrap - 1 - y);
                 case FlowDirection::UpLeft:
-                    return visibleColumns - 1 - index / cellWrap;
-            }
-        }
-        return 0;
-    }
-
-    private uint getCellY(uint index)
-    {
-        uint visibleRows = getVisibleRows();
-        if (visibleRows > 0)
-        {
-            switch (flowDirection)
-            {
-                case FlowDirection::DownRight:
-                case FlowDirection::DownLeft:
-                    return index % cellWrap;
-                case FlowDirection::UpRight:
-                case FlowDirection::UpLeft:
-                    return cellWrap - 1 - index % cellWrap;
-                case FlowDirection::RightDown:
-                case FlowDirection::LeftDown:
-                    return index / cellWrap;
-                case FlowDirection::RightUp:
-                case FlowDirection::LeftUp:
-                    return visibleRows - 1 - index / cellWrap;
+                    return (scrollIndex + getVisibleColumns() - 1 - x) * cellWrap + (cellWrap - 1 - y);
             }
         }
         return 0;
@@ -195,7 +247,10 @@ class StandardList : List, StandardStack
             case FlowDirection::RightUp:
             case FlowDirection::LeftDown:
             case FlowDirection::LeftUp:
-                return Maths::Ceil(components.size() / float(cellWrap));
+            {
+                uint rows = Maths::Max(Maths::Ceil(components.size() / float(cellWrap)) - scrollIndex, 0);
+                return maxLines > 0 ? Maths::Min(rows, maxLines) : rows;
+            }
             case FlowDirection::DownRight:
             case FlowDirection::DownLeft:
             case FlowDirection::UpRight:
@@ -218,7 +273,10 @@ class StandardList : List, StandardStack
             case FlowDirection::DownLeft:
             case FlowDirection::UpRight:
             case FlowDirection::UpLeft:
-                return Maths::Ceil(components.size() / float(cellWrap));
+            {
+                uint columns = Maths::Max(Maths::Ceil(components.size() / float(cellWrap)) - scrollIndex, 0);
+                return maxLines > 0 ? Maths::Min(columns, maxLines) : columns;
+            }
         }
         return 0;
     }
@@ -236,12 +294,13 @@ class StandardList : List, StandardStack
             minWidths = array<float>(visibleColumns, 0.0f);
             minHeights = array<float>(visibleRows, 0.0f);
 
-            for (uint i = 0; i < components.size(); i++)
+            for (uint x = 0; x < visibleColumns; x++)
+            for (uint y = 0; y < visibleRows; y++)
             {
-                Vec2f childBounds = components[i].getMinBounds();
+                uint index = getCellIndex(x, y);
+                if (index >= components.size()) continue;
 
-                uint x = getCellX(i);
-                uint y = getCellY(i);
+                Vec2f childBounds = components[index].getMinBounds();
 
                 if (childBounds.x > minWidths[x])
                 {
@@ -327,18 +386,82 @@ class StandardList : List, StandardStack
         stretchWidths = distributeExcess(stretchWidths, minWidths);
         stretchHeights = distributeExcess(stretchHeights, minHeights);
 
-        for (uint i = 0; i < components.size(); i++)
+        for (uint x = 0; x < visibleColumns; x++)
+        for (uint y = 0; y < visibleRows; y++)
         {
-            Component@ component = components[i];
-            if (child !is component) continue;
+            uint index = getCellIndex(x, y);
+            if (index >= components.size()) continue;
 
-            uint x = getCellX(i);
-            uint y = getCellY(i);
+            Component@ component = components[index];
+            if (child !is component) continue;
 
             return Vec2f(stretchWidths[x], stretchHeights[y]);
         }
 
         return Vec2f_zero;
+    }
+
+    bool canScroll()
+    {
+        return maxLines > 0 && components.size() / float(cellWrap) > maxLines;
+    }
+
+    Component@[] getComponents()
+    {
+        if (canScroll())
+        {
+            uint visibleRows = getVisibleRows();
+            uint visibleColumns = getVisibleColumns();
+
+            Component@[] visibleComponents;
+
+            for (uint x = 0; x < visibleColumns; x++)
+            for (uint y = 0; y < visibleRows; y++)
+            {
+                uint index = getCellIndex(x, y);
+                if (index >= components.size()) continue;
+
+                visibleComponents.push_back(components[index]);
+            }
+
+            return visibleComponents;
+        }
+
+        return components;
+    }
+
+    void Update()
+    {
+        if (!isVisible()) return;
+
+        if (canScroll() && ui.canScroll(this))
+        {
+            uint newScrollIndex = scrollIndex;
+            CControls@ controls = getControls();
+
+            if (controls.mouseScrollDown)
+            {
+                newScrollIndex++;
+            }
+            if (controls.mouseScrollUp && newScrollIndex > 0)
+            {
+                newScrollIndex--;
+            }
+
+            SetScrollIndex(newScrollIndex);
+        }
+
+        uint visibleRows = getVisibleRows();
+        uint visibleColumns = getVisibleColumns();
+
+        for (uint x = 0; x < visibleColumns; x++)
+        for (uint y = 0; y < visibleRows; y++)
+        {
+            uint index = getCellIndex(x, y);
+            if (index >= components.size()) continue;
+
+            components[index].Update();
+        }
     }
 
     void Render()
@@ -347,12 +470,16 @@ class StandardList : List, StandardStack
 
         Vec2f innerPos = getInnerPosition();
 
-        for (uint i = 0; i < components.size(); i++)
-        {
-            Component@ component = components[i];
+        uint visibleRows = getVisibleRows();
+        uint visibleColumns = getVisibleColumns();
 
-            uint x = getCellX(i);
-            uint y = getCellY(i);
+        for (uint x = 0; x < visibleColumns; x++)
+        for (uint y = 0; y < visibleRows; y++)
+        {
+            uint index = getCellIndex(x, y);
+            if (index >= components.size()) continue;
+
+            Component@ component = components[index];
 
             Vec2f childBounds = component.getBounds();
             Vec2f childAlignment = component.getAlignment();

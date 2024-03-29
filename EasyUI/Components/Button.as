@@ -5,23 +5,17 @@ interface Button : List
 
 class StandardButton : Button, StandardList
 {
-    private EasyUI@ ui;
-
     StandardButton()
     {
         error("Initialized StandardButton using the default constructor. Use StandardButton(EasyUI@ ui) instead.");
         printTrace();
 
-        super();
-
-        @ui = EasyUI();
+        super(EasyUI());
     }
 
     StandardButton(EasyUI@ ui)
     {
-        super();
-
-        @this.ui = ui;
+        super(ui);
 
         AddEventListener(Event::Click, PlaySoundHandler("menuclick.ogg"));
     }

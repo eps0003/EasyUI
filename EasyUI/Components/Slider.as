@@ -9,8 +9,6 @@ interface Slider : List
 
 class StandardVerticalSlider : Slider, StandardList
 {
-    private EasyUI@ ui;
-
     private float percentage = 0.0f;
     private float handleRatio = 0.2f;
     private bool pressed = false;
@@ -21,16 +19,12 @@ class StandardVerticalSlider : Slider, StandardList
         error("Initialized StandardVerticalSlider using the default constructor. Use StandardVerticalSlider(EasyUI@ ui) instead.");
         printTrace();
 
-        super();
-
-        @ui = EasyUI();
+        super(EasyUI());
     }
 
     StandardVerticalSlider(EasyUI@ ui)
     {
-        super();
-
-        @this.ui = ui;
+        super(ui);
     }
 
     void SetPercentage(float percentage)
@@ -159,24 +153,14 @@ class StandardVerticalSlider : Slider, StandardList
 
 class StandardHorizontalSlider : Slider, StandardList
 {
-    private EasyUI@ ui;
-
     private float percentage = 0.0f;
     private float handleRatio = 0.2f;
     private bool pressed = false;
     private float clickOffsetX;
 
-    StandardHorizontalSlider()
-    {
-        error("Initialized StandardHorizontalSlider using the default constructor. Use StandardHorizontalSlider(EasyUI@ ui) instead.");
-        printTrace();
-
-        @ui = EasyUI();
-    }
-
     StandardHorizontalSlider(EasyUI@ ui)
     {
-        @this.ui = ui;
+        super(ui);
     }
 
     void SetPercentage(float percentage)

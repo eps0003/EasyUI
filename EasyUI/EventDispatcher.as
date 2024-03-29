@@ -92,6 +92,7 @@ enum Event
     Spacing,
     CellWrap,
     FlowDirection,
+    ScrollIndex,
 
     // Interaction
     Press,

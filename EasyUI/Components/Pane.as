@@ -18,16 +18,21 @@ class StandardPane : Pane, StandardList
     private SColor color;
     private bool hasColor = false;
 
-    StandardPane(StandardPaneType type)
+    StandardPane(EasyUI@ ui)
     {
-        super();
+        super(ui);
+    }
+
+    StandardPane(EasyUI@ ui, StandardPaneType type)
+    {
+        super(ui);
 
         this.type = type;
     }
 
-    StandardPane(SColor color)
+    StandardPane(EasyUI@ ui, SColor color)
     {
-        super();
+        super(ui);
 
         this.color = color;
         hasColor = true;

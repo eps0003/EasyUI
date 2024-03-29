@@ -358,6 +358,28 @@ Examples:
 - `FlowDirection::RightDown` means children are listed from left to right and wrap down onto new rows.
 - `FlowDirection::DownRight` means children are listed from top to bottom and wrap right onto new columns.
 
+#### Max lines
+
+The maximum number of lines before the list requires scrolling to view all children.
+
+Default: `0` (no maximum)
+
+```angelscript
+void SetMaxLines(uint lines);
+uint getMaxLines();
+```
+
+#### Scroll index
+
+The number of lines to scroll.
+
+Default: `0`
+
+```angelscript
+void SetScrollIndex(uint index);
+uint getScrollIndex();
+```
+
 #### Column sizes
 
 The relative size of each column for when children stretch.
