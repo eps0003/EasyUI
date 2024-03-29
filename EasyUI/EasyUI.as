@@ -21,7 +21,8 @@ class EasyUI
 
     private Component@ hovering;
     private Component@ clickable;
-    private Component@ scrollable;
+    private Component@ scrollableDown;
+    private Component@ scrollableUp;
     private Component@ interacting;
     private Component@ prevInteracting;
 
@@ -85,9 +86,14 @@ class EasyUI
         return component !is null && component is clickable;
     }
 
-    bool canScroll(Component@ component)
+    bool canScrollDown(Component@ component)
     {
-        return component !is null && component is scrollable;
+        return component !is null && component is scrollableDown;
+    }
+
+    bool canScrollUp(Component@ component)
+    {
+        return component !is null && component is scrollableUp;
     }
 
     bool isHovering(Component@ component)
@@ -109,7 +115,8 @@ class EasyUI
     {
         @hovering = null;
         @clickable = null;
-        @scrollable = null;
+        @scrollableDown = null;
+        @scrollableUp = null;
 
         if (Menu::getMainMenu() !is null || g_videorecording) return;
 
@@ -128,7 +135,8 @@ class EasyUI
         }
 
         // Remember scrollable component and if hovering
-        Component@ scroll = scrollable;
+        Component@ scrollDown = scrollableDown;
+        Component@ scrollUp = scrollableUp;
         bool hover = isHovering();
 
         // Traverse child components
@@ -141,7 +149,8 @@ class EasyUI
         // Reapply scrollable component if hovering
         if (hover)
         {
-            @scrollable = scroll;
+            @scrollableDown = scrollDown;
+            @scrollableUp = scrollUp;
         }
 
         if (hovering is null)
@@ -154,9 +163,14 @@ class EasyUI
             @clickable = component;
         }
 
-        if (scrollable is null && component.canScroll())
+        if (scrollableDown is null && component.canScrollDown())
         {
-            @scrollable = component;
+            @scrollableDown = component;
+        }
+
+        if (scrollableUp is null && component.canScrollUp())
+        {
+            @scrollableUp = component;
         }
     }
 
@@ -247,7 +261,8 @@ class EasyUI
             }
         }
 
-        DrawDebug(scrollable, "scrollable", SColor(255, 0, 0, 255), detailed);
+        DrawDebug(scrollableDown, "scrollable", SColor(255, 0, 0, 255), detailed);
+        DrawDebug(scrollableUp, "scrollable", SColor(255, 0, 0, 255), detailed);
         DrawDebug(clickable, "clickable", SColor(255, 255, 0, 0), detailed);
         DrawDebug(hovering, "hovering", SColor(255, 255, 165, 0), detailed);
         DrawDebug(interacting, "interacting", SColor(255, 0, 128, 0), detailed);

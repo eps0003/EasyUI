@@ -289,8 +289,10 @@ Check various mouse-related attributes of the component.
 bool isHovering();
 // Can the component be clicked if it is hovered and unobstructed
 bool canClick();
-// Can the component be scrolled if it is hovered and unobstructed
-bool canScroll();
+// Can the component be scrolled down if it is hovered and unobstructed
+bool canScrollDown();
+// Can the component be scrolled up if it is hovered and unobstructed
+bool canScrollUp();
 ```
 
 ### Stack

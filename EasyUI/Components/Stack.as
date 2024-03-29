@@ -359,7 +359,12 @@ class StandardStack : Stack
         return false;
     }
 
-    bool canScroll()
+    bool canScrollDown()
+    {
+        return false;
+    }
+
+    bool canScrollUp()
     {
         return false;
     }

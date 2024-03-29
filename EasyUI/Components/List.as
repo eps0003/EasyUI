@@ -401,9 +401,29 @@ class StandardList : List, StandardStack
         return Vec2f_zero;
     }
 
-    bool canScroll()
+    private bool canScroll()
     {
         return maxLines > 0 && components.size() / float(cellWrap) > maxLines;
+    }
+
+    bool canScrollDown()
+    {
+        if (maxLines == 0) return false;
+
+        int totalLines = Maths::Ceil(components.size() / float(cellWrap));
+        uint hiddenLines = Maths::Max(totalLines - maxLines, 0);
+
+        return hiddenLines > 0 && scrollIndex  < hiddenLines;
+    }
+
+    bool canScrollUp()
+    {
+        if (maxLines == 0) return false;
+
+        int totalLines = Maths::Ceil(components.size() / float(cellWrap));
+        uint hiddenLines = Maths::Max(totalLines - maxLines, 0);
+
+        return hiddenLines > 0 && scrollIndex > 0;
     }
 
     Component@[] getComponents()
@@ -434,21 +454,16 @@ class StandardList : List, StandardStack
     {
         if (!isVisible()) return;
 
-        if (canScroll() && ui.canScroll(this))
+        CControls@ controls = getControls();
+
+        if (canScrollDown() && ui.canScrollDown(this) && controls.mouseScrollDown)
         {
-            uint newScrollIndex = scrollIndex;
-            CControls@ controls = getControls();
+            SetScrollIndex(scrollIndex + 1);
+        }
 
-            if (controls.mouseScrollDown)
-            {
-                newScrollIndex++;
-            }
-            if (controls.mouseScrollUp && newScrollIndex > 0)
-            {
-                newScrollIndex--;
-            }
-
-            SetScrollIndex(newScrollIndex);
+        if (canScrollUp() && ui.canScrollUp(this) && controls.mouseScrollUp && scrollIndex > 0)
+        {
+            SetScrollIndex(scrollIndex - 1);
         }
 
         uint visibleRows = getVisibleRows();

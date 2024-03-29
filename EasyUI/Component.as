@@ -52,7 +52,8 @@ interface Component : EventDispatcher
     bool isHovering();
 
     bool canClick();
-    bool canScroll();
+    bool canScrollDown();
+    bool canScrollUp();
 
     void SetParent(Component@ parent);
     Component@ getParent();

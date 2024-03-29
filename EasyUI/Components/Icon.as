@@ -112,11 +112,6 @@ class StandardIcon : Icon, StandardStack
         return clickable;
     }
 
-    bool canScroll()
-    {
-        return false;
-    }
-
     private Vec2f getCroppedFrameDim()
     {
         return Vec2f(
