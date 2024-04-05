@@ -16,58 +16,6 @@ bool isHovering(Component@ component)
     return isMouseInBounds(min, max);
 }
 
-// For a list of sizes, determine which sizes exceed their minimum
-// size and distribute the excess to the other sizes. If all
-// excess has been distributed or if the minimum sizes make it
-// impossible to distribute the excess, terminate the recursion.
-float[] distributeExcess(float[] sizes, float[] minSizes)
-{
-    uint count = sizes.size();
-    float sizesSum = 0.0f;
-
-    // Accumulate excess size that needs redistributing
-    float excess = 0.0f;
-    uint excessCount = 0;
-
-    for (uint i = 0; i < count; i++)
-    {
-        float size = sizes[i];
-        float minSize = minSizes[i];
-
-        if (minSize >= size)
-        {
-            excess += minSize - size;
-            excessCount++;
-            sizes[i] = minSize;
-        }
-        else
-        {
-            sizesSum += size;
-        }
-    }
-
-    // All excess has been distributed or all sizes have excess
-    if (excess == 0.0f || excessCount == count)
-    {
-        return sizes;
-    }
-
-    // Redistribute excess size
-    for (uint i = 0; i < count; i++)
-    {
-        float size = sizes[i];
-        float minSize = minSizes[i];
-
-        if (minSize < size)
-        {
-            sizes[i] -= excess * size / sizesSum;
-        }
-    }
-
-    // Recurse
-    return distributeExcess(sizes, minSizes);
-}
-
 namespace GUI
 {
     void DrawOutlinedRectangle(Vec2f min, Vec2f max, float thickness, SColor color)
