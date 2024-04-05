@@ -23,9 +23,10 @@ The only [King Arthur's Gold](https://kag2d.com/) UI mod you'll ever need. Build
 
 ## Usage
 
-1. Put the EasyUI folder in your `Mods` folder.
-2. Add `EasyUI` to a new line in `mods.cfg` above any mod that will use it.
-3. Build, update, and render your UI in a new or existing client-only script.
+1. Download and unzip `EasyUI.zip` from the [latest release](https://github.com/eps0003/EasyUI/releases/latest).
+2. Put the contained `EasyUI` folder in your `Mods` folder.
+3. Add `EasyUI` to a new line in `mods.cfg` above any mod that will use it.
+4. Build, update, and render your UI in a new or existing client-only script.
 
 ## Example
 
