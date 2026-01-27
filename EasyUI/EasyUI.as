@@ -65,6 +65,11 @@ class EasyUI
         this.components = components;
     }
 
+    Component@[]@ GetComponents()
+    {
+        return components;
+    }
+
     bool isHovering()
     {
         return hovering !is null;
@@ -353,3 +358,4 @@ class EasyUI
         GUI::DrawRectangle(mousePos - Vec2f(1, 1), mousePos + Vec2f(1, 1), SColor(255, 255, 0, 255));
     }
 }
+
