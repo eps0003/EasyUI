@@ -31,6 +31,7 @@ enum Event
     Clickable,
     Text,
     Font,
+    Team,
     Color,
     Wrap,
     MaxLines,
@@ -49,3 +50,4 @@ enum Event
     EndDrag,
     Scroll,
 }
+
