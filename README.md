@@ -498,6 +498,28 @@ void SetFrameDim(uint width, uint height);
 Vec2f getFrameDim();
 ```
 
+#### Team
+
+The team number of the icon.
+
+Default: `0`
+
+```angelscript
+void SetTeam(uint team);
+uint getTeam();
+```
+
+#### Color
+
+The color of the icon.
+
+Default: `white`
+
+```angelscript
+void SetColor(SColor color);
+SColor getColor();
+```
+
 #### Crop
 
 The icon can be cropped if it is too small compared to its frame dimensions.
@@ -654,3 +676,4 @@ Default: `false`
 void SetChecked(bool checked);
 bool isChecked();
 ```
+
