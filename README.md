@@ -130,10 +130,10 @@ parent inner bounds ────|──┃─>┃       ┌ ─ ─ ─ ─ ┐ 
 | Category      | Components                                                                                                                      |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Input         | [StandardButton](#button) • [StandardVerticalSlider](#slider) • [StandardHorizontalSlider](#slider) • [StandardToggle](#toggle) |
-| Informational | [StandardAvatar](#avatar) • [StandardIcon](#icon) • [StandardLabel](#label) • [StandardHorizontalProgress](#progress)           |
+| Informational | [StandardAvatar](#avatar) • [StandardIcon](#icon) • [StandardLabel](#label) • [StandardProgress](#progress)           |
 | Container     | [StandardList](#list) • [StandardPane](#pane) • [StandardStack](#stack)                                                         |
 
-Planned: Dropdown, Minimap, Radio Button, Tile, Vertical Progress
+Planned: Dropdown, Minimap, Radio Button, Tile
 
 ## Interfaces
 
@@ -640,6 +640,34 @@ void SetPercentage(float percentage);
 float getPercentage();
 ```
 
+#### Color
+
+The color of the progress.
+
+Default: white
+
+```angelscript
+void SetColor(SColor color);
+SColor getColor();
+```
+
+#### Fill Direction
+
+The direction the progress will fill in.
+
+Default: FillDirection::Right
+
+```angelscript
+void SetFillDirection(FillDirection direction);
+FillDirection getFillDirection();
+```
+
+Examples:
+
+- `FillDirection::Right` means the progress will flow from left to right.
+- `FillDirection::Top` means the progress will flow from bottom to top.
+
+
 ### Slider
 
 A component that displays a slider whose handle can be dragged.
@@ -676,4 +704,5 @@ Default: `false`
 void SetChecked(bool checked);
 bool isChecked();
 ```
+
 
