@@ -40,6 +40,7 @@ enum Event
     Spacing,
     CellWrap,
     FlowDirection,
+    FillDirection,
     ScrollIndex,
 
     // Interaction
@@ -50,4 +51,5 @@ enum Event
     EndDrag,
     Scroll,
 }
+
 
